@@ -1,10 +1,14 @@
 /* One machine on its own page: what it is doing, the jobs that wait for it (and how long they will take together), the last ones it finished, and the ways to
  * give it work. */
+import { useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, Empty, Progress } from "../components/ui";
+import { ApiError } from "../api";
+import type { HeadMeasure } from "../types";
 import { machineQueue } from "../jobtools";
 import { atLeast, duration, jobPercent } from "../model";
 import { JOB_TONE, stateKey } from "./Monitor";
+import type { TextKey } from "../i18n";
 
 const MACHINE_TONE = { idle: "ok", busy: "run", waiting: "wait" } as const;
 
@@ -70,6 +74,8 @@ export function MachinePage({ id }: { id: string }) {
           <dd>{q.ready.length > 0 ? `${q.ready.length} · ${duration(q.readySeconds)}` : "-"}</dd>
         </dl>
       </Card>
+
+      <HeadCard id={id} operator={operator} />
 
       <Card title={t("mach_now")} wide>
         {q.active ? (
@@ -139,5 +145,72 @@ export function MachinePage({ id }: { id: string }) {
         )}
       </Card>
     </div>
+  );
+}
+
+/** The node of the drill head of this machine, through the server: what it says, its camera and a measure of the table. Not shown when the machine has no node. */
+function HeadCard({ id, operator }: { id: string; operator: boolean }) {
+  const { api, t, err, say, refreshS } = useApp();
+  const { data, error } = usePolled(() => api.headStatus(id), refreshS || 5, [id]);
+  const [camera, setCamera] = useState(false);
+  const [measure, setMeasure] = useState<HeadMeasure | null>(null);
+  const [busy, setBusy] = useState(false);
+  if (error instanceof ApiError && error.code === "no_head") return null;
+  const measureNow = async () => {
+    setBusy(true);
+    try {
+      setMeasure(await api.headMeasure(id));
+    } catch (e) {
+      setMeasure(null);
+      say(err(e), "error");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <Card
+      title={t("head_title")}
+      wide
+      actions={
+        <>
+          {data?.camera && <button onClick={() => setCamera((c) => !c)}>{camera ? t("head_hide_camera") : t("head_show_camera")}</button>}
+          {operator && data?.laser && (
+            <button disabled={busy} onClick={() => void measureNow()}>
+              {t("head_measure")}
+            </button>
+          )}
+        </>
+      }
+    >
+      {error != null && !data && <p className="error">{err(error)}</p>}
+      {data && (
+        <div className="plan-grid">
+          <dl className="facts">
+            <dt>{t("head_node")}</dt>
+            <dd>
+              {data.node} {data.version}
+              {data.camera_model ? ` · ${data.camera_model}` : ""}
+            </dd>
+            <dt>{t("head_speed")}</dt>
+            <dd>{data.rpm_sensor ? `${Math.round(data.rpm)} rpm` : "-"}</dd>
+            <dt>{t("head_temp")}</dt>
+            <dd>
+              {data.temp_c == null ? "-" : `${data.temp_c.toFixed(1)} °C`} <Badge tone={data.heat === "hot" ? "bad" : data.heat === "warm" ? "wait" : data.heat === "ok" ? "ok" : "dim"}>{t(`heat_${data.heat}` as TextKey)}</Badge>
+            </dd>
+            <dt>{t("head_protect")}</dt>
+            <dd>
+              <Badge tone={data.protect_open ? "bad" : "ok"}>{data.protect_open ? t("head_protect_open") : t("head_protect_closed")}</Badge>
+            </dd>
+            {measure && (
+              <>
+                <dt>{t("head_measure")}</dt>
+                <dd>{measure.ok ? `${measure.distance_mm.toFixed(3)} mm ± ${measure.sigma_mm.toFixed(3)} (${measure.used}/${measure.asked})` : `${t("head_refused_why")}: ${measure.why ?? "?"}`}</dd>
+              </>
+            )}
+          </dl>
+          {camera && data.camera && <img className="head-camera" src={api.headStreamUrl(id)} alt={t("head_title")} />}
+        </div>
+      )}
+    </Card>
   );
 }

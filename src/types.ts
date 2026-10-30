@@ -149,3 +149,29 @@ export interface Fleet {
   machines: FleetMachine[];
   summary: { machines: number; idle: number; busy: number; waiting: number; stations: number };
 }
+
+/** What the node of the drill head says about itself (`GET /api/v1/machines/:id/head/status`, the answer of EH3D-NODE-BUNGARD-AUX). */
+export interface HeadStatus {
+  node: string;
+  version: string;
+  camera: boolean;
+  camera_model?: string;
+  laser: boolean;
+  rpm_sensor: boolean;
+  rpm: number;
+  temp_c: number | null;
+  heat: "ok" | "warm" | "hot" | "unknown";
+  protect_open: boolean;
+  uptime_s: number;
+}
+
+/** One measure of the table under the head. */
+export interface HeadMeasure {
+  ok: boolean;
+  why?: string;
+  distance_mm: number;
+  sigma_mm: number;
+  asked: number;
+  used: number;
+  rejected: number;
+}

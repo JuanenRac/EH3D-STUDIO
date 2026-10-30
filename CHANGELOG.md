@@ -13,7 +13,8 @@ All notable changes to this project are documented here.
 - **One page for each machine:** what it is doing, the jobs that wait for it with their total time and the last ones it finished, with a button to prepare a job for it.
 - **Copies and drawings:** a job can be left ready in up to 50 equal copies at once, and the drawing of a plan is saved as an SVG.
 - **A lost server is shown:** a red line says when the server stops answering and goes away by itself when it answers again.
-- **More tests:** 46 (the holes typed by hand, the files, the plan, the list, the CSV, the export and import of machines, the queue of a machine, the copies, the address and the alert).
+- **The node of the drill head on the page of a machine:** its spindle speed, its temperature with the verdict of the node, the protect output, the camera model, its camera and, for an operator, a measure of the table, through EH3D-SERVER.
+- **More tests:** 47 (the holes typed by hand, the files, the plan, the list, the CSV, the export and import of machines, the queue of a machine, the copies, the address and the alert).
 
 ## [0.0.1] - First release: the pages to set up and watch the machines, with the updates from GitHub
 

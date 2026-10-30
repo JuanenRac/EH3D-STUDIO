@@ -18,7 +18,7 @@
 
 ---
 
-**Verifica di onestà - cosa gira oggi:** un'applicazione web in React e TypeScript che accede a EH3D-SERVER e mostra e modifica ciò che contiene: le macchine con la loro stazione, il loro nodo e i file di configurazione, i lavori, gli utenti e i token, gli eventi in tempo reale. Il client dell'API, le regole dei moduli, il menu per ruolo e le otto lingue sono coperti da 46 test, e le pagine sono state viste in un browser contro un server locale con macchine simulate. **Non è stata usata con macchine su un banco di prova**, e il server non termina ancora TLS.
+**Verifica di onestà - cosa gira oggi:** un'applicazione web in React e TypeScript che accede a EH3D-SERVER e mostra e modifica ciò che contiene: le macchine con la loro stazione, il loro nodo e i file di configurazione, i lavori, gli utenti e i token, gli eventi in tempo reale. Il client dell'API, le regole dei moduli, il menu per ruolo e le otto lingue sono coperti da 47 test, e le pagine sono state viste in un browser contro un server locale con macchine simulate. **Non è stata usata con macchine su un banco di prova**, e il server non termina ancora TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Versione | `0.0.1` |
 | Maturità | Impalcatura |
-| Test | 46 test (`npm test`) |
+| Test | 47 test (`npm test`) |
 | Stack tecnologico | React 19, TypeScript, Vite |
 | Su hardware reale | Non con macchine su un banco: vista in un browser contro un server locale con macchine simulate |
 
@@ -45,7 +45,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Area | Stato | Cosa significa qui |
 |---|---|---|
 | Software | 🟡 | L'applicazione compila senza avvisi (tipi, lint, build) ed è servita dal server alla radice del suo indirizzo; è stata eseguita in un browser contro un server locale. |
-| Test | 🟢 | 46 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le otto lingue. |
+| Test | 🟢 | 47 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le otto lingue. |
 | Pagine | 🟡 | Panoramica, macchine per stazione, lavori, eventi in tempo reale, macchine, utenti e token, server, account, preferenze e informazioni sono scritti; lavori e macchine si gestiscono con l'API reale del server. Nessuna pagina è stata provata da qualcuno che non sia l'autore. |
 | Lingue | 🟢 | Otto lingue in ogni testo, compresi i rifiuti del server; i testi sono letti da un test, ma solo l'inglese e poche frasi delle altre sono state lette da una persona. |
 | Macchine reali | 🔴 | Nulla è stato fatto su un banco: nessuna macchina aggiunta, nessun nodo raggiunto e nessun lavoro eseguito tramite essa su una macchina reale. |
@@ -152,6 +152,7 @@ Come si incastrano le parti di questo repository: chi parla con esso, cosa conti
 * **Avvisi:** il titolo della scheda conta i lavori che aspettano l'operatore e, se la persona lo attiva, un suono e una notifica del browser avvisano quando uno nuovo inizia ad aspettare.
 * **Le macchine passano da un server all'altro:** ogni macchina si può copiare e le macchine di un server si possono esportare in un file e importare in un altro (i token di accesso dei nodi non vengono mai esportati).
 * **Una pagina per ogni macchina, copie e server caduto:** la pagina di una macchina mostra cosa fa, i lavori che la aspettano con il loro tempo totale e gli ultimi che ha finito; un lavoro può essere lasciato pronto in più copie insieme (la stessa scheda molte volte); il disegno di un piano si salva come SVG; e una riga rossa avvisa quando il server smette di rispondere, finché non risponde di nuovo.
+* **Il nodo della testa di foratura nella pagina di una macchina:** quando la configurazione della macchina nomina il nodo (`head_address`), la pagina mostra la velocità del mandrino, la temperatura con il verdetto del nodo, l'uscita di protezione e il modello di telecamera, un pulsante che mostra la telecamera (MJPEG) e, per un operatore, un pulsante che misura il tavolo sotto la testa; tutto passa per EH3D-SERVER, che conserva il token del nodo. Provato con un simulato, mai con un nodo reale.
 
 ## 🔒 Sicurezza e protezione
 
@@ -198,7 +199,7 @@ Copia `dist/` sulla CM5 (ad esempio in `/opt/eh3d-studio`), metti `studio_dir = 
 
 ## 🧪 Test
 
-`npm test` esegue 46 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le otto lingue (un testo in ogni lingua, cinese e giapponese nella loro scrittura, gli stessi segnaposto ovunque). Passano anche `npm run typecheck` e `npm run lint`.
+`npm test` esegue 47 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le otto lingue (un testo in ogni lingua, cinese e giapponese nella loro scrittura, gli stessi segnaposto ovunque). Passano anche `npm run typecheck` e `npm run lint`.
 
 ## 🏗️ Compilazione e rilascio
 

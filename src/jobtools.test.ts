@@ -192,6 +192,18 @@ describe("the address and the alert", () => {
     await api.createJob("m 1", { kind: "drill" });
     expect(calls).toEqual(["POST /api/v1/machines/m%201/preview", "POST /api/v1/machines/m%201/jobs"]);
   });
+  it("asks the server for the node of the drill head, and the camera picture carries the token in its address", async () => {
+    const calls: string[] = [];
+    const api = new Api("tok en", async (url, init) => {
+      calls.push(`${init?.method} ${url}`);
+      return new Response(JSON.stringify({ node: "head-1" }), { status: 200 });
+    });
+    await api.headStatus("bench-1");
+    await api.headMeasure("bench-1");
+    await api.headMeasure("bench-1", 5);
+    expect(calls).toEqual(["GET /api/v1/machines/bench-1/head/status", "POST /api/v1/machines/bench-1/head/measure", "POST /api/v1/machines/bench-1/head/measure?samples=5"]);
+    expect(api.headStreamUrl("bench-1")).toBe("/api/v1/machines/bench-1/head/stream?token=tok%20en");
+  });
 });
 
 describe("one machine and its queue", () => {

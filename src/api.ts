@@ -3,7 +3,7 @@
  * `{ "error": code, "detail": text }` with a status, and that is what an ApiError carries. The pages never build a URL by hand.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import type { Fleet, Health, Job, JobView, JobSummary, Machine, MachineInput, NewToken, Role, Session, TokenInfo, UpdatesView, UserInfo } from "./types";
+import type { Fleet, HeadMeasure, HeadStatus, Health, Job, JobView, JobSummary, Machine, MachineInput, NewToken, Role, Session, TokenInfo, UpdatesView, UserInfo } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string, public detail: string) {
@@ -102,6 +102,13 @@ export class Api {
   confirmJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/confirm`, {});
   cancelJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/cancel`, {});
   deleteJob = (id: string) => this.request<unknown>("DELETE", `/jobs/${encodeURIComponent(id)}`);
+
+  // ---- the node of the drill head, through the server
+  headStatus = (machine: string) => this.request<HeadStatus>("GET", `/machines/${encodeURIComponent(machine)}/head/status`);
+  headMeasure = (machine: string, samples = 0) =>
+    this.request<HeadMeasure>("POST", `/machines/${encodeURIComponent(machine)}/head/measure${samples > 0 ? `?samples=${samples}` : ""}`, {});
+  /** The address of the camera picture of the node: the token goes in the address because a picture cannot carry a header. */
+  headStreamUrl = (machine: string) => `${BASE}/machines/${encodeURIComponent(machine)}/head/stream?token=${encodeURIComponent(this.token ?? "")}`;
 
   // ---- the updates of the installed services, from the releases of GitHub (administrator)
   updates = () => this.request<UpdatesView>("GET", "/updates");
