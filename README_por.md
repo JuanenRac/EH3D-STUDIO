@@ -18,7 +18,7 @@
 
 ---
 
-**Verificação de honestidade - o que corre hoje:** uma aplicação web em React e TypeScript que entra no EH3D-SERVER e mostra e altera o que ele guarda: as máquinas com a sua estação, o seu nó e os ficheiros de configuração, os trabalhos, os utilizadores e os tokens, os eventos em direto. O cliente da API, as regras dos formulários, o menu por perfil e os oito idiomas estão cobertos por 44 testes, e as páginas foram vistas num navegador contra um servidor local com máquinas simuladas. **Não foi usada com máquinas numa bancada**, e o servidor ainda não termina TLS.
+**Verificação de honestidade - o que corre hoje:** uma aplicação web em React e TypeScript que entra no EH3D-SERVER e mostra e altera o que ele guarda: as máquinas com a sua estação, o seu nó e os ficheiros de configuração, os trabalhos, os utilizadores e os tokens, os eventos em direto. O cliente da API, as regras dos formulários, o menu por perfil e os oito idiomas estão cobertos por 46 testes, e as páginas foram vistas num navegador contra um servidor local com máquinas simuladas. **Não foi usada com máquinas numa bancada**, e o servidor ainda não termina TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Versão | `0.0.1` |
 | Maturidade | Estrutura inicial |
-| Testes | 44 testes (`npm test`) |
+| Testes | 46 testes (`npm test`) |
 | Tecnologias | React 19, TypeScript, Vite |
 | Em hardware real | Não com máquinas numa bancada: vista num navegador contra um servidor local com máquinas simuladas |
 
@@ -45,7 +45,7 @@ Cada linha é uma parte deste repositório e a luz diz até onde chega hoje. É 
 | Área | Estado | O que significa aqui |
 |---|---|---|
 | Software | 🟡 | A aplicação compila sem avisos (tipos, lint, compilação) e é servida pelo servidor na raiz do seu endereço; já correu num navegador contra um servidor local. |
-| Testes | 🟢 | Passam 44 testes (`npm test`): o cliente da API com os seus erros, as regras de nomes, palavras-passe e endereços, o menu por perfil, a frota por estação, as ações de um trabalho e os oito idiomas. |
+| Testes | 🟢 | Passam 46 testes (`npm test`): o cliente da API com os seus erros, as regras de nomes, palavras-passe e endereços, o menu por perfil, a frota por estação, as ações de um trabalho e os oito idiomas. |
 | Páginas | 🟡 | Resumo, máquinas por estação, trabalhos, eventos em direto, máquinas, utilizadores e tokens, servidor, conta, preferências e acerca de estão escritos; os trabalhos e as máquinas gerem-se com a API real do servidor. Nenhuma página foi experimentada por alguém que não seja o autor. |
 | Idiomas | 🟢 | Oito idiomas em cada texto, incluindo as recusas do servidor; os textos são lidos por um teste, mas só o inglês e algumas frases dos outros foram lidos por uma pessoa. |
 | Máquinas reais | 🔴 | Nada se fez com ela numa bancada: nenhuma máquina adicionada, nenhum nó alcançado e nenhum trabalho executado por ela numa máquina real. |
@@ -104,6 +104,12 @@ Como as partes deste repositório se encaixam: quem fala com ele, o que contém 
 <p align="center"><em>Um trabalho: o plano com os furos já feitos, quanto já leva e os botões do seu estado.</em></p>
 
 <p align="center">
+  <img src="images/screenshots/machine.png" alt="machine" width="100%">
+</p>
+
+<p align="center"><em>Uma máquina: o que faz, o que a espera e os últimos trabalhos que terminou.</em></p>
+
+<p align="center">
   <img src="images/screenshots/machines.png" alt="machines" width="100%">
 </p>
 
@@ -145,6 +151,7 @@ Como as partes deste repositório se encaixam: quem fala com ele, o que contém 
 * **Uma lista com que se pode trabalhar:** pesquisa por nome, máquina, pessoa ou estado, cinco ordenações, um CSV do que se vê e um botão que remove os trabalhos terminados; o resumo soma o que as máquinas fizeram (trabalhos, furos, horas).
 * **Avisos:** o título do separador conta os trabalhos que esperam pelo operador e, se a pessoa o ativar, um som e uma notificação do navegador avisam quando um novo começa a esperar.
 * **As máquinas passam de um servidor para outro:** cada máquina pode ser copiada, e as máquinas de um servidor podem ser exportadas para um ficheiro e importadas noutro (os tokens de acesso dos nós nunca são exportados).
+* **Uma página para cada máquina, cópias e servidor em baixo:** a página de uma máquina mostra o que faz, os trabalhos que a esperam com o seu tempo total e os últimos que terminou; um trabalho pode ficar pronto em várias cópias de uma vez (a mesma placa muitas vezes); o desenho de um plano guarda-se como SVG; e uma linha vermelha avisa quando o servidor deixa de responder, até voltar a responder.
 
 ## 🔒 Segurança e proteção
 
@@ -191,7 +198,7 @@ Copie `dist/` para a CM5 (por exemplo para `/opt/eh3d-studio`), ponha `studio_di
 
 ## 🧪 Testes
 
-`npm test` executa 44 testes e passam todos: o cliente da API (o token, o corpo, a consulta, os erros, uma rede que falha, os caminhos com nomes que precisam de escape), as regras de nomes, palavras-passe e endereços de nó, o que está errado numa máquina, o menu de cada perfil, as máquinas agrupadas por estação, as contagens e as ações de um trabalho, e os oito idiomas (um texto em cada idioma, chinês e japonês na sua escrita, os mesmos marcadores em todo o lado). `npm run typecheck` e `npm run lint` também passam.
+`npm test` executa 46 testes e passam todos: o cliente da API (o token, o corpo, a consulta, os erros, uma rede que falha, os caminhos com nomes que precisam de escape), as regras de nomes, palavras-passe e endereços de nó, o que está errado numa máquina, o menu de cada perfil, as máquinas agrupadas por estação, as contagens e as ações de um trabalho, e os oito idiomas (um texto em cada idioma, chinês e japonês na sua escrita, os mesmos marcadores em todo o lado). `npm run typecheck` e `npm run lint` também passam.
 
 ## 🏗️ Compilação e publicação
 

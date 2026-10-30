@@ -10,7 +10,10 @@ All notable changes to this project are documented here.
 - **A list that can be worked with:** search, five orders, a CSV of what is shown and a button that clears the finished jobs.
 - **Alerts:** the title of the tab counts the jobs that wait for the operator; with the preference on, a sound and a notification of the browser say when a new one starts waiting.
 - **Machines move between servers:** a copy button and the export and import of machines as a file (the access tokens of the nodes are never exported).
-- **More tests:** 44 (the holes typed by hand, the files, the plan, the list, the CSV, the export and import of machines, the address and the alert).
+- **One page for each machine:** what it is doing, the jobs that wait for it with their total time and the last ones it finished, with a button to prepare a job for it.
+- **Copies and drawings:** a job can be left ready in up to 50 equal copies at once, and the drawing of a plan is saved as an SVG.
+- **A lost server is shown:** a red line says when the server stops answering and goes away by itself when it answers again.
+- **More tests:** 46 (the holes typed by hand, the files, the plan, the list, the CSV, the export and import of machines, the queue of a machine, the copies, the address and the alert).
 
 ## [0.0.1] - First release: the pages to set up and watch the machines, with the updates from GitHub
 

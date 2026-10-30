@@ -1,6 +1,6 @@
 /* A job that waits for the operator must not wait because the tab is in the background: the title of the page counts the jobs that wait, and, when the person asked
  * for it, a sound and a notification of the browser say when a new one starts waiting. GPL-3.0-or-later. */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Api } from "./api";
 
 /** Is there a new reason to call the person: more jobs wait than the last time we looked. */
@@ -76,4 +76,25 @@ export function useAttention(api: Api, signedIn: boolean, seconds: number, alert
       clearInterval(id);
     };
   }, [api, signedIn, seconds]);
+}
+
+/** Is the server answering: the health check every 8 seconds; a failure shows the line "the server does not answer" until it answers again. */
+export function useReachable(api: Api, signedIn: boolean): boolean {
+  const [ok, setOk] = useState(true);
+  useEffect(() => {
+    if (!signedIn) return;
+    let alive = true;
+    const look = () => {
+      api.health().then(
+        () => alive && setOk(true),
+        () => alive && setOk(false),
+      );
+    };
+    const id = setInterval(look, 8000);
+    return () => {
+      alive = false;
+      clearInterval(id);
+    };
+  }, [api, signedIn]);
+  return ok;
 }

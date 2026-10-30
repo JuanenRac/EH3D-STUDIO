@@ -241,3 +241,38 @@ export function copyId(id: string, taken: string[]): string {
   }
   return `${base.slice(0, 26)}-copy`;
 }
+
+// ---- one machine and its queue
+
+/** The jobs of one machine split as the page shows them: the one that is active, the ones that are ready (oldest first, the order they were made) and the last finished. */
+export function machineQueue(jobs: JobSummary[], machine: string, lastN = 8): { active: JobSummary | null; ready: JobSummary[]; recent: JobSummary[]; readySeconds: number } {
+  const mine = jobs.filter((j) => j.machine === machine);
+  const active = mine.find((j) => j.state === "connecting" || j.state === "running" || j.state === "waiting_operator") ?? null;
+  const ready = mine.filter((j) => j.state === "ready").sort((a, b) => a.created - b.created);
+  const over: JobState[] = ["done", "cancelled", "failed"];
+  const recent = mine
+    .filter((j) => over.includes(j.state))
+    .sort((a, b) => (b.finished ?? b.created) - (a.finished ?? a.created))
+    .slice(0, lastN);
+  const readySeconds = ready.reduce((n, j) => n + (j.estimate_s ?? 0), 0);
+  return { active, ready, recent, readySeconds };
+}
+
+/** The names of `copies` copies of a job: `board`, `board #2`, `board #3` ... (60 characters at most). */
+export function copyNames(name: string, copies: number): string[] {
+  const n = Math.max(1, Math.min(Math.floor(copies) || 1, 50));
+  return Array.from({ length: n }, (_, i) => (i === 0 ? name : `${name.slice(0, 54)} #${i + 1}`));
+}
+
+/** The drawing as a file to keep: the SVG of the page with its own size and a white margin-less background. */
+export function svgFile(svg: SVGSVGElement): string {
+  const clone = svg.cloneNode(true) as SVGSVGElement;
+  clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  clone.removeAttribute("class");
+  clone.setAttribute("width", "800");
+  const vb = (clone.getAttribute("viewBox") ?? "0 0 100 80").split(/\s+/).map(Number);
+  clone.setAttribute("height", String(Math.round((800 * vb[3]) / Math.max(vb[2], 1))));
+  const bg = clone.querySelector(".plan-bg");
+  bg?.setAttribute("fill", "#ffffff");
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone) + "\n";
+}

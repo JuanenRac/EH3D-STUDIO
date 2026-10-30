@@ -126,7 +126,9 @@ function MachineRow({ m }: { m: FleetMachine }) {
     <div className="machine-row">
       <span className={`dot ${tone}`} />
       <div className="machine-name">
-        <strong>{m.name}</strong>
+        <a href={`#/machine/${encodeURIComponent(m.id)}`}>
+          <strong>{m.name}</strong>
+        </a>
         <small>
           {m.id} · {m.model} · {m.connection}
         </small>

@@ -3,18 +3,19 @@
 import { useMemo, useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, Empty, Field } from "../components/ui";
-import { PlanView } from "../components/PlanView";
-import { defaultDrillTool, drillRequest, fileRequest, fileSlot, kindOfFiles, nameFromFile, parseHoles, toolColour, toolsUsed } from "../jobtools";
+import { PlanDownload, PlanView } from "../components/PlanView";
+import { copyNames, defaultDrillTool, drillRequest, fileRequest, fileSlot, kindOfFiles, nameFromFile, parseHoles, toolColour, toolsUsed } from "../jobtools";
 import type { DrillToolInput, SourceFiles } from "../jobtools";
 import { duration } from "../model";
 import type { JobView } from "../types";
 
 type Source = "files" | "typed";
 
-export function PreparePage() {
+export function PreparePage({ machineId = "" }: { machineId?: string }) {
   const { api, t, err, say } = useApp();
   const machines = usePolled(() => api.machines(), 0);
-  const [machine, setMachine] = useState("");
+  const [machine, setMachine] = useState(machineId);
+  const [copies, setCopies] = useState(1);
   const [source, setSource] = useState<Source>("files");
   const [name, setName] = useState("");
   const [files, setFiles] = useState<SourceFiles>({});
@@ -82,9 +83,13 @@ export function PreparePage() {
     if (!body || !chosen) return;
     setBusy(true);
     try {
-      const job = await api.createJob(chosen, body);
-      say(t("prep_created"), "ok");
-      window.location.hash = job?.id ? `#/job/${job.id}` : "#/jobs";
+      let first: { id?: string } | null = null;
+      for (const copy of copyNames(String(body.name), copies)) {
+        const job = await api.createJob(chosen, { ...body, name: copy });
+        first = first ?? job;
+      }
+      say(copies > 1 ? t("prep_created_n", { n: copies }) : t("prep_created"), "ok");
+      window.location.hash = copies === 1 && first?.id ? `#/job/${first.id}` : "#/jobs";
     } catch (e) {
       say(err(e), "error");
     } finally {
@@ -215,6 +220,11 @@ export function PreparePage() {
           </>
         )}
 
+        <div className="form-grid">
+          <Field label={t("prep_copies")} hint={t("prep_copies_hint")}>
+            <input type="number" min={1} max={50} value={copies} onChange={(e) => setCopies(Math.max(1, Math.min(50, Number(e.target.value) || 1)))} />
+          </Field>
+        </div>
         <div className="form-actions">
           <button disabled={!body || busy || !chosen} onClick={() => void preview()}>
             {t("prep_preview")}
@@ -228,7 +238,10 @@ export function PreparePage() {
       {view && (
         <Card title={t("prep_plan")} wide>
           <div className="plan-grid">
-            <PlanView view={view} label={t("prep_plan")} />
+            <div>
+              <PlanView view={view} label={t("prep_plan")} />
+              <PlanDownload name={name.trim() || "plan"} />
+            </div>
             <div>
               <dl className="facts">
                 <dt>{t("jobs_estimate")}</dt>

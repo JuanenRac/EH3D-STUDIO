@@ -18,7 +18,7 @@
 
 ---
 
-**Comprobación de honestidad - lo que se ejecuta hoy:** una aplicación web en React y TypeScript que entra en EH3D-SERVER y muestra y cambia lo que este guarda: las máquinas con su estación, su nodo y sus ficheros de configuración, los trabajos, los usuarios y los tokens, los eventos en vivo. El cliente de la API, las reglas de los formularios, el menú por rol y los ocho idiomas están cubiertos por 44 pruebas, y las páginas se han visto en un navegador contra un servidor local con máquinas simuladas. **No se ha usado con máquinas en un banco de pruebas**, y el servidor aún no termina TLS.
+**Comprobación de honestidad - lo que se ejecuta hoy:** una aplicación web en React y TypeScript que entra en EH3D-SERVER y muestra y cambia lo que este guarda: las máquinas con su estación, su nodo y sus ficheros de configuración, los trabajos, los usuarios y los tokens, los eventos en vivo. El cliente de la API, las reglas de los formularios, el menú por rol y los ocho idiomas están cubiertos por 46 pruebas, y las páginas se han visto en un navegador contra un servidor local con máquinas simuladas. **No se ha usado con máquinas en un banco de pruebas**, y el servidor aún no termina TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Versión | `0.0.1` |
 | Madurez | Andamiaje |
-| Pruebas | 44 pruebas (`npm test`) |
+| Pruebas | 46 pruebas (`npm test`) |
 | Pila tecnológica | React 19, TypeScript, Vite |
 | En hardware real | No con máquinas en un banco: vista en un navegador contra un servidor local con máquinas simuladas |
 
@@ -45,7 +45,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 | Área | Estado | Qué significa aquí |
 |---|---|---|
 | Software | 🟡 | La aplicación compila sin avisos (tipos, lint, compilación) y el servidor la sirve en la raíz de su dirección; se ha ejecutado en un navegador contra un servidor local. |
-| Pruebas | 🟢 | Pasan 44 pruebas (`npm test`): el cliente de la API con sus errores, las reglas de nombres, contraseñas y direcciones, el menú por rol, la flota por estación, las acciones de un trabajo y los ocho idiomas. |
+| Pruebas | 🟢 | Pasan 46 pruebas (`npm test`): el cliente de la API con sus errores, las reglas de nombres, contraseñas y direcciones, el menú por rol, la flota por estación, las acciones de un trabajo y los ocho idiomas. |
 | Páginas | 🟡 | Resumen, máquinas por estación, trabajos, eventos en vivo, máquinas, usuarios y tokens, servidor, cuenta, preferencias y acerca de están escritos; los trabajos y las máquinas se gestionan con la API real del servidor. Ninguna página la ha probado alguien que no sea el autor. |
 | Idiomas | 🟢 | Ocho idiomas en cada texto, incluidas las negativas del servidor; los textos los lee una prueba, pero solo el inglés y unas pocas frases de los demás las ha leído una persona. |
 | Máquinas reales | 🔴 | Nada se ha hecho con ella en un banco: no se ha añadido ninguna máquina, no se ha llegado a ningún nodo ni se ha ejecutado un trabajo a través de ella en una máquina real. |
@@ -104,6 +104,12 @@ Cómo encajan las partes de este repositorio: quién habla con él, qué contien
 <p align="center"><em>Un trabajo: el plano con los agujeros ya hechos, cuánto lleva y los botones de su estado.</em></p>
 
 <p align="center">
+  <img src="images/screenshots/machine.png" alt="machine" width="100%">
+</p>
+
+<p align="center"><em>Una máquina: lo que hace, lo que la espera y los últimos trabajos que terminó.</em></p>
+
+<p align="center">
   <img src="images/screenshots/machines.png" alt="machines" width="100%">
 </p>
 
@@ -145,6 +151,7 @@ Cómo encajan las partes de este repositorio: quién habla con él, qué contien
 * **Una lista con la que se puede trabajar:** búsqueda por nombre, máquina, persona o estado, cinco órdenes, un CSV de lo que se ve y un botón que quita los trabajos terminados; el resumen suma lo que han hecho las máquinas (trabajos, agujeros, horas).
 * **Avisos:** el título de la pestaña cuenta los trabajos que esperan al operador y, si la persona lo activa, un sonido y una notificación del navegador avisan cuando uno nuevo empieza a esperar.
 * **Las máquinas pasan de un servidor a otro:** cada máquina se puede copiar, y las máquinas de un servidor se pueden exportar a un fichero e importar en otro (los tokens de acceso de los nodos nunca se exportan).
+* **Una página para cada máquina, copias y servidor caído:** la página de una máquina muestra lo que hace, los trabajos que la esperan con su tiempo total y los últimos que terminó; un trabajo puede dejarse listo en varias copias a la vez (la misma placa muchas veces); el dibujo de un plano se guarda como SVG; y una línea roja avisa cuando el servidor deja de responder, hasta que vuelve a hacerlo.
 
 ## 🔒 Seguridad y protección
 
@@ -191,7 +198,7 @@ Copia `dist/` a la CM5 (por ejemplo a `/opt/eh3d-studio`), pon `studio_dir = /op
 
 ## 🧪 Pruebas
 
-`npm test` ejecuta 44 pruebas y pasan todas: el cliente de la API (el token, el cuerpo, la consulta, los errores, una red que falla, las rutas con nombres que necesitan escape), las reglas de nombres, contraseñas y direcciones de nodo, lo que está mal en una máquina, el menú de cada rol, las máquinas agrupadas por estación, los recuentos y las acciones de un trabajo, y los ocho idiomas (un texto en cada idioma, chino y japonés en su escritura, los mismos marcadores en todas partes). `npm run typecheck` y `npm run lint` también pasan.
+`npm test` ejecuta 46 pruebas y pasan todas: el cliente de la API (el token, el cuerpo, la consulta, los errores, una red que falla, las rutas con nombres que necesitan escape), las reglas de nombres, contraseñas y direcciones de nodo, lo que está mal en una máquina, el menú de cada rol, las máquinas agrupadas por estación, los recuentos y las acciones de un trabajo, y los ocho idiomas (un texto en cada idioma, chino y japonés en su escritura, los mismos marcadores en todas partes). `npm run typecheck` y `npm run lint` también pasan.
 
 ## 🏗️ Compilación y publicación
 

@@ -18,7 +18,7 @@
 
 ---
 
-**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the eight languages are covered by 44 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
+**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the eight languages are covered by 46 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.0.1` |
 | Maturity | Scaffolding |
-| Tests | 44 tests (`npm test`) |
+| Tests | 46 tests (`npm test`) |
 | Stack | React 19, TypeScript, Vite |
 | On real hardware | Not against machines on a bench: looked at in a browser against a local server with simulated machines |
 
@@ -45,7 +45,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟡 | The application builds without warnings (typecheck, lint, build) and is served by the server at the root of its address; it has been run in a browser against a local server. |
-| Tests | 🟢 | 44 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the eight languages. |
+| Tests | 🟢 | 46 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the eight languages. |
 | Pages | 🟡 | Overview, machines by station, jobs, live events, machines, users and tokens, server, account, preferences and about are written; the jobs and the machines are managed against the real API of the server. No page has been tried by someone who is not the author. |
 | Languages | 🟢 | Eight languages in every text, the refusals of the server included; the texts are read by a test, but only English and a few phrases of the others have been read by a person. |
 | Real machines | 🔴 | Nothing has been done with it on a bench: no machine has been added, no node reached and no job run through it on a real machine. |
@@ -104,6 +104,12 @@ How the parts of this repository fit together: who talks to it, what it holds an
 <p align="center"><em>One job: the plan with the holes already drilled, how far it has got and the buttons of its state.</em></p>
 
 <p align="center">
+  <img src="images/screenshots/machine.png" alt="machine" width="100%">
+</p>
+
+<p align="center"><em>One machine: what it is doing, what waits for it and the last jobs it finished.</em></p>
+
+<p align="center">
   <img src="images/screenshots/machines.png" alt="machines" width="100%">
 </p>
 
@@ -145,6 +151,7 @@ How the parts of this repository fit together: who talks to it, what it holds an
 * **A list that can be worked with:** search by name, machine, person or state, five orders, a CSV of what is shown, and one button that clears the finished jobs; the overview adds up what the machines have done (jobs, holes, hours).
 * **Alerts:** the title of the tab counts the jobs that wait for the operator, and, if the person turns it on, a sound and a notification of the browser say when a new one starts waiting.
 * **Machines move between servers:** every machine can be copied, and the machines of a server can be exported to a file and imported into another one (the access tokens of the nodes are never exported).
+* **One page for each machine, copies and a lost server:** the page of a machine shows what it is doing, the jobs that wait for it with their total time, and the last ones it finished; a job can be left ready in several copies at once (the same board many times); the drawing of a plan is saved as an SVG; and a red line says when the server stops answering, until it answers again.
 
 ## 🔒 Security & Safety
 
@@ -191,7 +198,7 @@ Copy `dist/` to the CM5 (for example to `/opt/eh3d-studio`), put `studio_dir = /
 
 ## 🧪 Testing
 
-`npm test` runs 44 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the eight languages (a text in every language, Chinese and Japanese in their own scripts, the same placeholders everywhere). `npm run typecheck` and `npm run lint` pass as well.
+`npm test` runs 46 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the eight languages (a text in every language, Chinese and Japanese in their own scripts, the same placeholders everywhere). `npm run typecheck` and `npm run lint` pass as well.
 
 ## 🏗️ Build & Release
 

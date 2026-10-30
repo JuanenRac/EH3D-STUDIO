@@ -1,6 +1,8 @@
 /* The drawing of a job: the board seen from above, every hole in the colour of its tool (the ones already drilled filled, the next one ringed) and the routing paths
  * over it. Millimetres in the box of the view; the Y axis points up as on the machine. */
-import { holeRadius, holesDone, planBox, toolColour } from "../jobtools";
+import { useRef } from "react";
+import { useApp } from "../context";
+import { holeRadius, holesDone, planBox, svgFile, toolColour } from "../jobtools";
 import type { JobView } from "../types";
 
 export function PlanView({ view, itemsDone, label }: { view: JobView; itemsDone?: number; label: string }) {
@@ -40,5 +42,29 @@ export function PlanView({ view, itemsDone, label }: { view: JobView; itemsDone?
         );
       })}
     </svg>
+  );
+}
+
+/** A button that keeps the drawing next to it as an SVG file (the first drawing of the page). */
+export function PlanDownload({ name }: { name: string }) {
+  const { t } = useApp();
+  const ref = useRef<HTMLButtonElement>(null);
+  return (
+    <button
+      ref={ref}
+      type="button"
+      onClick={() => {
+        const svg = ref.current?.parentElement?.querySelector("svg.plan") as SVGSVGElement | null;
+        if (!svg) return;
+        const url = URL.createObjectURL(new Blob([svgFile(svg)], { type: "image/svg+xml" }));
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${name.replace(/[^A-Za-z0-9._-]+/g, "_")}.svg`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }}
+    >
+      {t("plan_save")}
+    </button>
   );
 }

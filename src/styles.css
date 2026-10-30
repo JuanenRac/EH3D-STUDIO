@@ -444,3 +444,5 @@ a { color: var(--accent); }
 .grid .card.wide { grid-column: 1 / -1; }
 .facts + .table { margin-top: 16px; }
 .machine-row a { text-decoration: none; }
+.lost { background: var(--bad); color: #fff; padding: 8px 18px; font-weight: 600; text-align: center; }
+.plan + button { margin-top: 10px; }

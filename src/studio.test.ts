@@ -120,7 +120,7 @@ describe("the rules checked before a request goes out", () => {
 
 describe("the navigation", () => {
   it("shows each role the pages it may use, in three groups", () => {
-    expect(pagesFor("viewer").map((p) => p.id)).toEqual(["overview", "fleet", "jobs", "job", "live", "server", "account", "preferences", "about"]);
+    expect(pagesFor("viewer").map((p) => p.id)).toEqual(["overview", "fleet", "machine", "jobs", "job", "live", "server", "account", "preferences", "about"]);
     expect(pagesFor("operator").length).toBe(pagesFor("viewer").length + 1);
     expect(pagesFor("admin").length).toBe(PAGES.length);
     expect(new Set(PAGES.map((p) => p.group))).toEqual(new Set(["monitor", "configure", "account"]));

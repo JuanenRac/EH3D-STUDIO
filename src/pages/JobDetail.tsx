@@ -1,7 +1,7 @@
 /* One job on its own page: the plan with the holes already drilled, how far it has got, who did what and when, the tools, and the buttons that fit its state. */
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Progress } from "../components/ui";
-import { PlanView } from "../components/PlanView";
+import { PlanDownload, PlanView } from "../components/PlanView";
 import { took } from "../jobtools";
 import { duration, isActive, jobActions, jobPercent } from "../model";
 import { ToolTable } from "./Prepare";
@@ -72,12 +72,19 @@ export function JobPage({ id }: { id: string }) {
           </p>
         )}
         <div className="plan-grid">
-          {job.view ? <PlanView view={job.view} itemsDone={isActive(job) || job.state === "done" ? job.items_done : undefined} label={job.name} /> : <Empty>{t("job_no_view")}</Empty>}
+          {job.view ? (
+            <div>
+              <PlanView view={job.view} itemsDone={isActive(job) || job.state === "done" ? job.items_done : undefined} label={job.name} />
+              <PlanDownload name={job.name} />
+            </div>
+          ) : (
+            <Empty>{t("job_no_view")}</Empty>
+          )}
           <div>
             <dl className="facts">
               <dt>{t("jobs_machine")}</dt>
               <dd>
-                <a href="#/fleet">{job.machine}</a>
+                <a href={`#/machine/${encodeURIComponent(job.machine)}`}>{job.machine}</a>
               </dd>
               <dt>{t("jobs_by")}</dt>
               <dd>{job.by}</dd>

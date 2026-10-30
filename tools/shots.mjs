@@ -26,7 +26,7 @@ if (!url || !token || !edge) {
   console.error("usage: node tools/shots.mjs --url URL --token TOKEN [--out DIR] [--edge PATH]");
   process.exit(2);
 }
-const PAGES = ["overview", "fleet", "jobs", "job", "prepare", "machines", "access", "server", "updates", "preferences"];
+const PAGES = ["overview", "fleet", "jobs", "job", "machine", "prepare", "machines", "access", "server", "updates", "preferences"];
 const port = 9300 + Math.floor(Math.random() * 500);
 const profile = mkdtempSync(path.join(tmpdir(), "eh3d-studio-shots-"));
 mkdirSync(out, { recursive: true });
@@ -74,8 +74,9 @@ try {
   const list = await (await fetch(`${url}/api/v1/jobs`, { headers: { authorization: `Bearer ${token}` } })).json();
   const shown = list.find((j) => j.state === "running" || j.state === "waiting_operator") ?? list[0];
   for (const p of PAGES) {
-    if (p === "job" && !shown) continue;
-    await send("Page.navigate", { url: `${url}/#/${p === "job" ? `job/${shown.id}` : p}` });
+    if ((p === "job" || p === "machine") && !shown) continue;
+    const route = p === "job" ? `job/${shown.id}` : p === "machine" ? `machine/${encodeURIComponent(shown.machine)}` : p;
+    await send("Page.navigate", { url: `${url}/#/${route}` });
     await send("Page.reload");
     await sleep(p === "overview" || p === "fleet" ? 3500 : 1800);
     if (p === "prepare") {

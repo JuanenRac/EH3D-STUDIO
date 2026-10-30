@@ -4,7 +4,7 @@ import type { Fleet, FleetMachine, JobState, JobSummary, Machine, MachineInput, 
 
 // ---- the navigation: every page belongs to a group and needs a role
 
-export type PageId = "overview" | "fleet" | "prepare" | "jobs" | "job" | "live" | "machines" | "access" | "server" | "updates" | "account" | "preferences" | "about";
+export type PageId = "overview" | "fleet" | "machine" | "prepare" | "jobs" | "job" | "live" | "machines" | "access" | "server" | "updates" | "account" | "preferences" | "about";
 
 export interface PageDef {
   id: PageId;
@@ -17,6 +17,7 @@ export interface PageDef {
 export const PAGES: PageDef[] = [
   { id: "overview", group: "monitor", needs: "viewer" },
   { id: "fleet", group: "monitor", needs: "viewer" },
+  { id: "machine", group: "monitor", needs: "viewer", hidden: true },
   { id: "prepare", group: "monitor", needs: "operator" },
   { id: "jobs", group: "monitor", needs: "viewer" },
   { id: "job", group: "monitor", needs: "viewer", hidden: true },

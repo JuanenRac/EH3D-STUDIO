@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Api, ApiError } from "./api";
 import { AppContext, THEMES, Toast, makeErr, makeText } from "./context";
 import type { AppState, ThemeId } from "./context";
-import { useAttention } from "./attention";
+import { useAttention, useReachable } from "./attention";
 import { browserLang, isLang, text } from "./i18n";
 import type { Lang, TextKey } from "./i18n";
 import { parseRoute, pagesFor } from "./model";
@@ -13,6 +13,7 @@ import { Login } from "./pages/Login";
 import { FleetPage, JobsPage, LivePage, Overview } from "./pages/Monitor";
 import { JobPage } from "./pages/JobDetail";
 import { PreparePage } from "./pages/Prepare";
+import { MachinePage } from "./pages/MachinePage";
 import { AccessPage, MachinesPage, ServerPage, UpdatesPage } from "./pages/Configure";
 import { AboutPage, AccountPage, PreferencesPage } from "./pages/Account";
 
@@ -109,6 +110,7 @@ export default function App() {
   };
 
   useAttention(api, session != null, refreshS, alerts, text(lang, "alert_waiting"));
+  const reachable = useReachable(api, session != null);
   if (!checked) return null;
   if (!session) return <Login api={api} lang={lang} onLang={changeLang} onSignedIn={() => void signedIn()} />;
 
@@ -142,8 +144,11 @@ export default function App() {
     case "fleet":
       body = <FleetPage />;
       break;
+    case "machine":
+      body = <MachinePage id={route.param} key={route.param} />;
+      break;
     case "prepare":
-      body = <PreparePage />;
+      body = <PreparePage machineId={route.param} />;
       break;
     case "jobs":
       body = <JobsPage />;
@@ -236,6 +241,11 @@ export default function App() {
               </button>
             </div>
           </header>
+          {!reachable && (
+            <div className="lost" role="alert">
+              {t("net_lost")}
+            </div>
+          )}
           <div className="page" key={current + route.param}>
             {body}
           </div>

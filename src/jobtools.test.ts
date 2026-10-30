@@ -3,6 +3,8 @@ import { Api } from "./api";
 import { shouldAlert, titleFor } from "./attention";
 import {
   copyId,
+  copyNames,
+  machineQueue,
   defaultDrillTool,
   drillRequest,
   fileRequest,
@@ -189,5 +191,32 @@ describe("the address and the alert", () => {
     await api.previewJob("m 1", { kind: "drill" });
     await api.createJob("m 1", { kind: "drill" });
     expect(calls).toEqual(["POST /api/v1/machines/m%201/preview", "POST /api/v1/machines/m%201/jobs"]);
+  });
+});
+
+describe("one machine and its queue", () => {
+  const jobs = [
+    job({ id: "1", machine: "a", state: "running", estimate_s: 100 }),
+    job({ id: "2", machine: "a", state: "ready", created: 20, estimate_s: 60 }),
+    job({ id: "3", machine: "a", state: "ready", created: 10, estimate_s: 40 }),
+    job({ id: "4", machine: "a", state: "done", created: 1, finished: 50 }),
+    job({ id: "5", machine: "a", state: "failed", created: 2, finished: 90 }),
+    job({ id: "6", machine: "b", state: "ready" }),
+  ];
+  it("splits what is active, what is ready (in the order it was made) and what finished last", () => {
+    const q = machineQueue(jobs, "a");
+    expect(q.active?.id).toBe("1");
+    expect(q.ready.map((j) => j.id)).toEqual(["3", "2"]);
+    expect(q.readySeconds).toBe(100);
+    expect(q.recent.map((j) => j.id)).toEqual(["5", "4"]);
+    expect(machineQueue(jobs, "b").active).toBeNull();
+    expect(machineQueue(jobs, "none").ready).toEqual([]);
+  });
+  it("names the copies of a job", () => {
+    expect(copyNames("board", 1)).toEqual(["board"]);
+    expect(copyNames("board", 3)).toEqual(["board", "board #2", "board #3"]);
+    expect(copyNames("board", 0)).toEqual(["board"]);
+    expect(copyNames("board", 500).length).toBe(50);
+    expect(copyNames("x".repeat(60), 2)[1].length).toBeLessThanOrEqual(60);
   });
 });
