@@ -18,7 +18,7 @@
 
 ---
 
-**Verifica di onestà - cosa gira oggi:** un'applicazione web in React e TypeScript che accede a EH3D-SERVER e mostra e modifica ciò che contiene: le macchine con la loro stazione, il loro nodo e i file di configurazione, i lavori, gli utenti e i token, gli eventi in tempo reale. Il client dell'API, le regole dei moduli, il menu per ruolo e le otto lingue sono coperti da 20 test, e le pagine sono state viste in un browser contro un server locale con macchine simulate. **Non è stata usata con macchine su un banco di prova**, e il server non termina ancora TLS.
+**Verifica di onestà - cosa gira oggi:** un'applicazione web in React e TypeScript che accede a EH3D-SERVER e mostra e modifica ciò che contiene: le macchine con la loro stazione, il loro nodo e i file di configurazione, i lavori, gli utenti e i token, gli eventi in tempo reale. Il client dell'API, le regole dei moduli, il menu per ruolo e le otto lingue sono coperti da 24 test, e le pagine sono state viste in un browser contro un server locale con macchine simulate. **Non è stata usata con macchine su un banco di prova**, e il server non termina ancora TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Versione | `0.0.1` |
 | Maturità | Impalcatura |
-| Test | 20 test (`npm test`) |
+| Test | 24 test (`npm test`) |
 | Stack tecnologico | React 19, TypeScript, Vite |
 | Su hardware reale | Non con macchine su un banco: vista in un browser contro un server locale con macchine simulate |
 
@@ -45,7 +45,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Area | Stato | Cosa significa qui |
 |---|---|---|
 | Software | 🟡 | L'applicazione compila senza avvisi (tipi, lint, build) ed è servita dal server alla radice del suo indirizzo; è stata eseguita in un browser contro un server locale. |
-| Test | 🟢 | 20 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le otto lingue. |
+| Test | 🟢 | 24 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le otto lingue. |
 | Pagine | 🟡 | Panoramica, macchine per stazione, lavori, eventi in tempo reale, macchine, utenti e token, server, account, preferenze e informazioni sono scritti; lavori e macchine si gestiscono con l'API reale del server. Nessuna pagina è stata provata da qualcuno che non sia l'autore. |
 | Lingue | 🟢 | Otto lingue in ogni testo, compresi i rifiuti del server; i testi sono letti da un test, ma solo l'inglese e poche frasi delle altre sono state lette da una persona. |
 | Macchine reali | 🔴 | Nulla è stato fatto su un banco: nessuna macchina aggiunta, nessun nodo raggiunto e nessun lavoro eseguito tramite essa su una macchina reale. |
@@ -110,6 +110,12 @@ Come si incastrano le parti di questo repository: chi parla con esso, cosa conti
 <p align="center"><em>Le impostazioni del server, come riferimento.</em></p>
 
 <p align="center">
+  <img src="images/screenshots/updates.png" alt="updates" width="100%">
+</p>
+
+<p align="center"><em>La pagina Aggiornamenti: ciò che è installato, l'ultima release su GitHub e cosa ha fatto l'helper del server.</em></p>
+
+<p align="center">
   <img src="images/screenshots/preferences.png" alt="preferences" width="100%">
 </p>
 
@@ -121,6 +127,7 @@ Come si incastrano le parti di questo repository: chi parla con esso, cosa conti
 * **Controlli prima dell'invio:** nomi, password e indirizzi dei nodi sono controllati nel modulo, e il rifiuto del server è mostrato come frase nella lingua della persona.
 * **Token mostrati una volta:** il token di un programma appare alla creazione e non si vede più; il token di un nodo non viene mai mostrato dopo il salvataggio.
 * **Segue il server:** flotta e lavori si aggiornano da soli (o solo a richiesta), e la pagina in tempo reale si riconnette quando il collegamento cade.
+* **Aggiornamenti:** una pagina per l'amministratore confronta il server e Studio installati con le ultime release su GitHub, controlla quando richiesto e aggiorna ciò che è più nuovo, mostrando cosa fa l'helper del server mentre lavora; quando il server stesso si riavvia, la pagina torna da sola. L'aggiornamento richiede `updates_dir` in `server.cfg` e l'helper di EH3D-SERVER installato; è stato provato con simulazioni di GitHub e systemd, mai su un'installazione reale.
 
 ## 🔒 Sicurezza e protezione
 
@@ -167,7 +174,7 @@ Copia `dist/` sulla CM5 (ad esempio in `/opt/eh3d-studio`), metti `studio_dir = 
 
 ## 🧪 Test
 
-`npm test` esegue 20 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le otto lingue (un testo in ogni lingua, cinese e giapponese nella loro scrittura, gli stessi segnaposto ovunque). Passano anche `npm run typecheck` e `npm run lint`.
+`npm test` esegue 24 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le otto lingue (un testo in ogni lingua, cinese e giapponese nella loro scrittura, gli stessi segnaposto ovunque). Passano anche `npm run typecheck` e `npm run lint`.
 
 ## 🏗️ Compilazione e rilascio
 

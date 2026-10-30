@@ -26,7 +26,7 @@ if (!url || !token || !edge) {
   console.error("usage: node tools/shots.mjs --url URL --token TOKEN [--out DIR] [--edge PATH]");
   process.exit(2);
 }
-const PAGES = ["overview", "fleet", "jobs", "machines", "access", "server", "preferences"];
+const PAGES = ["overview", "fleet", "jobs", "machines", "access", "server", "updates", "preferences"];
 const port = 9300 + Math.floor(Math.random() * 500);
 const profile = mkdtempSync(path.join(tmpdir(), "eh3d-studio-shots-"));
 mkdirSync(out, { recursive: true });

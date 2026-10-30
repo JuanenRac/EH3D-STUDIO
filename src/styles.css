@@ -409,3 +409,7 @@ pre.log {
   font-size: 13px;
   white-space: pre-wrap;
 }
+
+.table a { text-decoration: none; }
+.table a code { color: var(--accent, #ffb300); }
+.table a:hover code { text-decoration: underline; }

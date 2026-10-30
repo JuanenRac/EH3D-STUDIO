@@ -18,7 +18,7 @@
 
 ---
 
-**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the eight languages are covered by 20 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
+**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the eight languages are covered by 24 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.0.1` |
 | Maturity | Scaffolding |
-| Tests | 20 tests (`npm test`) |
+| Tests | 24 tests (`npm test`) |
 | Stack | React 19, TypeScript, Vite |
 | On real hardware | Not against machines on a bench: looked at in a browser against a local server with simulated machines |
 
@@ -45,7 +45,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟡 | The application builds without warnings (typecheck, lint, build) and is served by the server at the root of its address; it has been run in a browser against a local server. |
-| Tests | 🟢 | 20 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the eight languages. |
+| Tests | 🟢 | 24 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the eight languages. |
 | Pages | 🟡 | Overview, machines by station, jobs, live events, machines, users and tokens, server, account, preferences and about are written; the jobs and the machines are managed against the real API of the server. No page has been tried by someone who is not the author. |
 | Languages | 🟢 | Eight languages in every text, the refusals of the server included; the texts are read by a test, but only English and a few phrases of the others have been read by a person. |
 | Real machines | 🔴 | Nothing has been done with it on a bench: no machine has been added, no node reached and no job run through it on a real machine. |
@@ -110,6 +110,12 @@ How the parts of this repository fit together: who talks to it, what it holds an
 <p align="center"><em>The settings of the server, as a reference.</em></p>
 
 <p align="center">
+  <img src="images/screenshots/updates.png" alt="updates" width="100%">
+</p>
+
+<p align="center"><em>The Updates page: what is installed, the latest release on GitHub and what the helper of the server did.</em></p>
+
+<p align="center">
   <img src="images/screenshots/preferences.png" alt="preferences" width="100%">
 </p>
 
@@ -117,10 +123,11 @@ How the parts of this repository fit together: who talks to it, what it holds an
 
 ## ✨ Features
 
-* **Each role sees its own menu:** a viewer sees the pages of Monitor, the Server page and the Account pages; an administrator also sees Machines and Users and tokens.
+* **Each role sees its own menu:** a viewer sees the pages of Monitor, the Server page and the Account pages; an administrator also sees Machines, Users and tokens and Updates.
 * **Checks before it sends:** names, passwords and node addresses are checked in the form, and the refusal of the server is shown as a sentence in the language of the person.
 * **Tokens shown once:** the token of a program appears when it is made and never again; the token of a node is never shown after it is saved.
 * **Follows the server:** the fleet and the jobs refresh by themselves (or only when asked), and the live page reconnects when the link drops.
+* **Updates:** a page for the administrator compares the installed server and Studio with the latest releases on GitHub, checks when asked and updates what is newer, showing what the helper of the server does while it works; when the server itself restarts, the page comes back by itself. The update needs `updates_dir` in `server.cfg` and the helper of EH3D-SERVER installed; it has been tested with stand-ins for GitHub and systemd, never on a real installation.
 
 ## 🔒 Security & Safety
 
@@ -167,7 +174,7 @@ Copy `dist/` to the CM5 (for example to `/opt/eh3d-studio`), put `studio_dir = /
 
 ## 🧪 Testing
 
-`npm test` runs 20 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the eight languages (a text in every language, Chinese and Japanese in their own scripts, the same placeholders everywhere). `npm run typecheck` and `npm run lint` pass as well.
+`npm test` runs 24 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the eight languages (a text in every language, Chinese and Japanese in their own scripts, the same placeholders everywhere). `npm run typecheck` and `npm run lint` pass as well.
 
 ## 🏗️ Build & Release
 
