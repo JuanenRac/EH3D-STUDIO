@@ -17,7 +17,7 @@ import { MachinePage } from "./pages/MachinePage";
 import { AccessPage, MachinesPage, ServerPage, UpdatesPage } from "./pages/Configure";
 import { AboutPage, AccountPage, PreferencesPage } from "./pages/Account";
 
-export const VERSION = "0.0.1";
+export const VERSION = "0.0.2";
 
 function read(key: string): string | null {
   try {
