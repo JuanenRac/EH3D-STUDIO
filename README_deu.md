@@ -18,7 +18,7 @@
 
 ---
 
-**Ehrlichkeitscheck - was heute läuft:** eine Webanwendung in React und TypeScript, die sich bei EH3D-SERVER anmeldet und zeigt und ändert, was dieser enthält: die Maschinen mit Station, Knoten und Konfigurationsdateien, die Aufträge, die Benutzer und die Tokens, die Live-Ereignisse. Der Client der API, die Regeln der Formulare, das Menü je Rolle und die acht Sprachen sind durch 24 Tests abgedeckt, und die Seiten wurden in einem Browser gegen einen lokalen Server mit simulierten Maschinen angesehen. **Sie wurde nicht mit Maschinen auf einem Prüfstand benutzt**, und der Server beendet TLS noch nicht.
+**Ehrlichkeitscheck - was heute läuft:** eine Webanwendung in React und TypeScript, die sich bei EH3D-SERVER anmeldet und zeigt und ändert, was dieser enthält: die Maschinen mit Station, Knoten und Konfigurationsdateien, die Aufträge, die Benutzer und die Tokens, die Live-Ereignisse. Der Client der API, die Regeln der Formulare, das Menü je Rolle und die acht Sprachen sind durch 44 Tests abgedeckt, und die Seiten wurden in einem Browser gegen einen lokalen Server mit simulierten Maschinen angesehen. **Sie wurde nicht mit Maschinen auf einem Prüfstand benutzt**, und der Server beendet TLS noch nicht.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.0.1` |
 | Reifegrad | Gerüst |
-| Tests | 24 Tests (`npm test`) |
+| Tests | 44 Tests (`npm test`) |
 | Technologie-Stack | React 19, TypeScript, Vite |
 | Auf echter Hardware | Nicht mit Maschinen auf einem Prüfstand: im Browser gegen einen lokalen Server mit simulierten Maschinen angesehen |
 
@@ -45,7 +45,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Software | 🟡 | Die Anwendung baut ohne Warnungen (Typen, Lint, Build) und wird vom Server an der Wurzel seiner Adresse ausgeliefert; sie lief in einem Browser gegen einen lokalen Server. |
-| Tests | 🟢 | 24 Tests bestehen (`npm test`): der Client der API mit seinen Fehlern, die Regeln für Namen, Passwörter und Adressen, das Menü je Rolle, die Flotte je Station, die Aktionen eines Auftrags und die acht Sprachen. |
+| Tests | 🟢 | 44 Tests bestehen (`npm test`): der Client der API mit seinen Fehlern, die Regeln für Namen, Passwörter und Adressen, das Menü je Rolle, die Flotte je Station, die Aktionen eines Auftrags und die acht Sprachen. |
 | Seiten | 🟡 | Übersicht, Maschinen je Station, Aufträge, Live-Ereignisse, Maschinen, Benutzer und Tokens, Server, Konto, Einstellungen und Info sind geschrieben; Aufträge und Maschinen werden gegen die echte API des Servers verwaltet. Keine Seite wurde von jemand anderem als dem Autor erprobt. |
 | Sprachen | 🟢 | Acht Sprachen in jedem Text, auch in den Ablehnungen des Servers; die Texte liest ein Test, aber nur Englisch und wenige Sätze der anderen hat ein Mensch gelesen. |
 | Echte Maschinen | 🔴 | Auf einem Prüfstand wurde nichts damit gemacht: keine Maschine hinzugefügt, kein Knoten erreicht und kein Auftrag über sie auf einer echten Maschine ausgeführt. |
@@ -92,6 +92,18 @@ Wie die Teile dieses Repositorys zusammenpassen: wer mit ihm spricht, was es ent
 <p align="center"><em>Die Aufträge mit ihren Filtern und den Aktionen, die die Rolle erlaubt.</em></p>
 
 <p align="center">
+  <img src="images/screenshots/prepare.png" alt="prepare" width="100%">
+</p>
+
+<p align="center"><em>Einen Auftrag vorbereiten: die getippte Arbeit, der Plan und die vom Server berechnete Zeit.</em></p>
+
+<p align="center">
+  <img src="images/screenshots/job.png" alt="job" width="100%">
+</p>
+
+<p align="center"><em>Ein Auftrag: der Plan mit den schon gebohrten Löchern, der Fortschritt und die Tasten seines Zustands.</em></p>
+
+<p align="center">
   <img src="images/screenshots/machines.png" alt="machines" width="100%">
 </p>
 
@@ -128,6 +140,11 @@ Wie die Teile dieses Repositorys zusammenpassen: wer mit ihm spricht, was es ent
 * **Tokens nur einmal sichtbar:** das Token eines Programms erscheint beim Erzeugen und nie wieder; das Token eines Knotens wird nach dem Speichern nie angezeigt.
 * **Folgt dem Server:** Flotte und Aufträge aktualisieren sich selbst (oder nur auf Anforderung), und die Live-Seite verbindet sich neu, wenn die Verbindung abbricht.
 * **Aktualisierungen:** eine Seite für den Administrator vergleicht den installierten Server und Studio mit den neuesten Releases auf GitHub, prüft auf Anfrage und aktualisiert, was neuer ist, und zeigt, was der Helfer des Servers tut, während er arbeitet; startet der Server selbst neu, kommt die Seite von selbst zurück. Die Aktualisierung braucht `updates_dir` in `server.cfg` und den installierten Helfer von EH3D-SERVER; getestet mit Attrappen für GitHub und systemd, nie an einer echten Installation.
+* **Einen Auftrag hier vorbereiten:** Maschine wählen und die Arbeit als die Dateien angeben, die die Programme lesen (`.NCD` mit `.DTD`, `.PLT` mit `.RTD`), oder als von Hand getippte Löcher (Werkzeug, x und y, mit Vorschub, Drehzahl und Zusatzhub je Werkzeug); den Plan, die Zeit und den Verfahrweg ansehen, die der Server berechnet, und den Auftrag bereitlegen. Ein Auftrag startet nie von selbst.
+* **Eine Seite für jeden Auftrag:** der Plan mit den schon gebohrten Löchern gefüllt und dem nächsten umringt, wie weit er ist, wer ihn gemacht hat und wann, die Werkzeuge und die zum Zustand passenden Tasten (starten, bestätigen, stoppen, löschen). Die Aufträge, die auf den Bediener warten, stehen oben in der Übersicht mit ihrer Taste Bestätigen.
+* **Eine Liste, mit der man arbeiten kann:** Suche nach Name, Maschine, Person oder Zustand, fünf Sortierungen, ein CSV des Angezeigten und eine Taste, die die beendeten Aufträge entfernt; die Übersicht summiert, was die Maschinen getan haben (Aufträge, Löcher, Stunden).
+* **Hinweise:** der Titel des Tabs zählt die Aufträge, die auf den Bediener warten, und, wenn die Person es einschaltet, melden ein Ton und eine Browser-Benachrichtigung, wenn ein neuer zu warten beginnt.
+* **Maschinen ziehen zwischen Servern um:** jede Maschine lässt sich kopieren, und die Maschinen eines Servers lassen sich in eine Datei exportieren und in einen anderen importieren (die Zugriffstokens der Knoten werden nie exportiert).
 
 ## 🔒 Sicherheit und Schutz
 
@@ -174,7 +191,7 @@ Kopieren Sie `dist/` auf die CM5 (zum Beispiel nach `/opt/eh3d-studio`), tragen 
 
 ## 🧪 Tests
 
-`npm test` führt 24 Tests aus und alle bestehen: der Client der API (das Token, der Rumpf, die Abfrage, die Fehler, ein ausfallendes Netz, die Pfade mit zu maskierenden Namen), die Regeln für Namen, Passwörter und Knotenadressen, was an einer Maschine falsch ist, das Menü jeder Rolle, die nach Station gruppierten Maschinen, die Zählungen und Aktionen eines Auftrags und die acht Sprachen (ein Text in jeder Sprache, Chinesisch und Japanisch in ihrer Schrift, überall dieselben Platzhalter). `npm run typecheck` und `npm run lint` bestehen ebenfalls.
+`npm test` führt 44 Tests aus und alle bestehen: der Client der API (das Token, der Rumpf, die Abfrage, die Fehler, ein ausfallendes Netz, die Pfade mit zu maskierenden Namen), die Regeln für Namen, Passwörter und Knotenadressen, was an einer Maschine falsch ist, das Menü jeder Rolle, die nach Station gruppierten Maschinen, die Zählungen und Aktionen eines Auftrags und die acht Sprachen (ein Text in jeder Sprache, Chinesisch und Japanisch in ihrer Schrift, überall dieselben Platzhalter). `npm run typecheck` und `npm run lint` bestehen ebenfalls.
 
 ## 🏗️ Build und Veröffentlichung
 
@@ -204,6 +221,7 @@ EH3D-STUDIO/
 │   ├── App.tsx context.tsx                      das Gerüst, das Menü in drei Gruppen, was die Seiten teilen
 │   ├── api.ts types.ts                          der Client der Server-API
 │   ├── model.ts                                 Rollen, Formularregeln, Flotte und Aufträge
+│   ├── jobtools.ts attention.ts                 die Auftragswerkzeuge: Löcher, Anfragen, Plan, Suche, CSV
 │   ├── i18n.ts texts.ts                         die acht Sprachen
 │   ├── pages/                                   Überwachung, Konfiguration, Konto und Anmeldung
 │   └── styles.css                               das Thema Forge und drei weitere

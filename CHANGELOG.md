@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Prepare a job from Studio:** a page for operators picks the machine and takes the work as the files the programs read (`.NCD` with `.DTD`, `.PLT` with `.RTD`) or as holes typed by hand with the feed, speed and extra stroke of each tool, shows the plan, the time and the travel the server works out, and keeps the job ready.
+- **A page for each job:** the plan with the holes already drilled filled in and the next one ringed, the progress, who made it and when, the tools and the buttons that fit its state.
+- **The jobs that wait for the operator** are at the top of the overview with a Confirm button, and the overview adds up what the machines have done (jobs, holes, time).
+- **A list that can be worked with:** search, five orders, a CSV of what is shown and a button that clears the finished jobs.
+- **Alerts:** the title of the tab counts the jobs that wait for the operator; with the preference on, a sound and a notification of the browser say when a new one starts waiting.
+- **Machines move between servers:** a copy button and the export and import of machines as a file (the access tokens of the nodes are never exported).
+- **More tests:** 44 (the holes typed by hand, the files, the plan, the list, the CSV, the export and import of machines, the address and the alert).
+
 ## [0.0.1] - First release: the pages to set up and watch the machines, with the updates from GitHub
 
 - **Updates:** a page for the administrator compares the installed server and Studio with the latest releases on GitHub, checks on request and updates what is newer, showing what the helper does while it works; it comes back by itself when the server restarts. A workflow builds the archive of the pages that the update takes from the release.

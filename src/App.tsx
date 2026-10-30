@@ -3,13 +3,16 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Api, ApiError } from "./api";
 import { AppContext, THEMES, Toast, makeErr, makeText } from "./context";
 import type { AppState, ThemeId } from "./context";
-import { browserLang, isLang } from "./i18n";
+import { useAttention } from "./attention";
+import { browserLang, isLang, text } from "./i18n";
 import type { Lang, TextKey } from "./i18n";
-import { isPageId, pagesFor } from "./model";
+import { parseRoute, pagesFor } from "./model";
 import type { PageId } from "./model";
 import type { Session } from "./types";
 import { Login } from "./pages/Login";
 import { FleetPage, JobsPage, LivePage, Overview } from "./pages/Monitor";
+import { JobPage } from "./pages/JobDetail";
+import { PreparePage } from "./pages/Prepare";
 import { AccessPage, MachinesPage, ServerPage, UpdatesPage } from "./pages/Configure";
 import { AboutPage, AccountPage, PreferencesPage } from "./pages/Account";
 
@@ -32,9 +35,8 @@ function write(key: string, value: string | null) {
   }
 }
 
-function pageFromHash(): PageId {
-  const id = window.location.hash.replace(/^#\/?/, "");
-  return isPageId(id) ? id : "overview";
+function routeFromHash() {
+  return parseRoute(window.location.hash);
 }
 
 const GROUPS = ["monitor", "configure", "account"] as const;
@@ -52,10 +54,12 @@ export default function App() {
     const n = Number(read("refresh") ?? 5);
     return [0, 2, 5, 10, 30].includes(n) ? n : 5;
   });
+  const [alerts, setAlerts] = useState<boolean>(() => read("alerts") === "1");
   const api = useMemo(() => new Api(read("token")), []);
   const [session, setSession] = useState<Session | null>(null);
   const [checked, setChecked] = useState(false);
-  const [page, setPage] = useState<PageId>(pageFromHash);
+  const [route, setRoute] = useState(routeFromHash);
+  const page: PageId = route.page;
   const [news, setNews] = useState<{ message: string; kind: "ok" | "error" } | null>(null);
 
   useEffect(() => {
@@ -63,7 +67,7 @@ export default function App() {
     document.documentElement.lang = lang;
   }, [theme, lang]);
   useEffect(() => {
-    const on = () => setPage(pageFromHash());
+    const on = () => setRoute(routeFromHash());
     window.addEventListener("hashchange", on);
     return () => window.removeEventListener("hashchange", on);
   }, []);
@@ -104,6 +108,7 @@ export default function App() {
     write("lang", l);
   };
 
+  useAttention(api, session != null, refreshS, alerts, text(lang, "alert_waiting"));
   if (!checked) return null;
   if (!session) return <Login api={api} lang={lang} onLang={changeLang} onSignedIn={() => void signedIn()} />;
 
@@ -113,6 +118,7 @@ export default function App() {
     lang,
     theme,
     refreshS,
+    alerts,
     t,
     err: (e) => {
       // a refusal because the login ended takes the person back to the sign-in
@@ -125,7 +131,7 @@ export default function App() {
   const current = allowed.some((p) => p.id === page) ? page : "overview";
   const go = (id: PageId) => {
     window.location.hash = `#/${id}`;
-    setPage(id);
+    setRoute({ page: id, param: "" });
   };
 
   let body;
@@ -136,8 +142,14 @@ export default function App() {
     case "fleet":
       body = <FleetPage />;
       break;
+    case "prepare":
+      body = <PreparePage />;
+      break;
     case "jobs":
       body = <JobsPage />;
+      break;
+    case "job":
+      body = <JobPage id={route.param} key={route.param} />;
       break;
     case "live":
       body = <LivePage />;
@@ -165,6 +177,10 @@ export default function App() {
             setTheme(x);
             write("theme", x);
           }}
+          onAlerts={(on) => {
+            setAlerts(on);
+            write("alerts", on ? "1" : "0");
+          }}
           onRefresh={(s) => {
             setRefreshS(s);
             write("refresh", String(s));
@@ -188,7 +204,7 @@ export default function App() {
           </div>
           <nav>
             {GROUPS.map((g) => {
-              const pages = allowed.filter((p) => p.group === g);
+              const pages = allowed.filter((p) => p.group === g && !p.hidden);
               if (pages.length === 0) return null;
               return (
                 <div key={g} className="nav-group">
@@ -220,7 +236,7 @@ export default function App() {
               </button>
             </div>
           </header>
-          <div className="page" key={current}>
+          <div className="page" key={current + route.param}>
             {body}
           </div>
           <footer className="statusbar">

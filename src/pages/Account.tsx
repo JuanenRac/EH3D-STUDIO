@@ -60,8 +60,8 @@ export function AccountPage() {
   );
 }
 
-export function PreferencesPage({ onLang, onTheme, onRefresh }: { onLang: (l: Lang) => void; onTheme: (t: ThemeId) => void; onRefresh: (s: number) => void }) {
-  const { lang, theme, refreshS, t } = useApp();
+export function PreferencesPage({ onLang, onTheme, onRefresh, onAlerts }: { onLang: (l: Lang) => void; onTheme: (t: ThemeId) => void; onRefresh: (s: number) => void; onAlerts: (on: boolean) => void }) {
+  const { lang, theme, refreshS, alerts, t } = useApp();
   return (
     <Card title={t("nav_preferences")}>
       <div className="form-grid">
@@ -91,6 +91,20 @@ export function PreferencesPage({ onLang, onTheme, onRefresh }: { onLang: (l: La
               </option>
             ))}
           </select>
+        </Field>
+        <Field label={t("pref_alerts")} hint={t("pref_alerts_hint")}>
+          <span className="check">
+            <input
+              type="checkbox"
+              checked={alerts}
+              onChange={(e) => {
+                const on = e.target.checked;
+                if (on && "Notification" in window && Notification.permission === "default") void Notification.requestPermission();
+                onAlerts(on);
+              }}
+            />
+            {t("pref_alerts_on")}
+          </span>
         </Field>
       </div>
     </Card>

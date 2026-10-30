@@ -5,6 +5,7 @@ import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Field } from "../components/ui";
 import { cfgKeys, emptyMachine, machineProblems, toInput, updatable, updatesBusy, validName, validPassword } from "../model";
 import type { MachineProblem } from "../model";
+import { copyId, machineExport, machineImport } from "../jobtools";
 import type { ConnectionKind, MachineInput, Role } from "../types";
 import { ROLES } from "../types";
 import type { TextKey } from "../i18n";
@@ -46,11 +47,58 @@ export function MachinesPage() {
       say(err(e), "error");
     }
   };
+  const exportAll = () => {
+    const url = URL.createObjectURL(new Blob([machineExport(data ?? [])], { type: "application/json" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "eh3d-machines.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  const importFile = async (file: File | undefined) => {
+    if (!file) return;
+    const list = machineImport(await file.text());
+    if (!list) {
+      say(t("mach_import_bad"), "error");
+      return;
+    }
+    const have = new Set((data ?? []).map((m) => m.id));
+    let made = 0;
+    let skipped = 0;
+    for (const m of list) {
+      if (have.has(m.id) || machineProblems(m).length > 0) {
+        skipped += 1;
+        continue;
+      }
+      try {
+        await api.addMachine(m);
+        made += 1;
+      } catch (e) {
+        say(err(e), "error");
+        skipped += 1;
+      }
+    }
+    say(t("mach_imported", { n: made, skipped }), skipped > 0 && made === 0 ? "error" : "ok");
+    reload();
+  };
   const problemText = (p: MachineProblem) => t(`mach_problem_${p}` as TextKey);
 
   return (
     <div className="stack">
-      <Card title={t("nav_machines")} wide actions={<button className="primary" onClick={() => setForm({ isNew: true, m: emptyMachine() })}>{t("mach_new")}</button>}>
+      <Card title={t("nav_machines")} wide actions={
+        <>
+          <label className="button">
+            {t("mach_import")}
+            <input type="file" accept=".json,application/json" hidden onChange={(e) => void importFile(e.target.files?.[0])} />
+          </label>
+          <button disabled={!data || data.length === 0} onClick={exportAll}>
+            {t("mach_export")}
+          </button>
+          <button className="primary" onClick={() => setForm({ isNew: true, m: emptyMachine() })}>
+            {t("mach_new")}
+          </button>
+        </>
+      }>
         {error != null && <p className="error">{err(error)}</p>}
         {data && data.length === 0 && <Empty>{t("mach_empty")}</Empty>}
         {data && data.length > 0 && (
@@ -81,6 +129,7 @@ export function MachinesPage() {
                   <td>{cfgKeys(m.cfg).length}</td>
                   <td className="row-actions">
                     <button onClick={() => setForm({ isNew: false, m: toInput(m) })}>{t("act_edit")}</button>
+                    <button onClick={() => setForm({ isNew: true, m: { ...toInput(m), id: copyId(m.id, (data ?? []).map((x) => x.id)), name: `${m.name} (${t("mach_copy")})` } })}>{t("act_copy")}</button>
                     <DangerButton label={t("act_delete")} onConfirm={() => void remove(m.id)} />
                   </td>
                 </tr>

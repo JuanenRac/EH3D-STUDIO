@@ -16,6 +16,8 @@ export interface AppState {
   theme: ThemeId;
   /** How often the pages that follow the server ask it again, in seconds. */
   refreshS: number;
+  /** A sound and a notification when a job starts waiting for the operator. */
+  alerts: boolean;
   t: (key: TextKey, vars?: Record<string, string | number>) => string;
   /** A refusal or a failure as a sentence in the language of the person. */
   err: (e: unknown) => string;

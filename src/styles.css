@@ -413,3 +413,34 @@ pre.log {
 .table a { text-decoration: none; }
 .table a code { color: var(--accent, #ffb300); }
 .table a:hover code { text-decoration: underline; }
+
+/* ---- the plan of a job, the page of a job, links that look like buttons */
+.plan-grid { display: grid; grid-template-columns: minmax(260px, 1.2fr) minmax(220px, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 800px) { .plan-grid { grid-template-columns: 1fr; } }
+.plan { width: 100%; max-height: 460px; border: 1px solid var(--line); background: var(--bg); }
+.plan-bg { fill: color-mix(in srgb, var(--panel) 80%, var(--accent) 6%); }
+.plan-path { opacity: 0.9; }
+.swatch { display: inline-block; width: 0.8em; height: 0.8em; border-radius: 50%; vertical-align: middle; }
+.job-head { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; margin-bottom: 14px; }
+a.button, label.button {
+  display: inline-block; padding: 7px 14px; border: 1px solid var(--line); color: var(--text); text-decoration: none; cursor: pointer; background: transparent; font: inherit;
+}
+a.button:hover, label.button:hover { border-color: var(--accent); color: var(--accent); }
+a.button.primary { background: var(--accent); color: var(--accent-on); border-color: var(--accent); }
+.table a { color: var(--text); text-decoration: none; }
+.table a:hover strong { color: var(--accent); }
+.table td input[type="number"] { width: 7em; }
+.check { display: inline-flex; gap: 8px; align-items: center; }
+.filters input[type="search"] { min-width: 14em; }
+input[type="checkbox"] { width: auto; }
+.facts a { color: var(--accent); text-decoration: none; }
+.facts a:hover { text-decoration: underline; }
+input[type="file"] { padding: 6px 8px; }
+input[type="file"]::file-selector-button {
+  margin-right: 12px; padding: 6px 12px; border: 1px solid var(--line); background: transparent; color: var(--text); font: inherit; cursor: pointer;
+}
+input[type="file"]::file-selector-button:hover { border-color: var(--accent); color: var(--accent); }
+a { color: var(--accent); }
+.grid .card.wide { grid-column: 1 / -1; }
+.facts + .table { margin-top: 16px; }
+.machine-row a { text-decoration: none; }

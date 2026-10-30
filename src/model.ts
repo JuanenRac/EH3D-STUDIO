@@ -4,18 +4,22 @@ import type { Fleet, FleetMachine, JobState, JobSummary, Machine, MachineInput, 
 
 // ---- the navigation: every page belongs to a group and needs a role
 
-export type PageId = "overview" | "fleet" | "jobs" | "live" | "machines" | "access" | "server" | "updates" | "account" | "preferences" | "about";
+export type PageId = "overview" | "fleet" | "prepare" | "jobs" | "job" | "live" | "machines" | "access" | "server" | "updates" | "account" | "preferences" | "about";
 
 export interface PageDef {
   id: PageId;
   group: "monitor" | "configure" | "account";
   needs: Role;
+  /** Reached from a link, not from the menu. */
+  hidden?: boolean;
 }
 
 export const PAGES: PageDef[] = [
   { id: "overview", group: "monitor", needs: "viewer" },
   { id: "fleet", group: "monitor", needs: "viewer" },
+  { id: "prepare", group: "monitor", needs: "operator" },
   { id: "jobs", group: "monitor", needs: "viewer" },
+  { id: "job", group: "monitor", needs: "viewer", hidden: true },
   { id: "live", group: "monitor", needs: "viewer" },
   { id: "machines", group: "configure", needs: "admin" },
   { id: "access", group: "configure", needs: "admin" },
@@ -39,6 +43,12 @@ export function pagesFor(role: Role): PageDef[] {
 
 export function isPageId(s: string): s is PageId {
   return PAGES.some((p) => p.id === s);
+}
+
+/** The page and the thing it shows from the address after the `#`: `/jobs`, `/job/ab12`. */
+export function parseRoute(hash: string): { page: PageId; param: string } {
+  const [id, ...rest] = hash.replace(/^#\/?/, "").split("/");
+  return { page: isPageId(id) ? id : "overview", param: decodeURIComponent(rest.join("/")) };
 }
 
 // ---- the rules of the server, checked before a request goes out

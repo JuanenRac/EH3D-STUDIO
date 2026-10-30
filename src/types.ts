@@ -80,8 +80,22 @@ export interface JobSummary {
   estimate_s: number | null;
 }
 
+/** What a client draws and follows (docs/API.md of EH3D-SERVER, "the view"). */
+export interface JobView {
+  kind: "drill" | "route";
+  name: string;
+  tools: { number: number; spindle_rpm: number | null; count: number; feed_mm_min: number | null; depth_mm: number | null; iterations: number | null }[];
+  holes: { tool: number; x_mm: number; y_mm: number }[];
+  paths: { pen?: number; tool?: number; points_mm: [number, number][] }[];
+  bounds_mm: [number, number, number, number] | null;
+  items: number;
+  hole_ends: number[];
+  estimate_s: number | null;
+  travel_mm: number | null;
+}
+
 export interface Job extends JobSummary {
-  view: unknown;
+  view: JobView | null;
 }
 
 export type MachineState = "idle" | "busy" | "waiting";

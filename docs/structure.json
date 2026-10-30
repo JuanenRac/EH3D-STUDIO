@@ -68,6 +68,20 @@
         },
         {
           "desc": {
+            "en": "the job tools: holes, requests, plan, search, CSV",
+            "es": "las herramientas de trabajos: agujeros, peticiones, plano, búsqueda, CSV",
+            "it": "gli strumenti dei lavori: fori, richieste, disegno, ricerca, CSV",
+            "de": "die Auftragswerkzeuge: Löcher, Anfragen, Plan, Suche, CSV",
+            "fr": "les outils des travaux : trous, requêtes, plan, recherche, CSV",
+            "pt": "as ferramentas dos trabalhos: furos, pedidos, plano, pesquisa, CSV",
+            "zh": "作业工具：孔位、请求、图形、搜索、CSV",
+            "ja": "ジョブの道具：穴・リクエスト・図面・検索・CSV"
+          },
+          "name": "jobtools.ts  attention.ts",
+          "tree_name": "jobtools.ts attention.ts"
+        },
+        {
+          "desc": {
             "en": "the eight languages",
             "es": "los ocho idiomas",
             "it": "le otto lingue",

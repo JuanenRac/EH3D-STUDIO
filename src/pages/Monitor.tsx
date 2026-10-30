@@ -1,14 +1,16 @@
 /* The four pages of the group Monitor: the overview, the machines by station, the jobs and the live events. */
 import { useEffect, useRef, useState } from "react";
 import { useApp, usePolled } from "../context";
-import { Badge, Card, Empty, Progress } from "../components/ui";
-import { countJobs, duration, groupFleet, isActive, jobActions, jobPercent } from "../model";
+import { Badge, Card, DangerButton, Empty, Progress } from "../components/ui";
+import { atLeast, countJobs, duration, groupFleet, isActive, jobActions, jobPercent } from "../model";
+import { JOB_ORDERS, finishedIds, jobsCsv, matchesQuery, sortJobs, totals, waitingJobs } from "../jobtools";
+import type { JobOrder } from "../jobtools";
 import type { FleetMachine, JobState } from "../types";
 import { JOB_STATES } from "../types";
 import type { TextKey } from "../i18n";
 
 const MACHINE_TONE = { idle: "ok", busy: "run", waiting: "wait" } as const;
-const JOB_TONE: Record<JobState, "ok" | "run" | "wait" | "bad" | "dim"> = {
+export const JOB_TONE: Record<JobState, "ok" | "run" | "wait" | "bad" | "dim"> = {
   ready: "dim",
   connecting: "run",
   running: "run",
@@ -38,6 +40,7 @@ export function Overview() {
   return (
     <div className="grid">
       {fleet.error != null && <p className="error">{err(fleet.error)}</p>}
+      <NeedsYou jobs={jobs.data ?? []} onDone={jobs.reload} />
       <Card title={t("ov_fleet")}>
         <div className="tiles">
           {tile(t("ov_machines"), f?.machines ?? "-")}
@@ -55,6 +58,21 @@ export function Overview() {
           {tile(t("job_failed"), c?.failed ?? "-", c && c.failed > 0 ? "bad" : "")}
         </div>
       </Card>
+      {jobs.data && (
+        <Card title={t("ov_history")}>
+          {(() => {
+            const s = totals(jobs.data);
+            return (
+              <div className="tiles">
+                {tile(t("job_done"), s.done, "ok")}
+                {tile(t("job_failed"), s.failed, s.failed > 0 ? "bad" : "")}
+                {tile(t("job_holes"), s.holes)}
+                {tile(t("ov_time"), duration(s.seconds))}
+              </div>
+            );
+          })()}
+        </Card>
+      )}
       <Card title={t("ov_server")}>
         <dl className="facts">
           <dt>{t("ov_version")}</dt>
@@ -64,6 +82,40 @@ export function Overview() {
         </dl>
       </Card>
     </div>
+  );
+}
+
+/** The jobs that wait for the operator, with the button that answers them, at the top of the overview where nobody can miss them. */
+function NeedsYou({ jobs, onDone }: { jobs: import("../types").JobSummary[]; onDone: () => void }) {
+  const { api, session, t, err, say } = useApp();
+  const waiting = waitingJobs(jobs);
+  if (waiting.length === 0) return null;
+  return (
+    <Card title={t("ov_needs_you", { n: waiting.length })} wide>
+      {waiting.map((j) => (
+        <div key={j.id} className="machine-row">
+          <span className="dot wait" />
+          <div className="machine-name">
+            <a href={`#/job/${j.id}`}>
+              <strong>{j.name}</strong>
+            </a>
+            <small>
+              {j.machine} · {j.pause ? j.pause.kind + (j.pause.tool != null ? ` T${j.pause.tool}` : "") : ""}
+            </small>
+          </div>
+          {jobActions(j, session.role).confirm && (
+            <button
+              className="primary"
+              onClick={() =>
+                void api.confirmJob(j.id).then(onDone, (e) => say(err(e), "error"))
+              }
+            >
+              {t("act_confirm")}
+            </button>
+          )}
+        </div>
+      ))}
+    </Card>
   );
 }
 
@@ -83,7 +135,7 @@ function MachineRow({ m }: { m: FleetMachine }) {
       <div className="machine-job">
         {m.job ? (
           <>
-            <span>{m.job.name}</span>
+            <a href={`#/job/${m.job.id}`}>{m.job.name}</a>
             <Progress percent={m.job.percent} tone={m.state === "waiting" ? "wait" : "run"} />
           </>
         ) : m.ready > 0 ? (
@@ -119,6 +171,8 @@ export function JobsPage() {
   const { api, session, t, err, say, refreshS } = useApp();
   const [machine, setMachine] = useState("");
   const [state, setState] = useState("");
+  const [query, setQuery] = useState("");
+  const [order, setOrder] = useState<JobOrder>("newest");
   const machines = usePolled(() => api.machines(), 0);
   const { data, error, reload } = usePolled(() => api.jobs({ machine, state }), refreshS, [machine, state]);
   const act = async (what: () => Promise<unknown>) => {
@@ -129,9 +183,58 @@ export function JobsPage() {
       say(err(e), "error");
     }
   };
+  const shown = data ? sortJobs(data.filter((j) => matchesQuery(j, query)), order) : [];
+  const clearFinished = async () => {
+    const ids = finishedIds(shown);
+    try {
+      for (const id of ids) await api.deleteJob(id);
+      say(t("jobs_cleared", { n: ids.length }), "ok");
+    } catch (e) {
+      say(err(e), "error");
+    }
+    reload();
+  };
+  const exportCsv = () => {
+    const url = URL.createObjectURL(new Blob([jobsCsv(shown)], { type: "text/csv" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "eh3d-jobs.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
   return (
-    <Card title={t("nav_jobs")} wide>
+    <Card
+      title={t("nav_jobs")}
+      wide
+      actions={
+        <>
+          {atLeast(session.role, "operator") && (
+            <a className="button primary" href="#/prepare">
+              {t("nav_prepare")}
+            </a>
+          )}
+          <button disabled={shown.length === 0} onClick={exportCsv}>
+            {t("jobs_csv")}
+          </button>
+          {atLeast(session.role, "operator") && finishedIds(shown).length > 0 && <DangerButton label={t("jobs_clear", { n: finishedIds(shown).length })} onConfirm={() => void clearFinished()} />}
+        </>
+      }
+    >
       <div className="filters">
+        <label>
+          {t("jobs_search")}
+          <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} />
+        </label>
+        <label>
+          {t("jobs_order")}
+          <select value={order} onChange={(e) => setOrder(e.target.value as JobOrder)}>
+            {JOB_ORDERS.map((o) => (
+              <option key={o} value={o}>
+                {t(`order_${o}` as TextKey)}
+              </option>
+            ))}
+          </select>
+        </label>
         <label>
           {t("jobs_machine")}
           <select value={machine} onChange={(e) => setMachine(e.target.value)}>
@@ -156,8 +259,8 @@ export function JobsPage() {
         </label>
       </div>
       {error != null && <p className="error">{err(error)}</p>}
-      {data && data.length === 0 && <Empty>{t("jobs_empty")}</Empty>}
-      {data && data.length > 0 && (
+      {data && shown.length === 0 && <Empty>{t("jobs_empty")}</Empty>}
+      {data && shown.length > 0 && (
         <table className="table">
           <thead>
             <tr>
@@ -171,13 +274,15 @@ export function JobsPage() {
             </tr>
           </thead>
           <tbody>
-            {data.map((j) => {
+            {shown.map((j) => {
               const a = jobActions(j, session.role);
               const pct = jobPercent(j);
               return (
                 <tr key={j.id}>
                   <td>
-                    <strong>{j.name}</strong>
+                    <a href={`#/job/${j.id}`}>
+                      <strong>{j.name}</strong>
+                    </a>
                     <small>{j.kind === "drill" ? t("jobs_drill") : t("jobs_route")}</small>
                     {j.message && <small className="warn">{j.message}</small>}
                   </td>

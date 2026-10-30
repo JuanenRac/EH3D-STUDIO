@@ -50,8 +50,25 @@ await call("POST", "/users", { name: "ana", role: "operator", password: "demo-pa
 await call("POST", "/users", { name: "luis", role: "viewer", password: "demo-password-3" }, token);
 await call("POST", "/tokens", { name: "drillpro-bench", role: "operator" }, token);
 
-const holes = (n) => Array.from({ length: n }, (_, i) => ({ tool: 1, x_mm: 5 + (i % 20) * 4, y_mm: 5 + Math.floor(i / 20) * 4 }));
-const job = (name, n) => ({ kind: "drill", name, board_mm: 1.6, tools: [{ number: 1, extra_stroke_mm: 0, feed_mm_min: 1000, spindle_rpm: 24000 }], holes: holes(n) });
+// a board with three tools: rows of small pads, a connector with bigger holes and four mounting holes at the corners
+const board = (n) => {
+  const out = [];
+  for (let i = 0; i < n; i++) out.push({ tool: 1, x_mm: 8 + (i % 20) * 3.5, y_mm: 8 + Math.floor(i / 20) * 5 });
+  for (let i = 0; i < 12; i++) out.push({ tool: 2, x_mm: 10 + i * 5.08, y_mm: 4 });
+  for (const [x, y] of [[3, 3], [3, 47], [80, 3], [80, 47]]) out.push({ tool: 3, x_mm: x, y_mm: y });
+  return out;
+};
+const job = (name, n) => ({
+  kind: "drill",
+  name,
+  board_mm: 1.6,
+  tools: [
+    { number: 1, extra_stroke_mm: 0, feed_mm_min: 1000, spindle_rpm: 24000 },
+    { number: 2, extra_stroke_mm: 0, feed_mm_min: 900, spindle_rpm: 24000 },
+    { number: 3, extra_stroke_mm: 0, feed_mm_min: 700, spindle_rpm: 20000 },
+  ],
+  holes: board(n),
+});
 const made = [];
 for (const [machine, name, n] of [["bench-1", "power-board", 400], ["bench-2", "sensor", 120], ["room-1", "frame", 60], ["bench-3", "led-strip", 80]]) {
   made.push(await call("POST", `/machines/${machine}/jobs`, job(name, n), token));

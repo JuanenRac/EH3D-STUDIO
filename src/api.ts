@@ -3,7 +3,7 @@
  * `{ "error": code, "detail": text }` with a status, and that is what an ApiError carries. The pages never build a URL by hand.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import type { Fleet, Health, Job, JobSummary, Machine, MachineInput, NewToken, Role, Session, TokenInfo, UpdatesView, UserInfo } from "./types";
+import type { Fleet, Health, Job, JobView, JobSummary, Machine, MachineInput, NewToken, Role, Session, TokenInfo, UpdatesView, UserInfo } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string, public detail: string) {
@@ -96,6 +96,8 @@ export class Api {
     return this.request<JobSummary[]>("GET", "/jobs" + (s ? `?${s}` : ""));
   };
   job = (id: string) => this.request<Job>("GET", `/jobs/${encodeURIComponent(id)}`);
+  previewJob = (machine: string, request: unknown) => this.request<JobView>("POST", `/machines/${encodeURIComponent(machine)}/preview`, request);
+  createJob = (machine: string, request: unknown) => this.request<Job>("POST", `/machines/${encodeURIComponent(machine)}/jobs`, request);
   startJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/start`, {});
   confirmJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/confirm`, {});
   cancelJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/cancel`, {});
