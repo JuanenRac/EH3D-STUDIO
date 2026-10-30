@@ -4,7 +4,7 @@ import type { Fleet, FleetMachine, JobState, JobSummary, Machine, MachineInput, 
 
 // ---- the navigation: every page belongs to a group and needs a role
 
-export type PageId = "overview" | "fleet" | "jobs" | "live" | "machines" | "access" | "server" | "account" | "preferences" | "about";
+export type PageId = "overview" | "fleet" | "jobs" | "live" | "machines" | "access" | "server" | "updates" | "account" | "preferences" | "about";
 
 export interface PageDef {
   id: PageId;
@@ -20,6 +20,7 @@ export const PAGES: PageDef[] = [
   { id: "machines", group: "configure", needs: "admin" },
   { id: "access", group: "configure", needs: "admin" },
   { id: "server", group: "configure", needs: "viewer" },
+  { id: "updates", group: "configure", needs: "admin" },
   { id: "account", group: "account", needs: "viewer" },
   { id: "preferences", group: "account", needs: "viewer" },
   { id: "about", group: "account", needs: "viewer" },
@@ -82,6 +83,18 @@ export function emptyMachine(): MachineInput {
 /** A machine as the server shows it, as the form edits it (the token of the node is never shown, so the field starts empty). */
 export function toInput(m: Machine): MachineInput {
   return { id: m.id, name: m.name, model: m.model, station: m.station, connection: { kind: m.connection.kind, address: m.connection.address, token: "" }, dcf: m.dcf, rcf: m.rcf, cfg: m.cfg };
+}
+
+// ---- the updates of the installed services
+
+/** The components that have a newer release than the one installed. */
+export function updatable(view: { components: { id: string; newer: boolean }[] }): string[] {
+  return view.components.filter((c) => c.newer).map((c) => c.id);
+}
+
+/** The helper is checking or updating, or a request waits for it: the page asks again soon and offers no new request. */
+export function updatesBusy(view: { pending: boolean; state: string }): boolean {
+  return view.pending || view.state === "checking" || view.state === "updating";
 }
 
 // ---- the fleet and the jobs

@@ -15,6 +15,8 @@ import {
   machineProblems,
   pagesFor,
   toInput,
+  updatable,
+  updatesBusy,
   validAddress,
   validName,
   validPassword,
@@ -224,5 +226,57 @@ describe("the eight languages", () => {
     expect(errorText("es", new ApiError(409, "machine_busy", ""))).toBe(text("es", "err_machine_busy"));
     expect(errorText("en", new ApiError(400, "weird_code", "why"))).toBe("weird_code: why");
     expect(errorText("it", new ApiError(0, "unreachable", "down"))).toBe(text("it", "err_unreachable"));
+  });
+});
+
+describe("the updates", () => {
+  const view = (patch: Record<string, unknown> = {}) => ({
+    enabled: true,
+    pending: false,
+    state: "idle",
+    message: "",
+    log: [],
+    components: [
+      { id: "server", name: "EH3D-SERVER", installed: "0.0.1", latest: "0.0.2", newer: true, url: null, published: null },
+      { id: "studio", name: "EH3D-STUDIO", installed: "0.0.1", latest: "0.0.1", newer: false, url: null, published: null },
+    ],
+    ...patch,
+  });
+
+  it("only an administrator sees the page, and it is in the group Configure", () => {
+    const page = PAGES.find((p) => p.id === "updates");
+    expect(page).toEqual({ id: "updates", group: "configure", needs: "admin" });
+    expect(pagesFor("operator").some((p) => p.id === "updates")).toBe(false);
+    expect(pagesFor("admin").some((p) => p.id === "updates")).toBe(true);
+  });
+
+  it("offers the components that have a newer release and waits while the helper works", () => {
+    expect(updatable(view())).toEqual(["server"]);
+    expect(updatable(view({ components: [] }))).toEqual([]);
+    expect(updatesBusy(view())).toBe(false);
+    expect(updatesBusy(view({ pending: true }))).toBe(true);
+    expect(updatesBusy(view({ state: "checking" }))).toBe(true);
+    expect(updatesBusy(view({ state: "updating" }))).toBe(true);
+    expect(updatesBusy(view({ state: "done" }))).toBe(false);
+    expect(updatesBusy(view({ state: "error" }))).toBe(false);
+  });
+
+  it("asks the server for them, checks them and updates them", async () => {
+    const f = fakeFetch([{ status: 200, body: view() }, { status: 200, body: { ok: true } }, { status: 200, body: { ok: true } }, { status: 409, body: { error: "update_refused", detail: "an update is already waiting or running" } }]);
+    const api = new Api("tok", f.fetcher);
+    expect((await api.updates()).components.length).toBe(2);
+    await api.checkUpdates();
+    await api.applyUpdates(["server", "studio"]);
+    await expect(api.applyUpdates(["server"])).rejects.toBeInstanceOf(ApiError);
+    expect(f.calls.map((c) => `${c.init?.method} ${c.url}`)).toEqual(["GET /api/v1/updates", "POST /api/v1/updates/check", "POST /api/v1/updates/apply", "POST /api/v1/updates/apply"]);
+    expect(JSON.parse(String(f.calls[2].init?.body))).toEqual({ components: ["server", "studio"] });
+  });
+
+  it("has every text of the page in the eight languages", () => {
+    for (const key of Object.keys(ROWS).filter((k) => k.startsWith("up_") || k === "nav_updates")) {
+      for (const lang of LANGS) expect(text(lang, key as TextKey, { n: 2 }).length).toBeGreaterThan(0);
+    }
+    expect(text("de", "up_apply", { n: 2 })).toBe("2 aktualisieren");
+    expect(text("en", "up_apply", { n: 1 })).toBe("Update 1");
   });
 });

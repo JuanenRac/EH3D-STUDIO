@@ -10,7 +10,7 @@ import type { PageId } from "./model";
 import type { Session } from "./types";
 import { Login } from "./pages/Login";
 import { FleetPage, JobsPage, LivePage, Overview } from "./pages/Monitor";
-import { AccessPage, MachinesPage, ServerPage } from "./pages/Configure";
+import { AccessPage, MachinesPage, ServerPage, UpdatesPage } from "./pages/Configure";
 import { AboutPage, AccountPage, PreferencesPage } from "./pages/Account";
 
 export const VERSION = "0.0.1";
@@ -150,6 +150,9 @@ export default function App() {
       break;
     case "server":
       body = <ServerPage />;
+      break;
+    case "updates":
+      body = <UpdatesPage />;
       break;
     case "account":
       body = <AccountPage />;

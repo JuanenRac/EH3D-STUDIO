@@ -397,3 +397,15 @@ button.danger.armed { background: var(--bad); color: #fff; }
   .machine-row { grid-template-columns: 18px 1fr; }
   .page { padding: 14px; }
 }
+
+pre.log {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  max-height: 260px;
+  overflow: auto;
+  background: var(--panel-raised, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+  border-radius: 6px;
+  font-size: 13px;
+  white-space: pre-wrap;
+}

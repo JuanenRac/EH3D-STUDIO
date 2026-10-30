@@ -108,6 +108,28 @@ export interface FleetMachine {
   ready: number;
 }
 
+/** What the server says about the updates of the installed services (see docs/API.md of EH3D-SERVER). */
+export interface UpdateComponent {
+  id: string;
+  name: string;
+  installed: string | null;
+  latest: string | null;
+  newer: boolean;
+  url: string | null;
+  published: string | null;
+}
+
+export type UpdateState = "idle" | "checking" | "updating" | "done" | "error";
+
+export interface UpdatesView {
+  enabled: boolean;
+  pending: boolean;
+  state: UpdateState;
+  message: string;
+  log: string[];
+  components: UpdateComponent[];
+}
+
 export interface Fleet {
   stations: { id: string; machines: string[] }[];
   machines: FleetMachine[];

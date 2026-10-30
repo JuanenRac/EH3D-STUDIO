@@ -1,0 +1,36 @@
+name: Release pages
+
+# Builds the pages of the Studio and keeps them as one archive, with the SHA-256 beside it, as an artifact of the run. The release itself is published from the
+# maintainer's machine, which downloads the artifact. This archive is what the update helper of EH3D-SERVER takes from the release and unpacks into /opt/eh3d-studio.
+# Run it by hand: Actions > Release pages > Run workflow.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pages:
+    name: Build the pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Package
+        run: |
+          set -euo pipefail
+          version=$(python3 -c "import json;print(json.load(open('eh3d.project.json'))['version'])")
+          mkdir -p out
+          tar -czf "out/eh3d-studio-${version}.tar.gz" -C dist .
+          (cd out && sha256sum "eh3d-studio-${version}.tar.gz" > "eh3d-studio-${version}.tar.gz.sha256")
+      - uses: actions/upload-artifact@v5
+        with:
+          name: eh3d-studio-pages
+          path: out/*
+          if-no-files-found: error

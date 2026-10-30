@@ -3,7 +3,7 @@
  * `{ "error": code, "detail": text }` with a status, and that is what an ApiError carries. The pages never build a URL by hand.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import type { Fleet, Health, Job, JobSummary, Machine, MachineInput, NewToken, Role, Session, TokenInfo, UserInfo } from "./types";
+import type { Fleet, Health, Job, JobSummary, Machine, MachineInput, NewToken, Role, Session, TokenInfo, UpdatesView, UserInfo } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string, public detail: string) {
@@ -100,6 +100,11 @@ export class Api {
   confirmJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/confirm`, {});
   cancelJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/cancel`, {});
   deleteJob = (id: string) => this.request<unknown>("DELETE", `/jobs/${encodeURIComponent(id)}`);
+
+  // ---- the updates of the installed services, from the releases of GitHub (administrator)
+  updates = () => this.request<UpdatesView>("GET", "/updates");
+  checkUpdates = () => this.request<unknown>("POST", "/updates/check", {});
+  applyUpdates = (components: string[]) => this.request<unknown>("POST", "/updates/apply", { components });
 
   /** The address of the websocket of the events: the token goes in the address because a browser cannot set a header on a websocket. */
   eventsUrl(location: { protocol: string; host: string }): string {

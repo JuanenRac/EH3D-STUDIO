@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Field } from "../components/ui";
-import { cfgKeys, emptyMachine, machineProblems, toInput, validName, validPassword } from "../model";
+import { cfgKeys, emptyMachine, machineProblems, toInput, updatable, updatesBusy, validName, validPassword } from "../model";
 import type { MachineProblem } from "../model";
 import type { ConnectionKind, MachineInput, Role } from "../types";
 import { ROLES } from "../types";
@@ -355,6 +355,96 @@ export function ServerPage() {
             ))}
           </tbody>
         </table>
+      </Card>
+    </div>
+  );
+}
+
+/** The updates of the installed services from the releases of GitHub: what is installed, what is the latest, and a button for the check and for the update. */
+export function UpdatesPage() {
+  const { api, t, err, say } = useApp();
+  const [fast, setFast] = useState(false);
+  const { data, error, reload } = usePolled(() => api.updates(), fast ? 2 : 10);
+  const busy = data ? updatesBusy(data) : false;
+  // while the helper works the page asks every two seconds; when the server itself restarts the requests fail for a while and then answer again
+  if (busy !== fast) setFast(busy);
+  const ask = async (what: () => Promise<unknown>) => {
+    try {
+      await what();
+      say(t("up_asked"), "ok");
+      setFast(true);
+      reload();
+    } catch (e) {
+      say(err(e), "error");
+    }
+  };
+  if (error != null && !data) return <p className="error">{err(error)}</p>;
+  if (!data) return <Empty>…</Empty>;
+  if (!data.enabled) {
+    return (
+      <Card title={t("nav_updates")} wide>
+        <p className="hint">{t("up_off")}</p>
+      </Card>
+    );
+  }
+  const todo = updatable(data);
+  return (
+    <div className="stack">
+      <Card
+        title={t("nav_updates")}
+        wide
+        actions={
+          <>
+            <button disabled={busy} onClick={() => void ask(() => api.checkUpdates())}>
+              {t("up_check")}
+            </button>
+            <button className="primary" disabled={busy || todo.length === 0} onClick={() => void ask(() => api.applyUpdates(todo))}>
+              {t("up_apply", { n: todo.length })}
+            </button>
+          </>
+        }
+      >
+        <p className="hint">{t("up_help")}</p>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>{t("up_component")}</th>
+              <th>{t("up_installed")}</th>
+              <th>{t("up_latest")}</th>
+              <th>{t("up_status")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.components.map((c) => (
+              <tr key={c.id}>
+                <td>{c.name}</td>
+                <td>
+                  <code>{c.installed ?? "-"}</code>
+                </td>
+                <td>
+                  {c.url ? (
+                    <a href={c.url} target="_blank" rel="noreferrer">
+                      <code>{c.latest ?? "-"}</code>
+                    </a>
+                  ) : (
+                    <code>{c.latest ?? "-"}</code>
+                  )}
+                </td>
+                <td>
+                  <Badge tone={c.latest == null ? "dim" : c.newer ? "wait" : "ok"}>{c.latest == null ? t("up_unknown") : c.newer ? t("up_newer") : t("up_current")}</Badge>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {todo.length === 0 && data.components.some((c) => c.latest != null) && <p className="hint">{t("up_nothing")}</p>}
+        <p className="hint">{t("up_restart")}</p>
+      </Card>
+      <Card title={t("up_log")} wide>
+        <p>
+          <Badge tone={data.state === "error" ? "bad" : data.state === "done" ? "ok" : data.state === "idle" ? "dim" : "run"}>{t(`up_state_${data.state}` as TextKey)}</Badge> {data.message}
+        </p>
+        {data.log.length > 0 && <pre className="log">{data.log.join("\n")}</pre>}
       </Card>
     </div>
   );
