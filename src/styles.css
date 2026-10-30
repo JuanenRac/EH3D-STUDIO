@@ -1,0 +1,399 @@
+/*
+ * The look of Studio. The default theme, Forge, is the one of EH3D-BUNGARD-GUI: warm black, amber lines, cards with two cut corners, chips with an amber outline and
+ * square-cut buttons. Every theme sets the same handful of variables and the rest of this file paints with them.
+ * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
+ */
+:root,
+html[data-theme="forge"] {
+  --bg: #14110d;
+  --panel: #181410;
+  --panel2: #211b13;
+  --line: #3a2f1e;
+  --accent: #ffb300;
+  --accent-on: #1a1200;
+  --text: #f0e6d0;
+  --muted: #a89878;
+  --ok: #9be564;
+  --run: #ffb300;
+  --wait: #ff9100;
+  --bad: #ff5252;
+  --pause: #ff5a1f;
+  --glow: none;
+  --cut: 14px;
+  --font: "Ubuntu", "Segoe UI", system-ui, sans-serif;
+}
+html[data-theme="paper"] {
+  --bg: #f4efe4;
+  --panel: #fffdf7;
+  --panel2: #f0e9d8;
+  --line: #cdbf9f;
+  --accent: #b36b00;
+  --accent-on: #ffffff;
+  --text: #2a2418;
+  --muted: #75694f;
+  --ok: #2e7d32;
+  --run: #b36b00;
+  --wait: #c25e00;
+  --bad: #c62828;
+  --pause: #d84315;
+}
+html[data-theme="neon"] {
+  --bg: #07060d;
+  --panel: #0e0c1a;
+  --panel2: #181330;
+  --line: #5a2cff;
+  --accent: #00e5ff;
+  --accent-on: #001014;
+  --text: #f0ecff;
+  --muted: #9a93c8;
+  --ok: #39ffb6;
+  --run: #00e5ff;
+  --wait: #ffd600;
+  --bad: #ff3d71;
+  --pause: #ff2bd6;
+  --glow: 0 0 16px rgba(0, 229, 255, 0.25);
+}
+html[data-theme="midnight"] {
+  --bg: #050912;
+  --panel: #0a1020;
+  --panel2: #111b36;
+  --line: #26357f;
+  --accent: #8da2ff;
+  --accent-on: #050a26;
+  --text: #e8ecff;
+  --muted: #8e9ad8;
+  --ok: #7cf0a4;
+  --run: #8da2ff;
+  --wait: #ffd168;
+  --bad: #ff7b8e;
+  --pause: #ff9a5a;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+}
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: 600;
+}
+h3 {
+  color: var(--accent);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+h4 {
+  margin: 1.4rem 0 0.6rem;
+  font-size: 0.95rem;
+}
+small,
+.hint,
+.muted {
+  color: var(--muted);
+}
+small {
+  display: block;
+}
+code {
+  font-family: "Cascadia Mono", "Consolas", monospace;
+  font-size: 0.92em;
+}
+
+/* the shell */
+.shell {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  height: 100%;
+}
+.sidebar {
+  border-right: 1px solid var(--line);
+  padding: 16px 12px;
+  overflow-y: auto;
+  background: var(--panel);
+}
+.brand {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 18px;
+  font-size: 1.15rem;
+}
+.brand em {
+  color: var(--accent);
+  font-style: normal;
+}
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  background: var(--accent);
+  color: var(--accent-on);
+  font-weight: 800;
+  clip-path: polygon(0 0, 78% 0, 100% 22%, 100% 100%, 22% 100%, 0 78%);
+}
+.nav-group {
+  margin-bottom: 14px;
+}
+.nav-group-title {
+  margin: 0 8px 6px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+nav button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: var(--muted);
+  padding: 9px 12px;
+  margin-bottom: 3px;
+  cursor: pointer;
+  font: inherit;
+}
+nav button:hover {
+  color: var(--text);
+  background: var(--panel2);
+}
+nav button.active {
+  color: var(--text);
+  background: var(--panel2);
+  border-color: var(--accent);
+  box-shadow: inset 3px 0 var(--accent);
+}
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+}
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--line);
+}
+.who {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  color: var(--muted);
+}
+.page {
+  flex: 1;
+  overflow: auto;
+  padding: 22px 24px;
+}
+.statusbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 24px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* cards: two corners cut, the amber outline */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+}
+.stack {
+  display: grid;
+  gap: 18px;
+}
+.card {
+  background: var(--panel);
+  border: 1.5px solid var(--accent);
+  padding: 16px 18px 18px;
+  box-shadow: var(--glow);
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+}
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+}
+.tile {
+  background: var(--panel2);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.tile strong {
+  display: block;
+  font-size: 1.9rem;
+  margin-top: 2px;
+}
+.tile.ok strong { color: var(--ok); }
+.tile.run strong { color: var(--run); }
+.tile.wait strong { color: var(--wait); }
+.tile.bad strong { color: var(--bad); }
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 18px;
+  margin: 0;
+}
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+
+/* the fleet */
+.machine-row {
+  display: grid;
+  grid-template-columns: 18px minmax(160px, 1.2fr) 150px minmax(180px, 1.6fr) 60px;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--line);
+}
+.machine-row:last-child { border-bottom: 0; }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: var(--muted); }
+.dot.ok { background: var(--ok); }
+.dot.run { background: var(--run); }
+.dot.wait { background: var(--wait); }
+.machine-job { display: grid; gap: 4px; }
+.pct { text-align: right; }
+
+.bar { height: 8px; border-radius: 4px; background: var(--panel2); overflow: hidden; min-width: 60px; }
+.bar i { display: block; height: 100%; background: var(--run); }
+.bar.wait i { background: var(--wait); }
+.bar.ok i { background: var(--ok); }
+.bar.bad i { background: var(--bad); }
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  border: 1px solid currentColor;
+}
+.badge.ok { color: var(--ok); }
+.badge.run { color: var(--run); }
+.badge.wait { color: var(--wait); }
+.badge.bad { color: var(--bad); }
+.badge.dim { color: var(--muted); }
+
+/* tables and forms */
+.table { width: 100%; border-collapse: collapse; }
+.table th { text-align: left; color: var(--muted); font-weight: 500; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 6px 10px; }
+.table td { padding: 10px; border-top: 1px solid var(--line); vertical-align: middle; }
+.cell-bar { min-width: 140px; }
+.row-actions { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
+.filters { display: flex; gap: 18px; margin-bottom: 14px; flex-wrap: wrap; }
+.filters label { display: grid; gap: 4px; color: var(--muted); font-size: 0.85rem; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 14px; }
+.form-grid.wide-fields { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.field { display: grid; gap: 5px; }
+.field-label { color: var(--muted); font-size: 0.85rem; }
+.form-actions { display: flex; gap: 10px; }
+
+button,
+select,
+input,
+textarea {
+  font: inherit;
+  color: var(--text);
+}
+input,
+select,
+textarea {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 8px 10px;
+  width: 100%;
+}
+textarea { font-family: "Cascadia Mono", "Consolas", monospace; font-size: 0.88rem; resize: vertical; }
+input:focus, select:focus, textarea:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+input[aria-invalid="true"] { border-color: var(--bad); }
+button {
+  background: transparent;
+  border: 1.3px solid var(--accent);
+  border-radius: 9px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.05s;
+}
+button:hover:not(:disabled) { background: var(--panel2); }
+button:active:not(:disabled) { transform: translateY(1px); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+button.primary { background: var(--accent); color: var(--accent-on); font-weight: 700; }
+button.primary:hover:not(:disabled) { filter: brightness(1.1); background: var(--accent); }
+button.danger { border-color: var(--bad); color: var(--bad); }
+button.danger.armed { background: var(--bad); color: #fff; }
+
+.error { color: var(--bad); }
+.warn { color: var(--wait); }
+.empty { color: var(--muted); padding: 18px 0; }
+.events { list-style: none; margin: 0; padding: 0; font-family: "Cascadia Mono", "Consolas", monospace; font-size: 0.86rem; }
+.events li { padding: 5px 0; border-bottom: 1px solid var(--line); }
+.events time { color: var(--muted); margin-right: 10px; }
+.secret { border: 1px dashed var(--accent); padding: 12px; margin: 10px 0; display: grid; gap: 8px; }
+.secret code { word-break: break-all; padding: 8px; background: var(--panel2); }
+
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  padding: 12px 18px;
+  max-width: 460px;
+  border-radius: 9px;
+  background: var(--panel2);
+  border: 1.5px solid var(--ok);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+.toast.error { border-color: var(--bad); }
+
+/* the sign-in */
+.login { display: grid; place-items: center; min-height: 100%; padding: 24px; }
+.login-card {
+  width: min(420px, 100%);
+  display: grid;
+  gap: 14px;
+  padding: 28px;
+  background: var(--panel);
+  border: 1.5px solid var(--accent);
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+}
+.login-card h1 { font-size: 2rem; }
+.login-card h1 span { color: var(--accent); }
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .sidebar { border-right: 0; border-bottom: 1px solid var(--line); display: flex; gap: 12px; overflow-x: auto; }
+  .nav-group { display: flex; gap: 4px; align-items: center; margin: 0; }
+  .nav-group-title { display: none; }
+  nav { display: flex; gap: 8px; }
+  nav button { width: auto; white-space: nowrap; }
+  .machine-row { grid-template-columns: 18px 1fr; }
+  .page { padding: 14px; }
+}

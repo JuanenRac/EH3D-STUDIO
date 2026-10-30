@@ -1,0 +1,396 @@
+{
+  "repo": "EH3D-STUDIO",
+  "ecosystem": "eh3d",
+  "svg": "en",
+  "exempt": [
+    "test.bat",
+    "test.sh",
+    "package-lock.json",
+    "tsconfig.app.json",
+    "eslint.config.js"
+  ],
+  "tagline": {
+    "en": "Two levels: the folders, and the files that carry the logic.",
+    "es": "Dos niveles: las carpetas y los ficheros que llevan la lógica.",
+    "de": "Zwei Ebenen: die Ordner und die Dateien, die die Logik tragen.",
+    "fr": "Deux niveaux : les dossiers et les fichiers qui portent la logique.",
+    "it": "Due livelli: le cartelle e i file che portano la logica.",
+    "ja": "2階層：フォルダと、ロジックを担うファイル。",
+    "zh": "两个层级：文件夹，以及承载逻辑的文件。",
+    "pt": "Dois níveis: as pastas e os ficheiros que levam a lógica."
+  },
+  "cards": [
+    {
+      "name": "src/",
+      "span": 3,
+      "accent": "a",
+      "rows": [
+        {
+          "desc": {
+            "en": "the shell, the menu in three groups, what the pages share",
+            "es": "el armazón, el menú en tres grupos, lo que comparten las páginas",
+            "it": "la struttura, il menu in tre gruppi, ciò che condividono le pagine",
+            "de": "das Gerüst, das Menü in drei Gruppen, was die Seiten teilen",
+            "fr": "l'ossature, le menu en trois groupes, ce que les pages partagent",
+            "pt": "a estrutura, o menu em três grupos, o que as páginas partilham",
+            "zh": "框架、分三组的菜单、页面共享的内容",
+            "ja": "枠組み、3 グループのメニュー、ページ共通の部分"
+          },
+          "name": "App.tsx  context.tsx",
+          "tree_name": "App.tsx context.tsx"
+        },
+        {
+          "desc": {
+            "en": "the client of the API of the server",
+            "es": "el cliente de la API del servidor",
+            "it": "il client dell'API del server",
+            "de": "der Client der Server-API",
+            "fr": "le client de l'API du serveur",
+            "pt": "o cliente da API do servidor",
+            "zh": "服务器 API 的客户端",
+            "ja": "サーバー API のクライアント"
+          },
+          "name": "api.ts  types.ts",
+          "tree_name": "api.ts types.ts"
+        },
+        {
+          "desc": {
+            "en": "roles, rules of the forms, fleet and jobs",
+            "es": "roles, reglas de los formularios, flota y trabajos",
+            "it": "ruoli, regole dei moduli, flotta e lavori",
+            "de": "Rollen, Formularregeln, Flotte und Aufträge",
+            "fr": "rôles, règles des formulaires, flotte et travaux",
+            "pt": "perfis, regras dos formulários, frota e trabalhos",
+            "zh": "角色、表单规则、机群和作业",
+            "ja": "ロール、フォームの規則、フリート、ジョブ"
+          },
+          "name": "model.ts"
+        },
+        {
+          "desc": {
+            "en": "the eight languages",
+            "es": "los ocho idiomas",
+            "it": "le otto lingue",
+            "de": "die acht Sprachen",
+            "fr": "les huit langues",
+            "pt": "os oito idiomas",
+            "zh": "八种语言",
+            "ja": "8 言語"
+          },
+          "name": "i18n.ts  texts.ts",
+          "tree_name": "i18n.ts texts.ts"
+        },
+        {
+          "desc": {
+            "en": "Monitor, Configure, Account and the sign-in",
+            "es": "Supervisión, Configuración, Cuenta y el acceso",
+            "it": "Monitoraggio, Configurazione, Account e accesso",
+            "de": "Überwachung, Konfiguration, Konto und Anmeldung",
+            "fr": "Supervision, Configuration, Compte et connexion",
+            "pt": "Monitorização, Configuração, Conta e entrada",
+            "zh": "监控、配置、账户和登录",
+            "ja": "モニター、設定、アカウント、サインイン"
+          },
+          "name": "pages/"
+        },
+        {
+          "desc": {
+            "en": "the Forge theme and three more",
+            "es": "el tema Forge y tres más",
+            "it": "il tema Forge e altri tre",
+            "de": "das Thema Forge und drei weitere",
+            "fr": "le thème Forge et trois autres",
+            "pt": "o tema Forge e mais três",
+            "zh": "Forge 主题及另外三个",
+            "ja": "Forge テーマとほか 3 つ"
+          },
+          "name": "styles.css"
+        }
+      ],
+      "sub": {
+        "en": "the pages of Studio",
+        "es": "las páginas de Studio",
+        "it": "le pagine di Studio",
+        "de": "die Seiten von Studio",
+        "fr": "les pages de Studio",
+        "pt": "as páginas do Studio",
+        "zh": "Studio 的页面",
+        "ja": "Studio のページ"
+      }
+    },
+    {
+      "name": "tools/",
+      "span": 3,
+      "accent": "d",
+      "rows": [
+        {
+          "desc": {
+            "en": "demo data and the pictures of the README",
+            "es": "datos de demostración y las imágenes del README",
+            "it": "dati dimostrativi e le immagini del README",
+            "de": "Demodaten und die Bilder des README",
+            "fr": "données de démonstration et les images du README",
+            "pt": "dados de demonstração e as imagens do README",
+            "zh": "演示数据和 README 的图片",
+            "ja": "デモデータと README の画像"
+          },
+          "name": "demo_seed.mjs  shots.mjs",
+          "tree_name": "demo_seed.mjs shots.mjs"
+        },
+        {
+          "desc": {
+            "en": "CI check and README check",
+            "es": "comprobación de CI y de README",
+            "it": "controllo CI e README",
+            "de": "CI- und README-Prüfung",
+            "fr": "contrôle CI et README",
+            "pt": "verificação de CI e de README",
+            "zh": "CI 和 README 检查",
+            "ja": "CI と README のチェック"
+          },
+          "name": "ci_validate.py"
+        }
+      ],
+      "sub": {
+        "en": "checks and pictures",
+        "es": "comprobaciones e imágenes",
+        "it": "controlli e immagini",
+        "de": "Prüfungen und Bilder",
+        "fr": "contrôles et images",
+        "pt": "verificações e imagens",
+        "zh": "检查和图片",
+        "ja": "チェックと図"
+      }
+    },
+    {
+      "name": {
+        "en": "Other folders and the files at the root",
+        "es": "Otras carpetas y los archivos de la raíz",
+        "de": "Weitere Ordner und die Dateien im Wurzelverzeichnis",
+        "fr": "Autres dossiers et fichiers à la racine",
+        "it": "Altre cartelle e i file nella radice",
+        "ja": "その他のフォルダーとルートのファイル",
+        "zh": "其他文件夹和根目录文件",
+        "pt": "Outras pastas e os ficheiros da raiz"
+      },
+      "span": 3,
+      "accent": "a",
+      "kind": "group",
+      "rows": [
+        {
+          "desc": {
+            "en": "the sources of the two pictures",
+            "es": "las fuentes de los dos dibujos",
+            "it": "le fonti dei due disegni",
+            "de": "die Quellen der beiden Bilder",
+            "fr": "les sources des deux images",
+            "pt": "as fontes dos dois desenhos",
+            "zh": "两幅图的源文件",
+            "ja": "2 つの図のソース"
+          },
+          "name": "docs/"
+        },
+        {
+          "desc": {
+            "en": "the icon of the page",
+            "es": "el icono de la página",
+            "it": "l'icona della pagina",
+            "de": "das Symbol der Seite",
+            "fr": "l'icône de la page",
+            "pt": "o ícone da página",
+            "zh": "页面图标",
+            "ja": "ページのアイコン"
+          },
+          "name": "public/"
+        },
+        {
+          "desc": {
+            "en": "banner, pictures and screenshots",
+            "es": "banner, dibujos y capturas",
+            "it": "banner, disegni e schermate",
+            "de": "Banner, Bilder und Screenshots",
+            "fr": "bannière, images et captures",
+            "pt": "banner, desenhos e capturas",
+            "zh": "横幅、图和截图",
+            "ja": "バナー、図、スクリーンショット"
+          },
+          "name": "images/"
+        },
+        {
+          "desc": {
+            "en": "CI workflow, issue and pull-request templates",
+            "es": "flujo de CI y plantillas",
+            "it": "workflow CI e modelli",
+            "de": "CI-Workflow und Vorlagen",
+            "fr": "workflow CI et modèles",
+            "pt": "fluxo de CI e modelos",
+            "zh": "CI 工作流和模板",
+            "ja": "CI ワークフローとテンプレート"
+          },
+          "name": ".github/"
+        },
+        {
+          "desc": {
+            "en": "the page that loads the application",
+            "es": "la página que carga la aplicación",
+            "it": "la pagina che carica l'applicazione",
+            "de": "die Seite, die die Anwendung lädt",
+            "fr": "la page qui charge l'application",
+            "pt": "a página que carrega a aplicação",
+            "zh": "加载应用的页面",
+            "ja": "アプリを読み込むページ"
+          },
+          "name": "index.html"
+        },
+        {
+          "desc": {
+            "en": "the package, its scripts and its versions",
+            "es": "el paquete, sus scripts y sus versiones",
+            "it": "il pacchetto, i suoi script e le versioni",
+            "de": "das Paket, seine Skripte und Versionen",
+            "fr": "le paquet, ses scripts et ses versions",
+            "pt": "o pacote, os seus scripts e versões",
+            "zh": "包、脚本和版本",
+            "ja": "パッケージ、スクリプト、バージョン"
+          },
+          "name": "package.json"
+        },
+        {
+          "desc": {
+            "en": "build and lint settings",
+            "es": "ajustes de compilación y lint",
+            "it": "impostazioni di build e lint",
+            "de": "Build- und Lint-Einstellungen",
+            "fr": "réglages de build et de lint",
+            "pt": "definições de compilação e lint",
+            "zh": "构建和 lint 设置",
+            "ja": "ビルドと lint の設定"
+          },
+          "name": "vite.config.ts"
+        },
+        {
+          "desc": {
+            "en": "build and lint settings",
+            "es": "ajustes de compilación y lint",
+            "it": "impostazioni di build e lint",
+            "de": "Build- und Lint-Einstellungen",
+            "fr": "réglages de build et de lint",
+            "pt": "definições de compilação e lint",
+            "zh": "构建和 lint 设置",
+            "ja": "ビルドと lint の設定"
+          },
+          "name": "eslint.config.js"
+        },
+        {
+          "desc": {
+            "en": "type settings",
+            "es": "ajustes de tipos",
+            "it": "impostazioni dei tipi",
+            "de": "Typeinstellungen",
+            "fr": "réglages de types",
+            "pt": "definições de tipos",
+            "zh": "类型设置",
+            "ja": "型の設定"
+          },
+          "name": "tsconfig.json"
+        },
+        {
+          "desc": {
+            "en": "type settings",
+            "es": "ajustes de tipos",
+            "it": "impostazioni dei tipi",
+            "de": "Typeinstellungen",
+            "fr": "réglages de types",
+            "pt": "definições de tipos",
+            "zh": "类型设置",
+            "ja": "型の設定"
+          },
+          "name": "tsconfig.app.json"
+        },
+        {
+          "desc": {
+            "en": "install and build the pages",
+            "es": "instalar y compilar las páginas",
+            "it": "installare e compilare le pagine",
+            "de": "Seiten installieren und bauen",
+            "fr": "installer et construire les pages",
+            "pt": "instalar e compilar as páginas",
+            "zh": "安装并构建页面",
+            "ja": "ページのインストールとビルド"
+          },
+          "name": "build.sh  build.bat",
+          "tree_name": "build.sh build.bat"
+        },
+        {
+          "desc": {
+            "en": "open Studio in development",
+            "es": "abrir Studio en desarrollo",
+            "it": "aprire Studio in sviluppo",
+            "de": "Studio in der Entwicklung öffnen",
+            "fr": "ouvrir Studio en développement",
+            "pt": "abrir o Studio em desenvolvimento",
+            "zh": "以开发模式打开 Studio",
+            "ja": "開発モードで Studio を開く"
+          },
+          "name": "run.sh  run.bat",
+          "tree_name": "run.sh run.bat"
+        },
+        {
+          "desc": {
+            "en": "manifest and version utility",
+            "es": "manifiesto y utilidad de versión",
+            "it": "manifesto e utilità di versione",
+            "de": "Manifest und Versionswerkzeug",
+            "fr": "manifeste et utilitaire de version",
+            "pt": "manifesto e utilitário de versão",
+            "zh": "清单和版本工具",
+            "ja": "マニフェストとバージョンユーティリティ"
+          },
+          "name": "eh3d.project.json  bump_manifest_version.py",
+          "tree_name": "eh3d.project.json bump_manifest_version.py"
+        },
+        {
+          "desc": {
+            "en": "what changed in each version",
+            "es": "qué cambió en cada versión",
+            "it": "cosa è cambiato in ogni versione",
+            "de": "was sich in jeder Version geändert hat",
+            "fr": "ce qui a changé à chaque version",
+            "pt": "o que mudou em cada versão",
+            "zh": "每个版本的变化",
+            "ja": "各バージョンの変更点"
+          },
+          "name": "CHANGELOG.md"
+        },
+        {
+          "desc": {
+            "en": "vulnerabilities and support",
+            "es": "vulnerabilidades y soporte",
+            "it": "vulnerabilità e supporto",
+            "de": "Schwachstellen und Support",
+            "fr": "vulnérabilités et support",
+            "pt": "vulnerabilidades e suporte",
+            "zh": "漏洞与支持",
+            "ja": "脆弱性とサポート"
+          },
+          "name": "SECURITY.md  SUPPORT.md",
+          "tree_name": "SECURITY.md SUPPORT.md"
+        },
+        {
+          "desc": {
+            "en": "how to contribute and the licence",
+            "es": "cómo contribuir y la licencia",
+            "it": "come contribuire e la licenza",
+            "de": "Mitwirken und Lizenz",
+            "fr": "contribuer et la licence",
+            "pt": "como contribuir e a licença",
+            "zh": "如何贡献和许可证",
+            "ja": "貢献方法とライセンス"
+          },
+          "name": "CONTRIBUTING.md  LICENSE",
+          "tree_name": "CONTRIBUTING.md CODE_OF_CONDUCT.md LICENSE"
+        }
+      ]
+    }
+  ]
+}

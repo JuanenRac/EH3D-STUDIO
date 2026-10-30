@@ -1,0 +1,145 @@
+{
+  "repo": "EH3D-STUDIO",
+  "ecosystem": "eh3d",
+  "tagline": "The configuration panel of the EH3D server, in the look of BUNGARD-GUI.",
+  "description": "EH3D-STUDIO is a web application in React and TypeScript. It signs in to EH3D-SERVER and shows and changes what the server holds, in three groups of pages: Monitor (the overview, the machines by station, the jobs and the live events), Configure (the machines with their node and their configuration files, the users and the tokens, the settings of the server) and Account. Each person sees the pages their role allows. The client of the API, the rules of the forms and the eight languages are tested; the pages have been looked at in a browser against a local server with simulated machines.",
+  "columns": [
+    "WHO USES IT",
+    "THIS REPOSITORY",
+    "WHAT IT TALKS TO"
+  ],
+  "nodes": [
+    {
+      "id": "person",
+      "column": 0,
+      "level": "external",
+      "title": "A person in a browser",
+      "lines": [
+        "any role, in one of",
+        "the eight languages"
+      ]
+    },
+    {
+      "id": "pages",
+      "column": 1,
+      "level": "tested",
+      "title": "Pages in three groups",
+      "lines": [
+        "Monitor, Configure, Account;",
+        "each role sees its own"
+      ],
+      "code": [
+        "src/App.tsx",
+        "src/model.ts"
+      ]
+    },
+    {
+      "id": "texts",
+      "column": 1,
+      "level": "tested",
+      "title": "Eight languages",
+      "lines": [
+        "one row of eight per text,",
+        "read by a test"
+      ],
+      "code": [
+        "src/texts.ts",
+        "src/i18n.ts"
+      ]
+    },
+    {
+      "id": "client",
+      "column": 1,
+      "level": "tested",
+      "title": "Client of the API",
+      "lines": [
+        "one method per request,",
+        "one kind of error"
+      ],
+      "code": [
+        "src/api.ts"
+      ]
+    },
+    {
+      "id": "forms",
+      "column": 1,
+      "level": "tested",
+      "title": "Rules of the forms",
+      "lines": [
+        "names, passwords, addresses;",
+        "the server checks again"
+      ],
+      "code": [
+        "src/model.ts"
+      ]
+    },
+    {
+      "id": "server",
+      "column": 2,
+      "level": "contract",
+      "title": "EH3D-SERVER",
+      "lines": [
+        "REST and websocket; it can",
+        "serve these pages itself"
+      ],
+      "code": [
+        "src/api.ts"
+      ]
+    },
+    {
+      "id": "browser",
+      "column": 2,
+      "level": "config",
+      "title": "Browser storage",
+      "lines": [
+        "the login token, the language,",
+        "the theme and the refresh"
+      ],
+      "code": [
+        "src/App.tsx"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "person",
+      "to": "pages",
+      "label": "HTTP",
+      "level": "tested"
+    },
+    {
+      "from": "texts",
+      "to": "pages",
+      "level": "tested"
+    },
+    {
+      "from": "forms",
+      "to": "client",
+      "level": "tested"
+    },
+    {
+      "from": "pages",
+      "to": "client",
+      "level": "tested"
+    },
+    {
+      "from": "client",
+      "to": "server",
+      "label": "API",
+      "level": "contract"
+    },
+    {
+      "from": "pages",
+      "to": "browser",
+      "level": "config"
+    }
+  ],
+  "legend": {
+    "tested": "rules covered by tests on a computer",
+    "contract": "the API of another repository",
+    "config": "kept by the browser",
+    "untested": "has not run on real hardware",
+    "external": "a program, a person or another repository"
+  },
+  "footer": "Looked at in a browser against a local server; not yet against machines on a bench."
+}
