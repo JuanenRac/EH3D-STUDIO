@@ -10,7 +10,15 @@ import {
   fileRequest,
   fileSlot,
   finishedIds,
+  gcodeLineCount,
+  gcodeRequest,
   holesDone,
+  keepProgram,
+  keptProgram,
+  parseToolList,
+  prepareRoute,
+  resumeHref,
+  withSkips,
   jobsCsv,
   kindOfFiles,
   machineExport,
@@ -230,5 +238,75 @@ describe("one machine and its queue", () => {
     expect(copyNames("board", 0)).toEqual(["board"]);
     expect(copyNames("board", 500).length).toBe(50);
     expect(copyNames("x".repeat(60), 2)[1].length).toBeLessThanOrEqual(60);
+  });
+});
+
+describe("free G-code programs and the work that is switched off or already done", () => {
+  it("builds the request of a G-code program with the safety switch off unless asked", () => {
+    expect(gcodeRequest("frame", "G0 X1\n")).toEqual({ kind: "gcode", name: "frame", gcode: "G0 X1\n" });
+    expect(gcodeRequest("frame", "G0 X1\n", 3.9, true)).toEqual({ kind: "gcode", name: "frame", gcode: "G0 X1\n", skip: 3, restore_outputs: true });
+    expect(gcodeRequest("frame", "x", 0, false)).not.toHaveProperty("restore_outputs");
+  });
+
+  it("counts the lines of a program as skip does, blank and comment lines too", () => {
+    expect(gcodeLineCount("")).toBe(0);
+    expect(gcodeLineCount("G0 X1")).toBe(1);
+    expect(gcodeLineCount("G0 X1\n")).toBe(1);
+    expect(gcodeLineCount("(a)\n\nG0 X1\r\nM30\n")).toBe(4);
+  });
+
+  it("reads the tools that are switched off", () => {
+    expect(parseToolList("5, 2 2;T7")).toEqual({ tools: [2, 5, 7], bad: [] });
+    expect(parseToolList("")).toEqual({ tools: [], bad: [] });
+    expect(parseToolList("3 x 100 0 1.5")).toEqual({ tools: [3], bad: ["x", "100", "0", "1.5"] });
+  });
+
+  it("adds skip_tools and skip to a drilling or routing request only when they say something", () => {
+    const r = fileRequest("drill", "board", { ncd: "n", dtd: "d" });
+    expect(withSkips(r, [], 0)).toEqual(r);
+    expect(withSkips(r, [2, 4], 12.7)).toEqual({ ...r, skip_tools: [2, 4], skip: 12 });
+    expect(r).not.toHaveProperty("skip_tools");
+  });
+
+  it("carries the line to go on from through the address of Prepare", () => {
+    const href = resumeHref("bungard 1", 120, "ab12");
+    expect(href).toBe("#/prepare/bungard%201/120/ab12");
+    const route = parseRoute(href);
+    expect(route.page).toBe("prepare");
+    expect(prepareRoute(route.param)).toEqual({ machine: "bungard 1", skip: 120, job: "ab12" });
+    expect(prepareRoute("m1")).toEqual({ machine: "m1", skip: 0, job: "" });
+    expect(prepareRoute("")).toEqual({ machine: "", skip: 0, job: "" });
+  });
+
+  it("keeps a program in the browser for the job that may go on, and does without when there is no store", () => {
+    const store = new Map<string, string>();
+    const fake = { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => void store.set(k, v) };
+    const real = globalThis.window;
+    Object.defineProperty(globalThis, "window", { value: { localStorage: fake }, configurable: true });
+    try {
+      keepProgram("j1", "frame", "G0 X1\n");
+      expect(keptProgram("j1")).toEqual({ name: "frame", text: "G0 X1\n" });
+      expect(keptProgram("other")).toBeNull();
+      store.set("eh3d.gcode.bad", "{not json");
+      expect(keptProgram("bad")).toBeNull();
+    } finally {
+      Object.defineProperty(globalThis, "window", { value: real, configurable: true });
+    }
+    // with no store at all neither call throws
+    expect(() => keepProgram("j2", "x", "y")).not.toThrow();
+  });
+
+  it("exports and imports a GRBL machine with its port and baud rate and no token", () => {
+    const m = { id: "g1", name: "Router", model: "ccd-mtc", station: "", connection: { kind: "grbl", address: "COM3", port: "COM3", baud: 57600 }, dcf: "", rcf: "", cfg: "" };
+    const file = machineExport([m]);
+    expect(file).not.toContain("token");
+    expect(machineImport(file)?.[0].connection).toEqual({ kind: "grbl", port: "COM3", baud: 57600 });
+  });
+
+  it("puts the line of a G-code job in the CSV", () => {
+    const j = { id: "j", machine: "m", name: "n", kind: "gcode", state: "failed", created: 0, started: null, finished: null, by: "x", items_total: 10, items_done: 4, holes_total: 0, holes_done: 0, line: 5, message: null, pause: null, estimate_s: null } as JobSummary;
+    const [head, row] = jobsCsv([j]).split("\r\n");
+    expect(head.split(",")).toContain("line");
+    expect(row.split(",")[head.split(",").indexOf("line")]).toBe("5");
   });
 });

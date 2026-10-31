@@ -3,7 +3,7 @@
  * `{ "error": code, "detail": text }` with a status, and that is what an ApiError carries. The pages never build a URL by hand.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import type { Fleet, HeadMeasure, HeadStatus, Health, Job, JobView, JobSummary, Machine, MachineInput, NewToken, Role, Session, SpindleGuard, SpindleId, SpindleView, TokenInfo, UpdatesView, UserInfo } from "./types";
+import type { Fleet, HeadInspection, HeadLight, HeadMeasure, HeadStatus, Health, Job, JobView, JobSummary, Machine, MachineInput, NewToken, Role, Session, SpindleGuard, SpindleId, SpindleView, TokenInfo, UpdatesView, UserInfo } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string, public detail: string) {
@@ -107,11 +107,25 @@ export class Api {
   confirmJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/confirm`, {});
   cancelJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/cancel`, {});
   deleteJob = (id: string) => this.request<unknown>("DELETE", `/jobs/${encodeURIComponent(id)}`);
+  /** Hold a running G-code job (the controller holds its movement) and let it go on: the resume also answers the wait of a job that goes on after a stop. */
+  pauseJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/pause`, {});
+  resumeJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/resume`, {});
 
   // ---- the node of the drill head, through the server
   headStatus = (machine: string) => this.request<HeadStatus>("GET", `/machines/${encodeURIComponent(machine)}/head/status`);
   headMeasure = (machine: string, samples = 0) =>
     this.request<HeadMeasure>("POST", `/machines/${encodeURIComponent(machine)}/head/measure${samples > 0 ? `?samples=${samples}` : ""}`, {});
+  /** The ring of LEDs of the head: read it (a viewer) and change it (an operator; the server hands on the answer of the node). */
+  headLight = (machine: string) => this.request<HeadLight>("GET", `/machines/${encodeURIComponent(machine)}/head/light`);
+  setHeadLight = (machine: string, change: { on?: boolean; level?: number; tone?: string }) => {
+    const q = new URLSearchParams();
+    if (change.on !== undefined) q.set("on", change.on ? "1" : "0");
+    if (change.level !== undefined) q.set("level", String(Math.max(0, Math.min(100, Math.round(change.level)))));
+    if (change.tone !== undefined) q.set("tone", change.tone);
+    return this.request<HeadLight>("POST", `/machines/${encodeURIComponent(machine)}/head/light?${q.toString()}`, {});
+  };
+  /** The last quality check of the machine (404 `no_inspection` until one is made after the server starts). */
+  headInspection = (machine: string) => this.request<HeadInspection>("GET", `/machines/${encodeURIComponent(machine)}/head/inspect`);
   /** The address of the camera picture of the node: the token goes in the address because a picture cannot carry a header. */
   headStreamUrl = (machine: string) => `${BASE}/machines/${encodeURIComponent(machine)}/head/stream?token=${encodeURIComponent(this.token ?? "")}`;
 

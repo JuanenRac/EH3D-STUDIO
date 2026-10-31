@@ -18,7 +18,7 @@
 
 ---
 
-**Vérification d'honnêteté - ce qui tourne aujourd'hui :** une application web en React et TypeScript qui se connecte à EH3D-SERVER et montre et modifie ce qu'il contient : les machines avec leur station, leur nœud et leurs fichiers de configuration, les travaux, les utilisateurs et les jetons, les événements en direct. Le client de l'API, les règles des formulaires, le menu par rôle et les huit langues sont couverts par 50 tests, et les pages ont été vues dans un navigateur contre un serveur local avec des machines simulées. **Elle n'a pas été utilisée avec des machines sur un banc**, et le serveur ne termine pas encore TLS.
+**Vérification d'honnêteté - ce qui tourne aujourd'hui :** une application web en React et TypeScript qui se connecte à EH3D-SERVER et montre et modifie ce qu'il contient : les machines avec leur station, leur nœud et leurs fichiers de configuration, les travaux, les utilisateurs et les jetons, les événements en direct. Le client de l'API, les règles des formulaires, le menu par rôle et les huit langues sont couverts par 67 tests, et les pages ont été vues dans un navigateur contre un serveur local avec des machines simulées. **Elle n'a pas été utilisée avec des machines sur un banc**, et le serveur ne termine pas encore TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.0.3` |
 | Maturité | Échafaudage |
-| Tests | 50 tests (`npm test`) |
+| Tests | 67 tests (`npm test`) |
 | Pile technique | React 19, TypeScript, Vite |
 | Sur du matériel réel | Pas avec des machines sur un banc : vue dans un navigateur contre un serveur local avec des machines simulées |
 
@@ -45,7 +45,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Logiciel | 🟡 | L'application se construit sans avertissement (types, lint, build) et est servie par le serveur à la racine de son adresse ; elle a tourné dans un navigateur contre un serveur local. |
-| Tests | 🟢 | 50 tests réussissent (`npm test`) : le client de l'API avec ses erreurs, les règles des noms, mots de passe et adresses, le menu par rôle, la flotte par station, les actions d'un travail et les huit langues. |
+| Tests | 🟢 | 67 tests réussissent (`npm test`) : le client de l'API avec ses erreurs, les règles des noms, mots de passe et adresses, le menu par rôle, la flotte par station, les actions d'un travail et les huit langues. |
 | Pages | 🟡 | Aperçu, machines par station, travaux, événements en direct, machines, utilisateurs et jetons, serveur, compte, préférences et à propos sont écrits ; travaux et machines se gèrent avec la vraie API du serveur. Aucune page n'a été essayée par quelqu'un d'autre que l'auteur. |
 | Langues | 🟢 | Huit langues dans chaque texte, refus du serveur compris ; les textes sont lus par un test, mais seuls l'anglais et quelques phrases des autres ont été lus par une personne. |
 | Machines réelles | 🔴 | Rien n'a été fait avec elle sur un banc : aucune machine ajoutée, aucun nœud atteint et aucun travail exécuté par elle sur une vraie machine. |
@@ -154,6 +154,8 @@ Comment s'assemblent les parties de ce dépôt : qui lui parle, ce qu'il contien
 * **Une page pour chaque machine, des copies et un serveur perdu :** la page d'une machine montre ce qu'elle fait, les travaux qui l'attendent avec leur temps total et les derniers qu'elle a terminés ; un travail peut être gardé prêt en plusieurs copies à la fois (la même carte plusieurs fois) ; le dessin d'un plan s'enregistre en SVG ; et une ligne rouge prévient quand le serveur ne répond plus, jusqu'à ce qu'il réponde de nouveau.
 * **Le nœud de la tête de perçage sur la page d'une machine :** quand la configuration de la machine nomme le nœud (`head_address`), la page montre la vitesse de sa broche, sa température avec le verdict du nœud, la sortie de protection et le modèle de caméra, un bouton qui affiche sa caméra (MJPEG) et, pour un opérateur, un bouton qui mesure la table sous la tête ; tout passe par EH3D-SERVER, qui garde le jeton du nœud. Testé avec un substitut, jamais avec un vrai nœud.
 * **La broche sur la page d'une machine :** tout le monde lit quelle broche porte la machine (l'originale ou celle avec variateur), ce qui arrive à un travail qui demande plus que ce qu'elle donne, les limites de la broche utilisée et la vitesse maximale à régler dans le nœud de la machine ; un administrateur change la broche et l'interrupteur de sécurité (refuser le travail, par défaut, ou avertir et ramener la vitesse au maximum de la broche). Quand un travail est préparé avec l'interrupteur sur `warn`, le plan liste ce qui dépasse la broche, outil par outil ; avec `reject` le serveur le refuse et Studio dit pourquoi. Non essayé sur une vraie machine.
+* **Travaux G-code libres et machines GRBL :** une machine peut être un contrôleur GRBL sur un port série du serveur (port et débit en bauds ; le serveur doit être compilé avec `--features serial`), et un administrateur l'ajoute ou la modifie dans Configuration. Dans Préparer, un programme G-code (collé ou chargé depuis un fichier) est prévisualisé et gardé prêt comme tout travail, avec un interrupteur de sécurité pour redémarrer la broche et le liquide de refroidissement à la reprise, désactivé par défaut. Un travail G-code en cours est mis en pause et repris depuis la liste, depuis sa page et depuis l'aperçu, qui disent la ligne atteinte et ce qu'il attend (une pause, ou l'attente avant le premier mouvement d'un travail qui reprend) ; un travail arrêté propose de reprendre à sa ligne, avec le programme gardé dans le navigateur. Les travaux de perçage et de défonçage acceptent les outils désactivés et les trous ou trajets déjà faits, et la référence des réglages du serveur liste `gcode_finish_wait_s` et `updates_dir`. Essayé sur le simulateur et avec un substitut, jamais avec un vrai contrôleur GRBL.
+* **L'anneau de LED et le dernier contrôle de qualité sur la page d'une machine :** un opérateur allume ou éteint l'anneau et règle son niveau et sa teinte, et chacun lit le verdict du dernier contrôle du travail. Testé avec un substitut, jamais avec un vrai nœud.
 
 ## 🔒 Sécurité et protection
 
@@ -200,7 +202,7 @@ Copiez `dist/` sur la CM5 (par exemple dans `/opt/eh3d-studio`), mettez `studio_
 
 ## 🧪 Tests
 
-`npm test` lance 50 tests et tous réussissent : le client de l'API (le jeton, le corps, la requête, les erreurs, un réseau qui tombe, les chemins avec des noms à échapper), les règles des noms, mots de passe et adresses de nœud, ce qui ne va pas dans une machine, le menu de chaque rôle, les machines groupées par station, les comptes et les actions d'un travail, et les huit langues (un texte dans chaque langue, chinois et japonais dans leur écriture, les mêmes marqueurs partout). `npm run typecheck` et `npm run lint` réussissent aussi.
+`npm test` lance 67 tests et tous réussissent : le client de l'API (le jeton, le corps, la requête, les erreurs, un réseau qui tombe, les chemins avec des noms à échapper), les règles des noms, mots de passe et adresses de nœud, ce qui ne va pas dans une machine, le menu de chaque rôle, les machines groupées par station, les comptes et les actions d'un travail, et les huit langues (un texte dans chaque langue, chinois et japonais dans leur écriture, les mêmes marqueurs partout). `npm run typecheck` et `npm run lint` réussissent aussi.
 
 ## 🏗️ Compilation et publication
 

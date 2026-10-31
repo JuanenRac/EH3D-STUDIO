@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Field } from "../components/ui";
-import { cfgKeys, emptyMachine, machineProblems, toInput, updatable, updatesBusy, validName, validPassword } from "../model";
+import { cfgKeys, connectionBody, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, toInput, updatable, updatesBusy, validName, validPassword } from "../model";
 import type { MachineProblem } from "../model";
 import { copyId, machineExport, machineImport } from "../jobtools";
 import type { ConnectionKind, MachineInput, Role } from "../types";
-import { ROLES } from "../types";
+import { CONNECTION_KINDS, ROLES } from "../types";
 import type { TextKey } from "../i18n";
 
 const MODELS = ["ccd-mtc", "ccd-atc", "ccd2-mtc", "ccd2-atc", "ccd-premium-mtc", "ccd-premium-atc"];
@@ -26,7 +26,7 @@ export function MachinesPage() {
     if (!form || problems.length) return;
     setSaving(true);
     try {
-      const body: MachineInput = { ...form.m, connection: form.m.connection.kind === "demo" ? { kind: "demo" } : form.m.connection };
+      const body: MachineInput = { ...form.m, connection: connectionBody(form.m.connection) };
       if (form.isNew) await api.addMachine(body);
       else await api.updateMachine(form.m.id, body);
       say(t("mach_saved"), "ok");
@@ -123,8 +123,13 @@ export function MachinesPage() {
                   </td>
                   <td>{m.station || "-"}</td>
                   <td>
-                    <Badge tone={m.connection.kind === "node" ? "run" : "dim"}>{t(m.connection.kind === "node" ? "mach_kind_node" : "mach_kind_demo")}</Badge>
+                    <Badge tone={m.connection.kind === "demo" ? "dim" : "run"}>{t(connectionKey(m.connection.kind))}</Badge>
                     {m.connection.kind === "node" && <small>{m.connection.address}</small>}
+                    {m.connection.kind === "grbl" && (
+                      <small>
+                        {m.connection.port ?? m.connection.address} · {m.connection.baud ?? DEFAULT_BAUD}
+                      </small>
+                    )}
                   </td>
                   <td>{cfgKeys(m.cfg).length}</td>
                   <td className="row-actions">
@@ -161,10 +166,24 @@ export function MachinesPage() {
             </Field>
             <Field label={t("mach_connection")}>
               <select value={form.m.connection.kind} onChange={(e) => setConn({ kind: e.target.value as ConnectionKind })}>
-                <option value="demo">{t("mach_kind_demo")}</option>
-                <option value="node">{t("mach_kind_node")}</option>
+                {CONNECTION_KINDS.map((k) => (
+                  <option key={k} value={k}>
+                    {t(connectionKey(k))}
+                  </option>
+                ))}
               </select>
             </Field>
+            {form.m.connection.kind === "grbl" && (
+              <>
+                <Field label={t("mach_port")} hint={t("mach_port_hint")}>
+                  <input value={form.m.connection.port ?? ""} placeholder="/dev/ttyUSB0" onChange={(e) => setConn({ port: e.target.value })} aria-invalid={problems.includes("port")} />
+                </Field>
+                <Field label={t("mach_baud")} hint={t("mach_baud_hint")}>
+                  <input type="number" min={1200} max={2000000} step={1} value={form.m.connection.baud ?? DEFAULT_BAUD} onChange={(e) => setConn({ baud: Number(e.target.value) })} aria-invalid={problems.includes("baud")} />
+                </Field>
+                <p className="hint grid-note">{t("mach_grbl_note")}</p>
+              </>
+            )}
             {form.m.connection.kind === "node" && (
               <>
                 <Field label={t("mach_address")} hint="192.168.0.50:5800">
@@ -365,6 +384,8 @@ export const SERVER_SETTINGS: { key: string; value: string; text: TextKey }[] = 
   { key: "max_body_mb", value: "8", text: "srv_max_body_mb" },
   { key: "keep_jobs", value: "200", text: "srv_keep_jobs" },
   { key: "studio_dir", value: "-", text: "srv_studio_dir" },
+  { key: "updates_dir", value: "-", text: "srv_updates_dir" },
+  { key: "gcode_finish_wait_s", value: "900", text: "srv_gcode_finish_wait_s" },
 ];
 
 export function ServerPage() {

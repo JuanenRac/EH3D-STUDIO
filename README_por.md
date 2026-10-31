@@ -18,7 +18,7 @@
 
 ---
 
-**Verificação de honestidade - o que corre hoje:** uma aplicação web em React e TypeScript que entra no EH3D-SERVER e mostra e altera o que ele guarda: as máquinas com a sua estação, o seu nó e os ficheiros de configuração, os trabalhos, os utilizadores e os tokens, os eventos em direto. O cliente da API, as regras dos formulários, o menu por perfil e os oito idiomas estão cobertos por 50 testes, e as páginas foram vistas num navegador contra um servidor local com máquinas simuladas. **Não foi usada com máquinas numa bancada**, e o servidor ainda não termina TLS.
+**Verificação de honestidade - o que corre hoje:** uma aplicação web em React e TypeScript que entra no EH3D-SERVER e mostra e altera o que ele guarda: as máquinas com a sua estação, o seu nó e os ficheiros de configuração, os trabalhos, os utilizadores e os tokens, os eventos em direto. O cliente da API, as regras dos formulários, o menu por perfil e os oito idiomas estão cobertos por 67 testes, e as páginas foram vistas num navegador contra um servidor local com máquinas simuladas. **Não foi usada com máquinas numa bancada**, e o servidor ainda não termina TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Versão | `0.0.3` |
 | Maturidade | Estrutura inicial |
-| Testes | 50 testes (`npm test`) |
+| Testes | 67 testes (`npm test`) |
 | Tecnologias | React 19, TypeScript, Vite |
 | Em hardware real | Não com máquinas numa bancada: vista num navegador contra um servidor local com máquinas simuladas |
 
@@ -45,7 +45,7 @@ Cada linha é uma parte deste repositório e a luz diz até onde chega hoje. É 
 | Área | Estado | O que significa aqui |
 |---|---|---|
 | Software | 🟡 | A aplicação compila sem avisos (tipos, lint, compilação) e é servida pelo servidor na raiz do seu endereço; já correu num navegador contra um servidor local. |
-| Testes | 🟢 | Passam 50 testes (`npm test`): o cliente da API com os seus erros, as regras de nomes, palavras-passe e endereços, o menu por perfil, a frota por estação, as ações de um trabalho e os oito idiomas. |
+| Testes | 🟢 | Passam 67 testes (`npm test`): o cliente da API com os seus erros, as regras de nomes, palavras-passe e endereços, o menu por perfil, a frota por estação, as ações de um trabalho e os oito idiomas. |
 | Páginas | 🟡 | Resumo, máquinas por estação, trabalhos, eventos em direto, máquinas, utilizadores e tokens, servidor, conta, preferências e acerca de estão escritos; os trabalhos e as máquinas gerem-se com a API real do servidor. Nenhuma página foi experimentada por alguém que não seja o autor. |
 | Idiomas | 🟢 | Oito idiomas em cada texto, incluindo as recusas do servidor; os textos são lidos por um teste, mas só o inglês e algumas frases dos outros foram lidos por uma pessoa. |
 | Máquinas reais | 🔴 | Nada se fez com ela numa bancada: nenhuma máquina adicionada, nenhum nó alcançado e nenhum trabalho executado por ela numa máquina real. |
@@ -154,6 +154,8 @@ Como as partes deste repositório se encaixam: quem fala com ele, o que contém 
 * **Uma página para cada máquina, cópias e servidor em baixo:** a página de uma máquina mostra o que faz, os trabalhos que a esperam com o seu tempo total e os últimos que terminou; um trabalho pode ficar pronto em várias cópias de uma vez (a mesma placa muitas vezes); o desenho de um plano guarda-se como SVG; e uma linha vermelha avisa quando o servidor deixa de responder, até voltar a responder.
 * **O nó da cabeça de furação na página de uma máquina:** quando a configuração da máquina indica o nó (`head_address`), a página mostra a velocidade do seu fuso, a sua temperatura com o veredicto do nó, a saída de proteção e o modelo de câmara, um botão que mostra a sua câmara (MJPEG) e, para um operador, um botão que mede a mesa sob a cabeça; tudo passa pelo EH3D-SERVER, que guarda o token do nó. Testado com um simulado, nunca com um nó real.
 * **O fuso na página de uma máquina:** todos leem que fuso a máquina leva (o original ou o do variador), o que acontece a um trabalho que pede mais do que ele dá, os limites do fuso em uso e a velocidade máxima a definir no nó da máquina; um administrador muda o fuso e o interruptor de segurança (recusar o trabalho, que é o valor por omissão, ou avisar e cortar as rotações ao máximo do fuso). Ao preparar um trabalho com o interruptor em `warn`, o plano lista o que passa do fuso, ferramenta a ferramenta; com `reject` o servidor recusa-o e o Studio diz porquê. Não testado numa máquina real.
+* **Trabalhos G-code livres e máquinas GRBL:** uma máquina pode ser um controlador GRBL numa porta série do servidor (porta e velocidade em baud; o servidor tem de ser compilado com `--features serial`), e um administrador adiciona-a ou altera-a em Configuração. Em Preparar, um programa G-code (colado ou carregado de um ficheiro) é pré-visualizado e deixado pronto como qualquer trabalho, com um interruptor de segurança para voltar a arrancar o fuso e o refrigerante ao continuar, desligado por omissão. Um trabalho G-code em curso é pausado e retomado a partir da lista, da sua página e do resumo, que dizem a linha a que chegou e o que espera (uma pausa, ou a espera antes do primeiro movimento de um trabalho que continua); um trabalho que parou oferece continuar a partir da sua linha, com o programa guardado no navegador. Os trabalhos de furação e fresagem aceitam as ferramentas desligadas e os furos ou trajetos já feitos, e a referência das definições do servidor lista `gcode_finish_wait_s` e `updates_dir`. Experimentado no simulador e com um substituto, nunca com um controlador GRBL real.
+* **O anel de LEDs e a última verificação de qualidade na página de uma máquina:** um operador liga ou desliga o anel e define o seu nível e tom, e todos leem o veredicto da última verificação do trabalho. Testado com um substituto, nunca com um nó real.
 
 ## 🔒 Segurança e proteção
 
@@ -200,7 +202,7 @@ Copie `dist/` para a CM5 (por exemplo para `/opt/eh3d-studio`), ponha `studio_di
 
 ## 🧪 Testes
 
-`npm test` executa 50 testes e passam todos: o cliente da API (o token, o corpo, a consulta, os erros, uma rede que falha, os caminhos com nomes que precisam de escape), as regras de nomes, palavras-passe e endereços de nó, o que está errado numa máquina, o menu de cada perfil, as máquinas agrupadas por estação, as contagens e as ações de um trabalho, e os oito idiomas (um texto em cada idioma, chinês e japonês na sua escrita, os mesmos marcadores em todo o lado). `npm run typecheck` e `npm run lint` também passam.
+`npm test` executa 67 testes e passam todos: o cliente da API (o token, o corpo, a consulta, os erros, uma rede que falha, os caminhos com nomes que precisam de escape), as regras de nomes, palavras-passe e endereços de nó, o que está errado numa máquina, o menu de cada perfil, as máquinas agrupadas por estação, as contagens e as ações de um trabalho, e os oito idiomas (um texto em cada idioma, chinês e japonês na sua escrita, os mesmos marcadores em todo o lado). `npm run typecheck` e `npm run lint` também passam.
 
 ## 🏗️ Compilação e publicação
 

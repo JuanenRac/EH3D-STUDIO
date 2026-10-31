@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **GRBL machines:** a machine can be a GRBL controller on a serial port of the server (port and baud rate, checked as the server checks them), with the note that the server must be built with `--features serial`; the list shows the port and the speed, and the export and import of machines carry them.
+- **Free G-code jobs:** Prepare takes a G-code program (pasted or loaded from a file), previews it with its lines, size and time, keeps it ready on a simulator or a GRBL machine and refuses it on a node (and the other jobs on a GRBL machine) before it is sent. The safety switch that starts the spindle and the coolant again when a job goes on is off unless it is ticked.
+- **Hold, resume and go on after a stop:** a running G-code job is held and resumed from the list, from its page and from the overview; the job says the line it has got to and what it waits for in words (a tool change, the spindle, a hold, or the wait before the first move of a job that goes on); a job that failed or was stopped offers to go on from its line, with the program kept in the browser.
+- **Tools that are off and work already done:** a drilling or routing job takes the tools or pens that are switched off and the holes or paths already done, and the plan says what the server left out.
+- **The ring of LEDs and the last quality check** on the page of a machine, for an operator to turn on or off and set, and for everybody to read.
+- **The reference of the settings of the server** lists `gcode_finish_wait_s` and `updates_dir`; the refusals `bad_gcode`, `wrong_machine`, `not_pausable`, `not_in_state`, `no_work`, `too_big` and `bad_light` are told in the eight languages; the CSV of the jobs has the line.
+- 17 tests more (67 in all).
+
 ## [0.0.3] - The spindle of the machine on its page
 
 - **The spindle of the machine on its page:** the page of a machine shows which spindle it carries (the original or the one with a drive), what the server does with a job that asks for more than the spindle gives, the limits of the spindle in use and the top speed to set in the node of the machine; an administrator changes the spindle and the safety switch (`reject` by default, or `warn`). Preparing a job lists, tool by tool, what goes beyond the spindle when the switch is on `warn`, and the refusal `spindle_limit` is told in the eight languages. Texts in the eight languages and 3 tests.

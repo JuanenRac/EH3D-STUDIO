@@ -33,14 +33,15 @@ export interface NewToken {
   token: string;
 }
 
-export type ConnectionKind = "node" | "demo";
+export type ConnectionKind = "node" | "demo" | "grbl";
+export const CONNECTION_KINDS: ConnectionKind[] = ["demo", "node", "grbl"];
 
 export interface Machine {
   id: string;
   name: string;
   model: string;
   station: string;
-  connection: { kind: ConnectionKind; address: string; token_set: boolean };
+  connection: { kind: ConnectionKind; address: string; token_set: boolean; port?: string; baud?: number };
   dcf: string;
   rcf: string;
   cfg: string;
@@ -85,10 +86,20 @@ export interface MachineInput {
   name: string;
   model: string;
   station: string;
-  connection: { kind: ConnectionKind; address?: string; token?: string };
+  connection: { kind: ConnectionKind; address?: string; token?: string; port?: string; baud?: number };
   dcf: string;
   rcf: string;
   cfg: string;
+}
+
+/** What a job is: a drilling job, a routing job, or the free G-code program of a GRBL machine or of the simulator. */
+export type JobKind = "drill" | "route" | "gcode";
+export const JOB_KINDS: JobKind[] = ["drill", "route", "gcode"];
+
+/** What a job waits for: a tool change or the spindle start (drilling and routing), a hold of the operator or the wait before the first move of a job that goes on (G-code). */
+export interface JobPause {
+  kind: "tool_change" | "spindle_start" | "hold" | "resume" | string;
+  tool?: number;
 }
 
 export type JobState = "ready" | "connecting" | "running" | "waiting_operator" | "done" | "cancelled" | "failed";
@@ -98,7 +109,7 @@ export interface JobSummary {
   id: string;
   machine: string;
   name: string;
-  kind: "drill" | "route";
+  kind: JobKind;
   state: JobState;
   created: number;
   started: number | null;
@@ -108,14 +119,16 @@ export interface JobSummary {
   items_done: number;
   holes_total: number;
   holes_done: number;
+  /** A G-code job: the line of the program text it has got to, which is where a job that goes on starts from; 0 for the others. */
+  line?: number;
   message: string | null;
-  pause: { kind: string; tool?: number } | null;
+  pause: JobPause | null;
   estimate_s: number | null;
 }
 
 /** What a client draws and follows (docs/API.md of EH3D-SERVER, "the view"). */
 export interface JobView {
-  kind: "drill" | "route";
+  kind: JobKind;
   name: string;
   tools: { number: number; spindle_rpm: number | null; count: number; feed_mm_min: number | null; depth_mm: number | null; iterations: number | null }[];
   holes: { tool: number; x_mm: number; y_mm: number }[];
@@ -126,6 +139,9 @@ export interface JobView {
   estimate_s: number | null;
   travel_mm: number | null;
   spindle_warnings?: SpindleFinding[];
+  /** The tools (or pens) that were switched off and how many holes or paths were already done, as the server left them out. */
+  skipped_tools?: number[];
+  skipped?: number;
 }
 
 export interface Job extends JobSummary {
@@ -142,7 +158,7 @@ export interface FleetJob {
   percent: number;
   items_done: number;
   items_total: number;
-  pause: { kind: string; tool?: number } | null;
+  pause: JobPause | null;
 }
 
 export interface FleetMachine {
@@ -208,4 +224,26 @@ export interface HeadMeasure {
   asked: number;
   used: number;
   rejected: number;
+}
+
+/** The ring of LEDs around the camera of the drill head, as the node says it (`GET .../head/light`). */
+export interface HeadLight {
+  on: boolean;
+  level: number;
+  max_level?: number;
+  tone?: string;
+  sectors?: string;
+  leds?: number;
+  auto_off_s?: number;
+  color?: string;
+  cue?: string;
+}
+
+export const LIGHT_TONES = ["white", "cool", "warm", "red", "green", "blue"] as const;
+
+/** The last quality check of the work through the camera of the head (`GET .../head/inspect`): only what the page shows is listed. */
+export interface HeadInspection {
+  verdict: "ok" | "not_ok" | "unknown";
+  quality?: number;
+  findings?: { code: string; hole?: number; fails?: boolean }[];
 }

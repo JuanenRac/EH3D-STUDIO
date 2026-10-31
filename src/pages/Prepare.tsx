@@ -4,20 +4,28 @@ import { useMemo, useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, Empty, Field } from "../components/ui";
 import { PlanDownload, PlanView } from "../components/PlanView";
-import { copyNames, defaultDrillTool, drillRequest, fileRequest, fileSlot, kindOfFiles, nameFromFile, parseHoles, toolColour, toolsUsed } from "../jobtools";
+import { copyNames, defaultDrillTool, drillRequest, fileRequest, fileSlot, gcodeLineCount, gcodeRequest, keepProgram, keptProgram, kindOfFiles, nameFromFile, parseHoles, parseToolList, prepareRoute, toolColour, toolsUsed, withSkips } from "../jobtools";
 import type { DrillToolInput, SourceFiles } from "../jobtools";
-import { duration, spindleFindingKey } from "../model";
+import { duration, spindleFindingKey, takesJob } from "../model";
 import type { JobView } from "../types";
 
-type Source = "files" | "typed";
+type Source = "files" | "typed" | "gcode";
 
+/** `machineId` is what follows `prepare/` in the address: the machine, and for a G-code job that goes on, the line to start from and the job whose program was kept. */
 export function PreparePage({ machineId = "" }: { machineId?: string }) {
   const { api, t, err, say } = useApp();
+  const route = useMemo(() => prepareRoute(machineId), [machineId]);
+  const kept = useMemo(() => (route.job ? keptProgram(route.job) : null), [route.job]);
   const machines = usePolled(() => api.machines(), 0);
-  const [machine, setMachine] = useState(machineId);
+  const [machine, setMachine] = useState(route.machine);
+  const [gcode, setGcode] = useState(kept?.text ?? "");
+  const [skipLines, setSkipLines] = useState(route.skip);
+  const [skipItems, setSkipItems] = useState(0);
+  const [skipTools, setSkipTools] = useState("");
+  const [restore, setRestore] = useState(false);
   const [copies, setCopies] = useState(1);
-  const [source, setSource] = useState<Source>("files");
-  const [name, setName] = useState("");
+  const [source, setSource] = useState<Source>(route.skip > 0 ? "gcode" : "files");
+  const [name, setName] = useState(kept?.name ?? "");
   const [files, setFiles] = useState<SourceFiles>({});
   const [fileNames, setFileNames] = useState<string[]>([]);
   const [sorting, setSorting] = useState("");
@@ -31,6 +39,18 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
   const chosen = machine || list[0]?.id || "";
   const parsed = useMemo(() => parseHoles(typed), [typed]);
   const used = toolsUsed(parsed.holes);
+  const off = useMemo(() => parseToolList(skipTools), [skipTools]);
+  const gcodeLines = useMemo(() => gcodeLineCount(gcode), [gcode]);
+  const connection = list.find((m) => m.id === chosen)?.connection.kind ?? "demo";
+  const wrongMachine = !takesJob(connection, source === "gcode" ? "gcode" : "drill");
+
+  const readProgram = async (picked: FileList | null) => {
+    const f = picked?.[0];
+    if (!f) return;
+    setGcode(await f.text());
+    if (!name) setName(nameFromFile(f.name));
+    setView(null);
+  };
 
   const readFiles = async (picked: FileList | null) => {
     if (!picked) return;
@@ -49,16 +69,26 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
   };
 
   const request = () => {
+    if (wrongMachine) return null;
+    if (source === "gcode") {
+      if (gcode.trim() === "" || skipLines >= Math.max(gcodeLines, 1)) return null;
+      return gcodeRequest(name.trim() || "program", gcode, skipLines, restore);
+    }
+    if (off.bad.length > 0) return null;
     if (source === "files") {
       const kind = kindOfFiles(files);
-      return kind ? fileRequest(kind, name.trim() || "job", files, sorting) : null;
+      return kind ? withSkips(fileRequest(kind, name.trim() || "job", files, sorting), off.tools, skipItems) : null;
     }
     if (parsed.holes.length === 0 || parsed.bad.length > 0) return null;
-    return drillRequest(
-      name.trim() || "job",
-      boardMm,
-      used.map((n) => tools[n] ?? defaultDrillTool(n)),
-      parsed.holes,
+    return withSkips(
+      drillRequest(
+        name.trim() || "job",
+        boardMm,
+        used.map((n) => tools[n] ?? defaultDrillTool(n)),
+        parsed.holes,
+      ),
+      off.tools,
+      skipItems,
     );
   };
   const body = request();
@@ -87,6 +117,7 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
       for (const copy of copyNames(String(body.name), copies)) {
         const job = await api.createJob(chosen, { ...body, name: copy });
         first = first ?? job;
+        if (source === "gcode" && job?.id) keepProgram(job.id, copy, gcode);
       }
       say(copies > 1 ? t("prep_created_n", { n: copies }) : t("prep_created"), "ok");
       window.location.hash = copies === 1 && first?.id ? `#/job/${first.id}` : "#/jobs";
@@ -131,11 +162,57 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
             >
               <option value="files">{t("prep_from_files")}</option>
               <option value="typed">{t("prep_from_typed")}</option>
+              <option value="gcode">{t("prep_from_gcode")}</option>
             </select>
           </Field>
         </div>
 
-        {source === "files" ? (
+        {wrongMachine && <p className="error">{t(connection === "grbl" ? "prep_machine_grbl" : "prep_machine_node")}</p>}
+
+        {source === "gcode" ? (
+          <>
+            <Field label={t("prep_gcode")} hint={t("prep_gcode_hint")}>
+              <textarea
+                className="gcode-text"
+                rows={12}
+                spellCheck={false}
+                value={gcode}
+                placeholder={"G21 G90\nG0 X10 Y10\nG1 X40 F300\nM30"}
+                onChange={(e) => {
+                  setGcode(e.target.value);
+                  setView(null);
+                }}
+              />
+            </Field>
+            <div className="form-grid">
+              <Field label={t("prep_gcode_file")}>
+                <input type="file" accept=".nc,.ngc,.gcode,.gc,.tap,.txt,.cnc" onChange={(e) => void readProgram(e.target.files)} />
+              </Field>
+              <Field label={t("prep_skip_lines")} hint={t("prep_skip_lines_hint")}>
+                <input
+                  type="number"
+                  min={0}
+                  step={1}
+                  value={skipLines}
+                  onChange={(e) => {
+                    setSkipLines(Math.max(0, Math.floor(Number(e.target.value) || 0)));
+                    setView(null);
+                  }}
+                />
+              </Field>
+              <p className="hint">{t("prep_gcode_lines", { n: gcodeLines })}</p>
+            </div>
+            {route.skip > 0 && <p className="hint">{kept ? t("prep_resume_loaded", { job: kept.name, line: route.skip }) : t("prep_resume_pick", { line: route.skip })}</p>}
+            {skipLines >= Math.max(gcodeLines, 1) && gcode.trim() !== "" && <p className="error">{t("prep_skip_beyond")}</p>}
+            <label className="check-row">
+              <input type="checkbox" checked={restore} onChange={(e) => setRestore(e.target.checked)} />
+              <span>
+                <strong>{t("prep_restore")}</strong>
+                <small className="hint">{t("prep_restore_hint")}</small>
+              </span>
+            </label>
+          </>
+        ) : source === "files" ? (
           <div className="form-grid">
             <Field label={t("prep_files")} hint={t("prep_files_hint")}>
               <input type="file" multiple accept=".ncd,.dtd,.plt,.rtd,.NCD,.DTD,.PLT,.RTD" onChange={(e) => void readFiles(e.target.files)} />
@@ -220,6 +297,34 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
           </>
         )}
 
+        {source !== "gcode" && (
+          <div className="form-grid">
+            <Field label={t("prep_skip_tools")} hint={t("prep_skip_tools_hint")}>
+              <input
+                value={skipTools}
+                placeholder="2, 5"
+                onChange={(e) => {
+                  setSkipTools(e.target.value);
+                  setView(null);
+                }}
+                aria-invalid={off.bad.length > 0}
+              />
+            </Field>
+            <Field label={t("prep_skip_items")} hint={t("prep_skip_items_hint")}>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={skipItems}
+                onChange={(e) => {
+                  setSkipItems(Math.max(0, Math.floor(Number(e.target.value) || 0)));
+                  setView(null);
+                }}
+              />
+            </Field>
+            {off.bad.length > 0 && <p className="error grid-note">{t("prep_skip_tools_bad", { words: off.bad.join(", ") })}</p>}
+          </div>
+        )}
         <div className="form-grid">
           <Field label={t("prep_copies")} hint={t("prep_copies_hint")}>
             <input type="number" min={1} max={50} value={copies} onChange={(e) => setCopies(Math.max(1, Math.min(50, Number(e.target.value) || 1)))} />
@@ -239,8 +344,8 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
         <Card title={t("prep_plan")} wide>
           <div className="plan-grid">
             <div>
-              <PlanView view={view} label={t("prep_plan")} />
-              <PlanDownload name={name.trim() || "plan"} />
+              {view.kind === "gcode" ? <p className="hint">{t("job_gcode_noplan")}</p> : <PlanView view={view} label={t("prep_plan")} />}
+              {view.kind !== "gcode" && <PlanDownload name={name.trim() || "plan"} />}
             </div>
             <div>
               <dl className="facts">
@@ -248,8 +353,23 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
                 <dd>{duration(view.estimate_s)}</dd>
                 <dt>{t("prep_travel")}</dt>
                 <dd>{view.travel_mm != null ? `${(view.travel_mm / 1000).toFixed(2)} m` : "-"}</dd>
-                <dt>{t("prep_holes_n")}</dt>
-                <dd>{view.holes.length}</dd>
+                {view.kind === "gcode" ? (
+                  <>
+                    <dt>{t("prep_lines_to_send")}</dt>
+                    <dd>{view.items}</dd>
+                  </>
+                ) : (
+                  <>
+                    <dt>{t("prep_holes_n")}</dt>
+                    <dd>{view.holes.length}</dd>
+                  </>
+                )}
+                {((view.skipped ?? 0) > 0 || (view.skipped_tools?.length ?? 0) > 0) && (
+                  <>
+                    <dt>{t("job_left_out")}</dt>
+                    <dd>{t("job_left_out_line", { n: view.skipped ?? 0, tools: (view.skipped_tools ?? []).join(", ") || "-" })}</dd>
+                  </>
+                )}
                 <dt>{t("prep_size")}</dt>
                 <dd>{view.bounds_mm ? `${(view.bounds_mm[2] - view.bounds_mm[0]).toFixed(1)} x ${(view.bounds_mm[3] - view.bounds_mm[1]).toFixed(1)} mm` : "-"}</dd>
               </dl>

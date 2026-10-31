@@ -5,6 +5,7 @@ import { useApp, usePolled } from "../context";
 import { Badge, Card, Empty, Progress } from "../components/ui";
 import { ApiError } from "../api";
 import type { HeadMeasure, SpindleGuard, SpindleId } from "../types";
+import { LIGHT_TONES } from "../types";
 import { SPINDLE_IDS } from "../types";
 import { machineQueue } from "../jobtools";
 import { atLeast, duration, jobPercent, spindleNameKey } from "../model";
@@ -79,6 +80,8 @@ export function MachinePage({ id }: { id: string }) {
       <SpindleCard id={id} admin={atLeast(session.role, "admin")} />
 
       <HeadCard id={id} operator={operator} />
+
+      <HeadLightCard id={id} operator={operator} />
 
       <Card title={t("mach_now")} wide>
         {q.active ? (
@@ -214,6 +217,92 @@ function SpindleCard({ id, admin }: { id: string; admin: boolean }) {
             )}
           </dl>
         </div>
+      )}
+    </Card>
+  );
+}
+
+/** The ring of LEDs of the head and the last quality check of the work. Not shown when the machine has no node of the head. */
+function HeadLightCard({ id, operator }: { id: string; operator: boolean }) {
+  const { api, t, err, say, refreshS } = useApp();
+  const light = usePolled(() => api.headLight(id), refreshS || 5, [id]);
+  const check = usePolled(() => api.headInspection(id), 0, [id]);
+  const [level, setLevel] = useState<number | null>(null);
+  if (light.error instanceof ApiError && (light.error.code === "no_head" || light.error.code === "head_unreachable" || light.error.code === "head_refused")) return null;
+  const change = async (c: { on?: boolean; level?: number; tone?: string }) => {
+    try {
+      await api.setHeadLight(id, c);
+      light.reload();
+    } catch (e) {
+      say(err(e), "error");
+    }
+  };
+  const l = light.data;
+  const shown = level ?? l?.level ?? 0;
+  const noCheck = check.error instanceof ApiError && check.error.code === "no_inspection";
+  const fails = check.data?.findings?.filter((f) => f.fails).length ?? 0;
+  return (
+    <Card title={t("head_light")} wide>
+      {light.error != null && !l && <p className="error">{err(light.error)}</p>}
+      {l && (
+        <dl className="facts">
+          <dt>{t("head_light")}</dt>
+          <dd>
+            <Badge tone={l.on ? "ok" : "dim"}>{l.on ? t("head_light_on") : t("head_light_off")}</Badge>
+            {operator && (
+              <button onClick={() => void change({ on: !l.on })}>{l.on ? t("head_light_off") : t("head_light_on")}</button>
+            )}
+          </dd>
+          <dt>{t("head_light_level")}</dt>
+          <dd>
+            {operator ? (
+              <input
+                type="range"
+                min={0}
+                max={l.max_level ?? 100}
+                value={shown}
+                onChange={(e) => setLevel(Number(e.target.value))}
+                onMouseUp={() => {
+                  if (level != null) void change({ level });
+                  setLevel(null);
+                }}
+                onTouchEnd={() => {
+                  if (level != null) void change({ level });
+                  setLevel(null);
+                }}
+                onKeyUp={() => {
+                  if (level != null) void change({ level });
+                  setLevel(null);
+                }}
+              />
+            ) : null}{" "}
+            {shown} %
+          </dd>
+          <dt>{t("head_light_tone")}</dt>
+          <dd>
+            {operator ? (
+              <select value={l.tone ?? "white"} onChange={(e) => void change({ tone: e.target.value })}>
+                {LIGHT_TONES.map((tn) => (
+                  <option key={tn} value={tn}>
+                    {t(`tone_${tn}` as TextKey)}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              (l.tone ?? "-")
+            )}
+          </dd>
+        </dl>
+      )}
+      <h4>{t("head_inspect")}</h4>
+      {noCheck && <p className="hint">{t("head_inspect_none")}</p>}
+      {check.error != null && !noCheck && !check.data && <p className="error">{err(check.error)}</p>}
+      {check.data && (
+        <p>
+          <Badge tone={check.data.verdict === "ok" ? "ok" : check.data.verdict === "not_ok" ? "bad" : "dim"}>{t(`verdict_${check.data.verdict}` as TextKey)}</Badge>{" "}
+          {check.data.quality != null ? `${Math.round(check.data.quality)} % · ` : ""}
+          {t("head_inspect_findings", { n: check.data.findings?.length ?? 0, fails })}
+        </p>
       )}
     </Card>
   );

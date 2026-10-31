@@ -2,8 +2,8 @@
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Progress } from "../components/ui";
 import { PlanDownload, PlanView } from "../components/PlanView";
-import { took } from "../jobtools";
-import { duration, isActive, jobActions, jobPercent } from "../model";
+import { resumeHref, took } from "../jobtools";
+import { duration, isActive, jobActions, jobKindKey, jobPercent, pauseKey, resumeLine, spindleFindingKey } from "../model";
 import { ToolTable } from "./Prepare";
 import { JOB_TONE, stateKey } from "./Monitor";
 
@@ -33,6 +33,8 @@ export function JobPage({ id }: { id: string }) {
   }
   if (!job) return <Empty>…</Empty>;
   const a = jobActions(job, session.role);
+  const from = resumeLine(job);
+  const operator = session.role !== "viewer";
   const pct = jobPercent(job);
   const tone = job.state === "failed" ? "bad" : job.state === "waiting_operator" ? "wait" : job.state === "done" ? "ok" : "run";
   return (
@@ -55,6 +57,17 @@ export function JobPage({ id }: { id: string }) {
                 {t("act_confirm")}
               </button>
             )}
+            {a.pause && <button onClick={() => void act(() => api.pauseJob(job.id))}>{t("act_pause")}</button>}
+            {a.resume && (
+              <button className="primary" onClick={() => void act(() => api.resumeJob(job.id))}>
+                {t("act_resume")}
+              </button>
+            )}
+            {from != null && operator && (
+              <a className="button primary" href={resumeHref(job.machine, from, job.id)}>
+                {t("job_resume_from", { line: from })}
+              </a>
+            )}
             {a.cancel && <button onClick={() => void act(() => api.cancelJob(job.id))}>{isActive(job) ? t("act_stop") : t("act_cancel")}</button>}
             {a.remove && <DangerButton label={t("act_delete")} onConfirm={() => void act(() => api.deleteJob(job.id), () => (window.location.hash = "#/jobs"))} />}
           </>
@@ -66,13 +79,24 @@ export function JobPage({ id }: { id: string }) {
           <strong>{pct} %</strong>
         </div>
         {job.message && <p className="warn">{job.message}</p>}
-        {job.pause && (
-          <p className="warn">
-            {t("job_waits_for", { what: job.pause.kind + (job.pause.tool != null ? ` T${job.pause.tool}` : "") })}
-          </p>
+        {job.pause && <p className="warn">{t("job_waits_for", { what: t(pauseKey(job.pause), { tool: job.pause.tool ?? "" }) })}</p>}
+        {from != null && <p className="hint">{t("job_resume_help", { line: from })}</p>}
+        {(job.view?.spindle_warnings?.length ?? 0) > 0 && (
+          <div className="spindle-warning" role="alert">
+            <strong>{t("spindle_warn_title")}</strong>
+            <ul>
+              {job.view?.spindle_warnings?.map((w, i) => (
+                <li key={i}>{t(spindleFindingKey(w.code), { tool: w.tool, value: w.value, limit: w.limit })}</li>
+              ))}
+            </ul>
+          </div>
         )}
         <div className="plan-grid">
-          {job.view ? (
+          {job.view && job.kind === "gcode" ? (
+            <div>
+              <p className="hint">{t("job_gcode_noplan")}</p>
+            </div>
+          ) : job.view ? (
             <div>
               <PlanView view={job.view} itemsDone={isActive(job) || job.state === "done" ? job.items_done : undefined} label={job.name} />
               <PlanDownload name={job.name} />
@@ -88,12 +112,33 @@ export function JobPage({ id }: { id: string }) {
               </dd>
               <dt>{t("jobs_by")}</dt>
               <dd>{job.by}</dd>
-              <dt>{t("jobs_drill")}/{t("jobs_route")}</dt>
-              <dd>{job.kind === "drill" ? t("jobs_drill") : t("jobs_route")}</dd>
-              <dt>{t("job_holes")}</dt>
-              <dd>
-                {job.holes_done} / {job.holes_total}
-              </dd>
+              <dt>{t("jobs_kind")}</dt>
+              <dd>{t(jobKindKey(job.kind))}</dd>
+              {job.kind === "gcode" ? (
+                <>
+                  <dt>{t("job_line")}</dt>
+                  <dd>{job.line ?? 0}</dd>
+                  {job.view?.bounds_mm && (
+                    <>
+                      <dt>{t("prep_size")}</dt>
+                      <dd>{`${(job.view.bounds_mm[2] - job.view.bounds_mm[0]).toFixed(1)} x ${(job.view.bounds_mm[3] - job.view.bounds_mm[1]).toFixed(1)} mm`}</dd>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <dt>{t("job_holes")}</dt>
+                  <dd>
+                    {job.holes_done} / {job.holes_total}
+                  </dd>
+                </>
+              )}
+              {job.view && ((job.view.skipped ?? 0) > 0 || (job.view.skipped_tools?.length ?? 0) > 0) && (
+                <>
+                  <dt>{t("job_left_out")}</dt>
+                  <dd>{t("job_left_out_line", { n: job.view.skipped ?? 0, tools: (job.view.skipped_tools ?? []).join(", ") || "-" })}</dd>
+                </>
+              )}
               <dt>{t("job_items")}</dt>
               <dd>
                 {job.items_done} / {job.items_total}

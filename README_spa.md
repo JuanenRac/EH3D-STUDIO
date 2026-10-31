@@ -18,7 +18,7 @@
 
 ---
 
-**Comprobación de honestidad - lo que se ejecuta hoy:** una aplicación web en React y TypeScript que entra en EH3D-SERVER y muestra y cambia lo que este guarda: las máquinas con su estación, su nodo y sus ficheros de configuración, los trabajos, los usuarios y los tokens, los eventos en vivo. El cliente de la API, las reglas de los formularios, el menú por rol y los ocho idiomas están cubiertos por 50 pruebas, y las páginas se han visto en un navegador contra un servidor local con máquinas simuladas. **No se ha usado con máquinas en un banco de pruebas**, y el servidor aún no termina TLS.
+**Comprobación de honestidad - lo que se ejecuta hoy:** una aplicación web en React y TypeScript que entra en EH3D-SERVER y muestra y cambia lo que este guarda: las máquinas con su estación, su nodo y sus ficheros de configuración, los trabajos, los usuarios y los tokens, los eventos en vivo. El cliente de la API, las reglas de los formularios, el menú por rol y los ocho idiomas están cubiertos por 67 pruebas, y las páginas se han visto en un navegador contra un servidor local con máquinas simuladas. **No se ha usado con máquinas en un banco de pruebas**, y el servidor aún no termina TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Versión | `0.0.3` |
 | Madurez | Andamiaje |
-| Pruebas | 50 pruebas (`npm test`) |
+| Pruebas | 67 pruebas (`npm test`) |
 | Pila tecnológica | React 19, TypeScript, Vite |
 | En hardware real | No con máquinas en un banco: vista en un navegador contra un servidor local con máquinas simuladas |
 
@@ -45,7 +45,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 | Área | Estado | Qué significa aquí |
 |---|---|---|
 | Software | 🟡 | La aplicación compila sin avisos (tipos, lint, compilación) y el servidor la sirve en la raíz de su dirección; se ha ejecutado en un navegador contra un servidor local. |
-| Pruebas | 🟢 | Pasan 50 pruebas (`npm test`): el cliente de la API con sus errores, las reglas de nombres, contraseñas y direcciones, el menú por rol, la flota por estación, las acciones de un trabajo y los ocho idiomas. |
+| Pruebas | 🟢 | Pasan 67 pruebas (`npm test`): el cliente de la API con sus errores, las reglas de nombres, contraseñas y direcciones, el menú por rol, la flota por estación, las acciones de un trabajo y los ocho idiomas. |
 | Páginas | 🟡 | Resumen, máquinas por estación, trabajos, eventos en vivo, máquinas, usuarios y tokens, servidor, cuenta, preferencias y acerca de están escritos; los trabajos y las máquinas se gestionan con la API real del servidor. Ninguna página la ha probado alguien que no sea el autor. |
 | Idiomas | 🟢 | Ocho idiomas en cada texto, incluidas las negativas del servidor; los textos los lee una prueba, pero solo el inglés y unas pocas frases de los demás las ha leído una persona. |
 | Máquinas reales | 🔴 | Nada se ha hecho con ella en un banco: no se ha añadido ninguna máquina, no se ha llegado a ningún nodo ni se ha ejecutado un trabajo a través de ella en una máquina real. |
@@ -154,6 +154,8 @@ Cómo encajan las partes de este repositorio: quién habla con él, qué contien
 * **Una página para cada máquina, copias y servidor caído:** la página de una máquina muestra lo que hace, los trabajos que la esperan con su tiempo total y los últimos que terminó; un trabajo puede dejarse listo en varias copias a la vez (la misma placa muchas veces); el dibujo de un plano se guarda como SVG; y una línea roja avisa cuando el servidor deja de responder, hasta que vuelve a hacerlo.
 * **El nodo del cabezal de taladro en la página de una máquina:** cuando la configuración de la máquina nombra el nodo (`head_address`), la página muestra la velocidad de su husillo, su temperatura con el veredicto del nodo, la salida de protección y el modelo de cámara, un botón que muestra su cámara (MJPEG) y, para un operador, un botón que mide la mesa bajo el cabezal; todo pasa por EH3D-SERVER, que guarda el token del nodo. Probado con un simulado, nunca con un nodo real.
 * **El husillo en la página de una máquina:** todos leen qué husillo lleva la máquina (el original o el del variador), qué ocurre con un trabajo que pide más de lo que da, los límites del husillo en uso y la velocidad máxima que poner en el nodo de la máquina; un administrador cambia el husillo y el interruptor de seguridad (rechazar el trabajo, que es el valor por defecto, o avisar y recortar las revoluciones al máximo del husillo). Al preparar un trabajo con el interruptor en `warn`, el plan lista lo que se pasa del husillo, herramienta por herramienta; con `reject` el servidor lo rechaza y Studio dice por qué. No probado con una máquina real.
+* **Trabajos G-code libres y máquinas GRBL:** una máquina puede ser un controlador GRBL en un puerto serie del servidor (puerto y velocidad en baudios; el servidor debe compilarse con `--features serial`), y un administrador la da de alta o la cambia en Configuración. En Preparar, un programa G-code (pegado o cargado desde un fichero) se previsualiza y se deja listo como cualquier trabajo, con un interruptor de seguridad para volver a arrancar el husillo y el refrigerante al seguir, apagado por defecto. Un trabajo G-code en marcha se pausa y se reanuda desde la lista, desde su página y desde el resumen, que dicen la línea a la que ha llegado y qué espera (una pausa, o la espera antes del primer movimiento de un trabajo que sigue); un trabajo que se detuvo ofrece seguir desde su línea, con el programa guardado en el navegador. Los trabajos de taladrado y fresado admiten las herramientas apagadas y los agujeros o trayectorias ya hechos, y la referencia de los ajustes del servidor lista `gcode_finish_wait_s` y `updates_dir`. Probado con el simulador y con un sustituto, nunca con un controlador GRBL real.
+* **El anillo de LEDs y la última comprobación de calidad en la página de una máquina:** un operador enciende o apaga el anillo y fija su nivel y su tono, y todos leen el veredicto de la última comprobación del trabajo. Probado con un sustituto, nunca con un nodo real.
 
 ## 🔒 Seguridad y protección
 
@@ -200,7 +202,7 @@ Copia `dist/` a la CM5 (por ejemplo a `/opt/eh3d-studio`), pon `studio_dir = /op
 
 ## 🧪 Pruebas
 
-`npm test` ejecuta 50 pruebas y pasan todas: el cliente de la API (el token, el cuerpo, la consulta, los errores, una red que falla, las rutas con nombres que necesitan escape), las reglas de nombres, contraseñas y direcciones de nodo, lo que está mal en una máquina, el menú de cada rol, las máquinas agrupadas por estación, los recuentos y las acciones de un trabajo, y los ocho idiomas (un texto en cada idioma, chino y japonés en su escritura, los mismos marcadores en todas partes). `npm run typecheck` y `npm run lint` también pasan.
+`npm test` ejecuta 67 pruebas y pasan todas: el cliente de la API (el token, el cuerpo, la consulta, los errores, una red que falla, las rutas con nombres que necesitan escape), las reglas de nombres, contraseñas y direcciones de nodo, lo que está mal en una máquina, el menú de cada rol, las máquinas agrupadas por estación, los recuentos y las acciones de un trabajo, y los ocho idiomas (un texto en cada idioma, chino y japonés en su escritura, los mismos marcadores en todas partes). `npm run typecheck` y `npm run lint` también pasan.
 
 ## 🏗️ Compilación y publicación
 

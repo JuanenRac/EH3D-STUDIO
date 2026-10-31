@@ -10,8 +10,15 @@ import {
   duration,
   emptyMachine,
   groupFleet,
+  connectionBody,
   jobActions,
+  jobKindKey,
   jobPercent,
+  pauseKey,
+  resumeLine,
+  takesJob,
+  validBaud,
+  validPort,
   machineProblems,
   pagesFor,
   spindleFindingKey,
@@ -161,10 +168,10 @@ describe("the fleet and the jobs", () => {
   });
 
   it("offers a person only what their role and the state of the job allow", () => {
-    expect(jobActions(job("ready"), "operator")).toEqual({ start: true, confirm: false, cancel: true, remove: true });
-    expect(jobActions(job("waiting_operator"), "operator")).toEqual({ start: false, confirm: true, cancel: true, remove: false });
-    expect(jobActions(job("done"), "admin")).toEqual({ start: false, confirm: false, cancel: false, remove: true });
-    expect(jobActions(job("ready"), "viewer")).toEqual({ start: false, confirm: false, cancel: false, remove: false });
+    expect(jobActions(job("ready"), "operator")).toEqual({ start: true, confirm: false, pause: false, resume: false, cancel: true, remove: true });
+    expect(jobActions(job("waiting_operator"), "operator")).toEqual({ start: false, confirm: true, pause: false, resume: false, cancel: true, remove: false });
+    expect(jobActions(job("done"), "admin")).toEqual({ start: false, confirm: false, pause: false, resume: false, cancel: false, remove: true });
+    expect(jobActions(job("ready"), "viewer")).toEqual({ start: false, confirm: false, pause: false, resume: false, cancel: false, remove: false });
   });
 
   it("writes a duration", () => {
@@ -319,5 +326,94 @@ describe("the spindle of the machine", () => {
     expect(spindleNameKey("original")).toBe("spindle_original");
     expect(spindleNameKey("vfd")).toBe("spindle_vfd");
     expect(text("es", "spindle_limits_line", { min: 6000, max: 24000, xy: 1500, z: 1200, bit: 6 })).toBe("6000 a 24000 rpm · avance de corte 1500 mm/min · penetración 1200 mm/min · broca hasta 6 mm");
+  });
+});
+
+describe("free G-code jobs, the GRBL connection, hold and resume", () => {
+  const gcode = (state: JobSummary["state"], pause: JobSummary["pause"] = null, line = 0) =>
+    ({ kind: "gcode" as const, state, pause, line });
+
+  it("holds a running G-code job and lets a held one go on with Resume instead of Confirm", () => {
+    expect(jobActions(gcode("running"), "operator")).toMatchObject({ pause: true, resume: false, confirm: false, cancel: true });
+    expect(jobActions(gcode("waiting_operator", { kind: "hold" }), "operator")).toMatchObject({ pause: false, resume: true, confirm: false });
+    expect(jobActions(gcode("waiting_operator", { kind: "resume" }), "operator")).toMatchObject({ resume: true, confirm: false });
+    expect(jobActions(gcode("running"), "viewer")).toMatchObject({ pause: false, resume: false, cancel: false });
+    // a drilling job waiting for a tool is still answered with Confirm, and cannot be held
+    expect(jobActions({ kind: "drill", state: "waiting_operator", pause: { kind: "tool_change", tool: 2 } }, "operator")).toMatchObject({ confirm: true, resume: false });
+    expect(jobActions({ kind: "drill", state: "running", pause: null }, "operator").pause).toBe(false);
+  });
+
+  it("names what a job waits for and what kind it is", () => {
+    expect(pauseKey({ kind: "tool_change", tool: 3 })).toBe("pause_tool_change");
+    expect(pauseKey({ kind: "spindle_start" })).toBe("pause_spindle_start");
+    expect(pauseKey({ kind: "hold" })).toBe("pause_hold");
+    expect(pauseKey({ kind: "resume" })).toBe("pause_resume");
+    expect(pauseKey(null)).toBe("pause_other");
+    expect(jobKindKey("gcode")).toBe("jobs_gcode");
+    expect(jobKindKey("route")).toBe("jobs_route");
+    expect(jobKindKey("drill")).toBe("jobs_drill");
+    expect(text("es", "pause_tool_change", { tool: 3 })).toContain("3");
+  });
+
+  it("offers to go on from the line where a G-code job stopped, and only then", () => {
+    expect(resumeLine({ kind: "gcode", state: "failed", line: 120 })).toBe(120);
+    expect(resumeLine({ kind: "gcode", state: "cancelled", line: 7 })).toBe(7);
+    expect(resumeLine({ kind: "gcode", state: "failed", line: 0 })).toBeNull();
+    expect(resumeLine({ kind: "gcode", state: "done", line: 50 })).toBeNull();
+    expect(resumeLine({ kind: "drill", state: "failed", line: 50 })).toBeNull();
+  });
+
+  it("asks the server to hold and to resume through the address of the job", async () => {
+    const f = fakeFetch([{ status: 200, body: {} }, { status: 200, body: {} }]);
+    const api = new Api("t", f.fetcher);
+    await api.pauseJob("a b");
+    await api.resumeJob("a b");
+    expect(f.calls.map((c) => c.url)).toEqual(["/api/v1/jobs/a%20b/pause", "/api/v1/jobs/a%20b/resume"]);
+    expect(f.calls.every((c) => c.init?.method === "POST")).toBe(true);
+  });
+
+  it("checks the port and the baud rate of a GRBL machine as the server does", () => {
+    expect(validPort("/dev/ttyUSB0")).toBe(true);
+    expect(validPort("COM3")).toBe(true);
+    expect(validPort("")).toBe(false);
+    expect(validPort("COM 3")).toBe(false);
+    expect(validPort("a@b")).toBe(false);
+    expect([validBaud(1200), validBaud(115200), validBaud(2_000_000), validBaud(1199), validBaud(2_000_001), validBaud(9600.5)]).toEqual([true, true, true, false, false, false]);
+    const m = { ...emptyMachine(), id: "g1", name: "Router", connection: { kind: "grbl" as const, port: "COM3", baud: 115200 } };
+    expect(machineProblems(m)).toEqual([]);
+    expect(machineProblems({ ...m, connection: { kind: "grbl", port: "", baud: 100 } })).toEqual(["port", "baud"]);
+    // a GRBL machine without a baud rate takes the default one
+    expect(machineProblems({ ...m, connection: { kind: "grbl", port: "COM3" } })).toEqual([]);
+  });
+
+  it("sends the connection the way the server wants it, and reads a GRBL machine back into the form", () => {
+    expect(connectionBody({ kind: "demo", address: "x" })).toEqual({ kind: "demo" });
+    expect(connectionBody({ kind: "grbl", port: " COM3 " })).toEqual({ kind: "grbl", port: "COM3", baud: 115200 });
+    expect(connectionBody({ kind: "node", address: "10.0.0.5:5800", token: "" })).toEqual({ kind: "node", address: "10.0.0.5:5800", token: "" });
+    const shown: Machine = { id: "g1", name: "Router", model: "ccd-mtc", station: "", connection: { kind: "grbl", address: "COM3", token_set: false, port: "COM3", baud: 57600 }, dcf: "", rcf: "", cfg: "" };
+    expect(toInput(shown).connection).toEqual({ kind: "grbl", port: "COM3", baud: 57600 });
+  });
+
+  it("knows which kinds of job each connection takes", () => {
+    expect([takesJob("node", "drill"), takesJob("node", "route"), takesJob("node", "gcode")]).toEqual([true, true, false]);
+    expect([takesJob("grbl", "drill"), takesJob("grbl", "route"), takesJob("grbl", "gcode")]).toEqual([false, false, true]);
+    expect([takesJob("demo", "drill"), takesJob("demo", "route"), takesJob("demo", "gcode")]).toEqual([true, true, true]);
+  });
+
+  it("tells the refusals of the G-code jobs and the new settings in every language", () => {
+    for (const code of ["bad_gcode", "wrong_machine", "not_pausable", "not_in_state", "no_work", "too_big", "bad_light"]) {
+      for (const lang of LANGS) expect(errorText(lang, new ApiError(422, code, "")), `${code}/${lang}`).not.toContain(code);
+    }
+    expect(SERVER_SETTINGS.map((s) => s.key)).toEqual(expect.arrayContaining(["gcode_finish_wait_s", "updates_dir"]));
+    for (const s of SERVER_SETTINGS) expect(ROWS, s.key).toHaveProperty(s.text);
+  });
+
+  it("reads and changes the ring of LEDs of the head through the server", async () => {
+    const f = fakeFetch([{ status: 200, body: { on: true, level: 40 } }, { status: 200, body: { on: false, level: 40 } }, { status: 404, body: { error: "no_inspection", detail: "" } }]);
+    const api = new Api("t", f.fetcher);
+    expect((await api.headLight("m 1")).level).toBe(40);
+    await api.setHeadLight("m 1", { on: false, level: 140, tone: "warm" });
+    expect(f.calls[1].url).toBe("/api/v1/machines/m%201/head/light?on=0&level=100&tone=warm");
+    await expect(api.headInspection("m 1")).rejects.toMatchObject({ code: "no_inspection" });
   });
 });

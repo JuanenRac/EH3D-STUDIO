@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Progress } from "../components/ui";
-import { atLeast, countJobs, duration, groupFleet, isActive, jobActions, jobPercent } from "../model";
+import { atLeast, countJobs, duration, groupFleet, isActive, jobActions, jobKindKey, jobPercent, pauseKey } from "../model";
 import { JOB_ORDERS, finishedIds, jobsCsv, matchesQuery, sortJobs, totals, waitingJobs } from "../jobtools";
 import type { JobOrder } from "../jobtools";
 import type { FleetMachine, JobState } from "../types";
@@ -100,9 +100,14 @@ function NeedsYou({ jobs, onDone }: { jobs: import("../types").JobSummary[]; onD
               <strong>{j.name}</strong>
             </a>
             <small>
-              {j.machine} · {j.pause ? j.pause.kind + (j.pause.tool != null ? ` T${j.pause.tool}` : "") : ""}
+              {j.machine} · {j.pause ? t(pauseKey(j.pause), { tool: j.pause.tool ?? "" }) : ""}
             </small>
           </div>
+          {jobActions(j, session.role).resume && (
+            <button className="primary" onClick={() => void api.resumeJob(j.id).then(onDone, (e) => say(err(e), "error"))}>
+              {t("act_resume")}
+            </button>
+          )}
           {jobActions(j, session.role).confirm && (
             <button
               className="primary"
@@ -285,7 +290,7 @@ export function JobsPage() {
                     <a href={`#/job/${j.id}`}>
                       <strong>{j.name}</strong>
                     </a>
-                    <small>{j.kind === "drill" ? t("jobs_drill") : t("jobs_route")}</small>
+                    <small>{t(jobKindKey(j.kind))}</small>
                     {j.message && <small className="warn">{j.message}</small>}
                   </td>
                   <td>{j.machine}</td>
@@ -301,6 +306,8 @@ export function JobsPage() {
                   <td className="row-actions">
                     {a.start && <button onClick={() => void act(() => api.startJob(j.id))}>{t("act_start")}</button>}
                     {a.confirm && <button onClick={() => void act(() => api.confirmJob(j.id))}>{t("act_confirm")}</button>}
+                    {a.pause && <button onClick={() => void act(() => api.pauseJob(j.id))}>{t("act_pause")}</button>}
+                    {a.resume && <button onClick={() => void act(() => api.resumeJob(j.id))}>{t("act_resume")}</button>}
                     {a.cancel && <button onClick={() => void act(() => api.cancelJob(j.id))}>{isActive(j) ? t("act_stop") : t("act_cancel")}</button>}
                     {a.remove && (
                       <button className="danger" onClick={() => void act(() => api.deleteJob(j.id))}>

@@ -55,7 +55,80 @@ export function defaultDrillTool(number: number): DrillToolInput {
   return { number, extra_stroke_mm: 0, feed_mm_min: 1000, spindle_rpm: 24000 };
 }
 
-export type JobRequest = { kind: "drill" | "route"; name: string } & Record<string, unknown>;
+export type JobRequest = { kind: "drill" | "route" | "gcode"; name: string } & Record<string, unknown>;
+
+/** The numbers of the tools (or pens) typed as `2, 5 7`: whole numbers from 1 to 99, each once, ascending; `bad` lists the words that were not one. */
+export function parseToolList(text: string): { tools: number[]; bad: string[] } {
+  const tools: number[] = [];
+  const bad: string[] = [];
+  for (const word of text.split(/[\s,;]+/).filter((w) => w !== "")) {
+    const n = Number(word.replace(/^T/i, ""));
+    if (!Number.isInteger(n) || n < 1 || n > 99) bad.push(word);
+    else if (!tools.includes(n)) tools.push(n);
+  }
+  return { tools: tools.sort((a, b) => a - b), bad };
+}
+
+/** A drilling or routing request with the tools that are off and the work already done: `skip_tools` and `skip` of the server, left out when they say nothing. */
+export function withSkips(r: JobRequest, skipTools: number[], skip: number): JobRequest {
+  const out: JobRequest = { ...r };
+  if (skipTools.length > 0) out.skip_tools = skipTools;
+  if (skip > 0) out.skip = Math.floor(skip);
+  return out;
+}
+
+/** The request of a free G-code program. `skip` is how many lines of the text are already done (a job that goes on after a stop); `restoreOutputs` starts the spindle and the coolant again when it goes on, and is off unless asked. */
+export function gcodeRequest(name: string, gcode: string, skip = 0, restoreOutputs = false): JobRequest {
+  const r: JobRequest = { kind: "gcode", name, gcode };
+  if (skip > 0) r.skip = Math.floor(skip);
+  if (restoreOutputs) r.restore_outputs = true;
+  return r;
+}
+
+/** How many lines a program text has (the numbering `skip` counts: blank and comment lines too). */
+export function gcodeLineCount(text: string): number {
+  if (text === "") return 0;
+  const n = text.split(/\r?\n/).length;
+  return text.endsWith("\n") ? n - 1 : n;
+}
+
+// ---- a G-code program kept in the browser, so a job that stopped can go on without picking the file again
+
+const KEPT = "eh3d.gcode.";
+const KEPT_MAX = 1_500_000;
+
+/** Keep the text of a program under the id of its job (best effort: a full or blocked store is not an error). */
+export function keepProgram(jobId: string, name: string, text: string): void {
+  if (text.length > KEPT_MAX) return;
+  try {
+    window.localStorage.setItem(KEPT + jobId, JSON.stringify({ name, text }));
+  } catch {
+    /* no store: the person picks the file again */
+  }
+}
+
+export function keptProgram(jobId: string): { name: string; text: string } | null {
+  try {
+    const raw = window.localStorage.getItem(KEPT + jobId);
+    if (!raw) return null;
+    const v = JSON.parse(raw) as { name?: unknown; text?: unknown };
+    return typeof v.name === "string" && typeof v.text === "string" ? { name: v.name, text: v.text } : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The address of Prepare for a job that goes on: `#/prepare/<machine>/<line>/<job>`; the page reads it back with prepareRoute. */
+export function resumeHref(machine: string, line: number, jobId: string): string {
+  return `#/prepare/${encodeURIComponent(machine)}/${line}/${encodeURIComponent(jobId)}`;
+}
+
+/** The machine, the line to start from and the job whose program was kept, from the part of the address after `prepare/`. */
+export function prepareRoute(param: string): { machine: string; skip: number; job: string } {
+  const [machine = "", skip = "", job = ""] = param.split("/");
+  const n = Number(skip);
+  return { machine, skip: Number.isInteger(n) && n > 0 ? n : 0, job };
+}
 
 /** The request for a drilling job typed by hand. */
 export function drillRequest(name: string, boardMm: number, tools: DrillToolInput[], holes: TypedHole[]): JobRequest {
@@ -170,8 +243,8 @@ function csvCell(v: string | number | null): string {
 
 /** The jobs as CSV (comma separated, with a header line); the times are seconds since 1970 as the server keeps them. */
 export function jobsCsv(jobs: JobSummary[]): string {
-  const head = ["id", "name", "machine", "kind", "state", "by", "created", "started", "finished", "items_done", "items_total", "holes_done", "holes_total", "estimate_s", "message"];
-  const rows = jobs.map((j) => [j.id, j.name, j.machine, j.kind, j.state, j.by, j.created, j.started, j.finished, j.items_done, j.items_total, j.holes_done, j.holes_total, j.estimate_s, j.message].map(csvCell).join(","));
+  const head = ["id", "name", "machine", "kind", "state", "by", "created", "started", "finished", "items_done", "items_total", "holes_done", "holes_total", "line", "estimate_s", "message"];
+  const rows = jobs.map((j) => [j.id, j.name, j.machine, j.kind, j.state, j.by, j.created, j.started, j.finished, j.items_done, j.items_total, j.holes_done, j.holes_total, j.line ?? 0, j.estimate_s, j.message].map(csvCell).join(","));
   return [head.join(","), ...rows].join("\r\n") + "\r\n";
 }
 
@@ -201,26 +274,40 @@ export function totals(jobs: JobSummary[]): { done: number; failed: number; hole
 // ---- machines moved between servers
 
 /** A machine as a file to keep: the node's token is never in it (the server does not give it away). */
-export function machineExport(machines: { id: string; name: string; model: string; station: string; connection: { kind: string; address: string }; dcf: string; rcf: string; cfg: string }[]): string {
-  const clean = machines.map((m) => ({ id: m.id, name: m.name, model: m.model, station: m.station, connection: { kind: m.connection.kind, address: m.connection.address }, dcf: m.dcf, rcf: m.rcf, cfg: m.cfg }));
+export function machineExport(machines: { id: string; name: string; model: string; station: string; connection: { kind: string; address: string; port?: string; baud?: number }; dcf: string; rcf: string; cfg: string }[]): string {
+  const clean = machines.map((m) => ({
+    id: m.id,
+    name: m.name,
+    model: m.model,
+    station: m.station,
+    connection: m.connection.kind === "grbl" ? { kind: "grbl", port: m.connection.port ?? m.connection.address, baud: m.connection.baud ?? 115200 } : { kind: m.connection.kind, address: m.connection.address },
+    dcf: m.dcf,
+    rcf: m.rcf,
+    cfg: m.cfg,
+  }));
   return JSON.stringify({ eh3d_machines: 1, machines: clean }, null, 2) + "\n";
 }
 
 /** The machines of a file made by machineExport, or null when it is not one. */
-export function machineImport(text: string): { id: string; name: string; model: string; station: string; connection: { kind: "node" | "demo"; address?: string }; dcf: string; rcf: string; cfg: string }[] | null {
+export function machineImport(text: string): { id: string; name: string; model: string; station: string; connection: { kind: "node" | "demo" | "grbl"; address?: string; port?: string; baud?: number }; dcf: string; rcf: string; cfg: string }[] | null {
   try {
     const v = JSON.parse(text) as { eh3d_machines?: number; machines?: unknown };
     if (v.eh3d_machines !== 1 || !Array.isArray(v.machines)) return null;
     const out = [];
     for (const raw of v.machines as Record<string, unknown>[]) {
-      const c = (raw.connection ?? {}) as { kind?: string; address?: string };
+      const c = (raw.connection ?? {}) as { kind?: string; address?: string; port?: string; baud?: number };
       if (typeof raw.id !== "string" || typeof raw.name !== "string") return null;
       out.push({
         id: raw.id,
         name: raw.name,
         model: typeof raw.model === "string" ? raw.model : "ccd-mtc",
         station: typeof raw.station === "string" ? raw.station : "",
-        connection: c.kind === "node" ? { kind: "node" as const, address: c.address ?? "" } : { kind: "demo" as const },
+        connection:
+          c.kind === "node"
+            ? { kind: "node" as const, address: c.address ?? "" }
+            : c.kind === "grbl"
+              ? { kind: "grbl" as const, port: typeof c.port === "string" ? c.port : "", baud: typeof c.baud === "number" ? c.baud : 115200 }
+              : { kind: "demo" as const },
         dcf: typeof raw.dcf === "string" ? raw.dcf : "",
         rcf: typeof raw.rcf === "string" ? raw.rcf : "",
         cfg: typeof raw.cfg === "string" ? raw.cfg : "",

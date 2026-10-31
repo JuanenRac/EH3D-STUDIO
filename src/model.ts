@@ -1,6 +1,6 @@
 /* What the pages decide with: the navigation and who may see what, the rules a name or a password must follow before it is sent, how the fleet is grouped, and
  * how a job is counted. Pure functions, tested on their own. GPL-3.0-or-later. */
-import type { Fleet, FleetMachine, JobState, JobSummary, Machine, MachineInput, Role, SpindleFinding, SpindleId } from "./types";
+import type { Fleet, FleetMachine, JobKind, JobPause, JobState, JobSummary, Machine, MachineInput, Role, SpindleFinding, SpindleId } from "./types";
 
 // ---- the spindle of a machine
 
@@ -87,7 +87,19 @@ export function validAddress(s: string): boolean {
   return port >= 1 && port <= 65535;
 }
 
-export type MachineProblem = "id" | "name" | "station" | "address";
+/** The serial port of a GRBL machine as the server accepts it: not empty, no space and no `@`. */
+export function validPort(s: string): boolean {
+  return s.trim() !== "" && !/[@\s]/.test(s);
+}
+
+/** The baud rate of a GRBL machine: a whole number from 1200 to 2000000. */
+export function validBaud(n: number): boolean {
+  return Number.isInteger(n) && n >= 1200 && n <= 2_000_000;
+}
+
+export const DEFAULT_BAUD = 115200;
+
+export type MachineProblem = "id" | "name" | "station" | "address" | "port" | "baud";
 
 /** What is wrong with a machine before it is sent (the server checks again, and says more: unknown keys of the configuration, for one). */
 export function machineProblems(m: MachineInput): MachineProblem[] {
@@ -96,6 +108,10 @@ export function machineProblems(m: MachineInput): MachineProblem[] {
   if (m.name.trim() === "" || m.name.length > 64) out.push("name");
   if (m.station !== "" && !validName(m.station)) out.push("station");
   if (m.connection.kind === "node" && !validAddress(m.connection.address ?? "")) out.push("address");
+  if (m.connection.kind === "grbl") {
+    if (!validPort(m.connection.port ?? "")) out.push("port");
+    if (!validBaud(m.connection.baud ?? DEFAULT_BAUD)) out.push("baud");
+  }
   return out;
 }
 
@@ -105,7 +121,55 @@ export function emptyMachine(): MachineInput {
 
 /** A machine as the server shows it, as the form edits it (the token of the node is never shown, so the field starts empty). */
 export function toInput(m: Machine): MachineInput {
-  return { id: m.id, name: m.name, model: m.model, station: m.station, connection: { kind: m.connection.kind, address: m.connection.address, token: "" }, dcf: m.dcf, rcf: m.rcf, cfg: m.cfg };
+  const c = m.connection;
+  const connection: MachineInput["connection"] =
+    c.kind === "grbl" ? { kind: "grbl", port: c.port ?? c.address, baud: c.baud ?? DEFAULT_BAUD } : { kind: c.kind, address: c.address, token: "" };
+  return { id: m.id, name: m.name, model: m.model, station: m.station, connection, dcf: m.dcf, rcf: m.rcf, cfg: m.cfg };
+}
+
+/** The connection as the server wants it: the simulator carries nothing, a GRBL machine its port and baud rate, a node its address (and the token only when typed). */
+export function connectionBody(c: MachineInput["connection"]): MachineInput["connection"] {
+  if (c.kind === "demo") return { kind: "demo" };
+  if (c.kind === "grbl") return { kind: "grbl", port: (c.port ?? "").trim(), baud: c.baud ?? DEFAULT_BAUD };
+  return c;
+}
+
+/** Which kinds of job a connection takes: a node, drilling and routing; a GRBL controller, G-code only; the simulator, all three. */
+export function takesJob(connection: string, kind: JobKind): boolean {
+  if (connection === "grbl") return kind === "gcode";
+  if (connection === "node") return kind !== "gcode";
+  return true;
+}
+
+/** The text that names a kind of connection. */
+export function connectionKey(kind: string): "mach_kind_node" | "mach_kind_demo" | "mach_kind_grbl" {
+  return kind === "node" ? "mach_kind_node" : kind === "grbl" ? "mach_kind_grbl" : "mach_kind_demo";
+}
+
+/** The text that names a kind of job. */
+export function jobKindKey(kind: string): "jobs_drill" | "jobs_route" | "jobs_gcode" {
+  return kind === "gcode" ? "jobs_gcode" : kind === "route" ? "jobs_route" : "jobs_drill";
+}
+
+/** The text that says what a job waits for. */
+export function pauseKey(pause: JobPause | null | undefined): "pause_tool_change" | "pause_spindle_start" | "pause_hold" | "pause_resume" | "pause_other" {
+  switch (pause?.kind) {
+    case "tool_change":
+      return "pause_tool_change";
+    case "spindle_start":
+      return "pause_spindle_start";
+    case "hold":
+      return "pause_hold";
+    case "resume":
+      return "pause_resume";
+    default:
+      return "pause_other";
+  }
+}
+
+/** A G-code job that stopped (failed or cancelled) after sending at least one line: the line a new job should start from, or null. */
+export function resumeLine(j: { kind: string; state: JobState; line?: number }): number | null {
+  return j.kind === "gcode" && (j.state === "failed" || j.state === "cancelled") && (j.line ?? 0) > 0 ? (j.line ?? 0) : null;
 }
 
 // ---- the updates of the installed services
@@ -171,11 +235,19 @@ export function jobPercent(j: Pick<JobSummary, "items_total" | "items_done" | "s
 }
 
 /** What the person may do with a job in this state. */
-export function jobActions(j: { state: JobState }, role: Role): { start: boolean; confirm: boolean; cancel: boolean; remove: boolean } {
+export function jobActions(
+  j: { state: JobState; kind?: string; pause?: JobPause | null },
+  role: Role,
+): { start: boolean; confirm: boolean; pause: boolean; resume: boolean; cancel: boolean; remove: boolean } {
   const operator = atLeast(role, "operator");
+  const gcode = j.kind === "gcode";
+  // a G-code job that waits because it was held, or because it goes on after a stop, is let go with Resume; the other waits (a tool, the spindle) are Confirm
+  const holdWait = gcode && j.state === "waiting_operator" && (j.pause?.kind === "hold" || j.pause?.kind === "resume");
   return {
     start: operator && j.state === "ready",
-    confirm: operator && j.state === "waiting_operator",
+    confirm: operator && j.state === "waiting_operator" && !holdWait,
+    pause: operator && gcode && j.state === "running",
+    resume: operator && holdWait,
     cancel: operator && (j.state === "ready" || isActive(j)),
     remove: operator && (j.state === "ready" || isFinished(j)),
   };

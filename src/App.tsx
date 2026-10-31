@@ -148,7 +148,7 @@ export default function App() {
       body = <MachinePage id={route.param} key={route.param} />;
       break;
     case "prepare":
-      body = <PreparePage machineId={route.param} />;
+      body = <PreparePage machineId={route.param} key={route.param} />;
       break;
     case "jobs":
       body = <JobsPage />;
