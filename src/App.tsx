@@ -17,7 +17,9 @@ import { MachinePage } from "./pages/MachinePage";
 import { AccessPage, MachinesPage, ServerPage, UpdatesPage } from "./pages/Configure";
 import { AboutPage, AccountPage, PreferencesPage } from "./pages/Account";
 
-export const VERSION = "0.0.2";
+// set at the build from package.json (vite.config.ts)
+declare const __STUDIO_VERSION__: string;
+export const VERSION: string = __STUDIO_VERSION__;
 
 function read(key: string): string | null {
   try {

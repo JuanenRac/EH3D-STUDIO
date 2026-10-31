@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+declare const __STUDIO_VERSION__: string;
 import { Api, ApiError } from "./api";
 import { LANGS, browserLang, errorText, text } from "./i18n";
 import type { TextKey } from "./i18n";
@@ -415,5 +416,13 @@ describe("free G-code jobs, the GRBL connection, hold and resume", () => {
     await api.setHeadLight("m 1", { on: false, level: 140, tone: "warm" });
     expect(f.calls[1].url).toBe("/api/v1/machines/m%201/head/light?on=0&level=100&tone=warm");
     await expect(api.headInspection("m 1")).rejects.toMatchObject({ code: "no_inspection" });
+  });
+});
+
+describe("the version of the page", () => {
+  it("is the one of package.json, set when the pages are built", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { version } = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version: string };
+    expect(__STUDIO_VERSION__).toBe(version);
   });
 });

@@ -14,7 +14,11 @@ const studioVersion = () => ({
 // While developing, the pages are served by Vite and the API of the server is reached through it (`EH3D_SERVER` names the server).
 const server = process.env.EH3D_SERVER ?? "http://127.0.0.1:18200";
 
+// The number of the version shown in the page is the one of package.json, so it cannot fall behind it.
+const packageVersion = (JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8")) as { version: string }).version;
+
 export default defineConfig({
+  define: { __STUDIO_VERSION__: JSON.stringify(packageVersion) },
   plugins: [react(), studioVersion()],
   server: {
     host: "127.0.0.1",

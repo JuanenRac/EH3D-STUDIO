@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.0.5] - The version shown in the page follows package.json
+
+- **The version shown in the page is the one of `package.json`:** it was written by hand in the code and the footer and the About page said 0.0.2 in the version 0.0.4; now the build takes it from `package.json` (and a test checks it), so it cannot fall behind.
+
 ## [0.0.4] - G-code jobs, GRBL machines, pause and resume, the ring of LEDs and more
 
 - **GRBL machines:** a machine can be a GRBL controller on a serial port of the server (port and baud rate, checked as the server checks them), with the note that the server must be built with `--features serial`; the list shows the port and the speed, and the export and import of machines carry them.
