@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.0.3] - The spindle of the machine on its page
+
 - **The spindle of the machine on its page:** the page of a machine shows which spindle it carries (the original or the one with a drive), what the server does with a job that asks for more than the spindle gives, the limits of the spindle in use and the top speed to set in the node of the machine; an administrator changes the spindle and the safety switch (`reject` by default, or `warn`). Preparing a job lists, tool by tool, what goes beyond the spindle when the switch is on `warn`, and the refusal `spindle_limit` is told in the eight languages. Texts in the eight languages and 3 tests.
 
 ## [0.0.2] - Prepare jobs from Studio, a page for each job and each machine, the drill head node, alerts and a workable job list
