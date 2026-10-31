@@ -14,6 +14,8 @@ import {
   jobPercent,
   machineProblems,
   pagesFor,
+  spindleFindingKey,
+  spindleNameKey,
   toInput,
   updatable,
   updatesBusy,
@@ -278,5 +280,44 @@ describe("the updates", () => {
     }
     expect(text("de", "up_apply", { n: 2 })).toBe("2 aktualisieren");
     expect(text("en", "up_apply", { n: 1 })).toBe("Update 1");
+  });
+});
+
+describe("the spindle of the machine", () => {
+  it("reads and changes the spindle of a machine through its own address", async () => {
+    const f = fakeFetch([
+      { status: 200, body: { spindle: "vfd", guard: "reject", limits: {}, active: null, node_max_rpm: 24000 } },
+      { status: 200, body: { spindle: "original", guard: "warn", limits: {}, active: null, node_max_rpm: 60000 } },
+    ]);
+    const api = new Api("t", f.fetcher);
+    expect((await api.spindle("bungard 1")).node_max_rpm).toBe(24000);
+    await api.setSpindle("bungard 1", { spindle: "original", guard: "warn" });
+    expect(f.calls[0].url).toBe("/api/v1/machines/bungard%201/spindle");
+    expect(f.calls[1].init?.method).toBe("PUT");
+    expect(JSON.parse(String(f.calls[1].init?.body))).toEqual({ spindle: "original", guard: "warn" });
+  });
+
+  it("says every excess the server can find and the refusals in every language", () => {
+    for (const code of ["rpm_above_max", "rpm_below_min", "feed_xy_above_max", "feed_z_above_max"] as const) {
+      const key = spindleFindingKey(code);
+      expect(ROWS, code).toHaveProperty(key);
+      for (const lang of LANGS) {
+        const line = text(lang, key as TextKey, { tool: 3, value: 60000, limit: 24000 });
+        expect(line, `${key}/${lang}`).toContain("3");
+        expect(line, `${key}/${lang}`).toContain("24000");
+        expect(line, `${key}/${lang}`).not.toContain("{");
+      }
+    }
+    for (const lang of LANGS) {
+      expect(errorText(lang, new ApiError(422, "spindle_limit", "tool 1: ..."))).toContain("(tool 1: ...)");
+      expect(errorText(lang, new ApiError(422, "bad_spindle", ""))).not.toContain("bad_spindle");
+    }
+  });
+
+  it("names the spindles and the case of a machine that does not say which it carries", () => {
+    expect(spindleNameKey("")).toBe("spindle_unset");
+    expect(spindleNameKey("original")).toBe("spindle_original");
+    expect(spindleNameKey("vfd")).toBe("spindle_vfd");
+    expect(text("es", "spindle_limits_line", { min: 6000, max: 24000, xy: 1500, z: 1200, bit: 6 })).toBe("6000 a 24000 rpm · avance de corte 1500 mm/min · penetración 1200 mm/min · broca hasta 6 mm");
   });
 });

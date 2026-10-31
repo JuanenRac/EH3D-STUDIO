@@ -18,7 +18,7 @@
 
 ---
 
-**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the eight languages are covered by 47 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
+**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the eight languages are covered by 50 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.0.2` |
 | Maturity | Scaffolding |
-| Tests | 47 tests (`npm test`) |
+| Tests | 50 tests (`npm test`) |
 | Stack | React 19, TypeScript, Vite |
 | On real hardware | Not against machines on a bench: looked at in a browser against a local server with simulated machines |
 
@@ -45,7 +45,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟡 | The application builds without warnings (typecheck, lint, build) and is served by the server at the root of its address; it has been run in a browser against a local server. |
-| Tests | 🟢 | 47 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the eight languages. |
+| Tests | 🟢 | 50 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the eight languages. |
 | Pages | 🟡 | Overview, machines by station, jobs, live events, machines, users and tokens, server, account, preferences and about are written; the jobs and the machines are managed against the real API of the server. No page has been tried by someone who is not the author. |
 | Languages | 🟢 | Eight languages in every text, the refusals of the server included; the texts are read by a test, but only English and a few phrases of the others have been read by a person. |
 | Real machines | 🔴 | Nothing has been done with it on a bench: no machine has been added, no node reached and no job run through it on a real machine. |
@@ -153,6 +153,7 @@ How the parts of this repository fit together: who talks to it, what it holds an
 * **Machines move between servers:** every machine can be copied, and the machines of a server can be exported to a file and imported into another one (the access tokens of the nodes are never exported).
 * **One page for each machine, copies and a lost server:** the page of a machine shows what it is doing, the jobs that wait for it with their total time, and the last ones it finished; a job can be left ready in several copies at once (the same board many times); the drawing of a plan is saved as an SVG; and a red line says when the server stops answering, until it answers again.
 * **The node of the drill head on the page of a machine:** when the machine's configuration names the node (`head_address`), the page shows its spindle speed, its temperature with the verdict of the node, the protect output and the camera model, a button that shows its camera (MJPEG) and, for an operator, a button that measures the table under the head; all of it goes through EH3D-SERVER, which holds the token of the node. Tested against a stand-in, never against a real node.
+* **The spindle on the page of a machine:** everybody reads which spindle the machine carries (the original or the one with a drive), what happens to a job that asks for more than it gives, the limits of the spindle in use and the top speed to set in the node of the machine; an administrator changes the spindle and the safety switch (refuse the job, which is the default, or warn and cut the turns to the top of the spindle). When a job is prepared with the switch on `warn`, the plan lists what goes beyond the spindle, tool by tool; with `reject` the server refuses it and Studio says why. Not tried against a real machine.
 
 ## 🔒 Security & Safety
 
@@ -199,7 +200,7 @@ Copy `dist/` to the CM5 (for example to `/opt/eh3d-studio`), put `studio_dir = /
 
 ## 🧪 Testing
 
-`npm test` runs 47 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the eight languages (a text in every language, Chinese and Japanese in their own scripts, the same placeholders everywhere). `npm run typecheck` and `npm run lint` pass as well.
+`npm test` runs 50 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the eight languages (a text in every language, Chinese and Japanese in their own scripts, the same placeholders everywhere). `npm run typecheck` and `npm run lint` pass as well.
 
 ## 🏗️ Build & Release
 

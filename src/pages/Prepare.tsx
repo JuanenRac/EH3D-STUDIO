@@ -6,7 +6,7 @@ import { Badge, Card, Empty, Field } from "../components/ui";
 import { PlanDownload, PlanView } from "../components/PlanView";
 import { copyNames, defaultDrillTool, drillRequest, fileRequest, fileSlot, kindOfFiles, nameFromFile, parseHoles, toolColour, toolsUsed } from "../jobtools";
 import type { DrillToolInput, SourceFiles } from "../jobtools";
-import { duration } from "../model";
+import { duration, spindleFindingKey } from "../model";
 import type { JobView } from "../types";
 
 type Source = "files" | "typed";
@@ -254,6 +254,16 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
                 <dd>{view.bounds_mm ? `${(view.bounds_mm[2] - view.bounds_mm[0]).toFixed(1)} x ${(view.bounds_mm[3] - view.bounds_mm[1]).toFixed(1)} mm` : "-"}</dd>
               </dl>
               <ToolTable view={view} />
+              {(view.spindle_warnings?.length ?? 0) > 0 && (
+                <div className="spindle-warning" role="alert">
+                  <strong>{t("spindle_warn_title")}</strong>
+                  <ul>
+                    {view.spindle_warnings?.map((w, i) => (
+                      <li key={i}>{t(spindleFindingKey(w.code), { tool: w.tool, value: w.value, limit: w.limit })}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         </Card>

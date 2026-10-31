@@ -3,7 +3,7 @@
  * `{ "error": code, "detail": text }` with a status, and that is what an ApiError carries. The pages never build a URL by hand.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import type { Fleet, HeadMeasure, HeadStatus, Health, Job, JobView, JobSummary, Machine, MachineInput, NewToken, Role, Session, TokenInfo, UpdatesView, UserInfo } from "./types";
+import type { Fleet, HeadMeasure, HeadStatus, Health, Job, JobView, JobSummary, Machine, MachineInput, NewToken, Role, Session, SpindleGuard, SpindleId, SpindleView, TokenInfo, UpdatesView, UserInfo } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string, public detail: string) {
@@ -86,6 +86,11 @@ export class Api {
   updateMachine = (id: string, m: MachineInput) => this.request<Machine>("PUT", `/machines/${encodeURIComponent(id)}`, m);
   deleteMachine = (id: string) => this.request<unknown>("DELETE", `/machines/${encodeURIComponent(id)}`);
   fleet = () => this.request<Fleet>("GET", "/fleet");
+
+  /** The spindle of a machine (a viewer reads it) and its change (an administrator): `original` and `vfd` take the limits that differ from the starting ones. */
+  spindle = (machine: string) => this.request<SpindleView>("GET", `/machines/${encodeURIComponent(machine)}/spindle`);
+  setSpindle = (machine: string, change: { spindle?: SpindleId | ""; guard?: SpindleGuard }) =>
+    this.request<SpindleView>("PUT", `/machines/${encodeURIComponent(machine)}/spindle`, change);
 
   // ---- jobs
   jobs = (filter: { machine?: string; state?: string } = {}) => {

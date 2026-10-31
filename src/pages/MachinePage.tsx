@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, Empty, Progress } from "../components/ui";
 import { ApiError } from "../api";
-import type { HeadMeasure } from "../types";
+import type { HeadMeasure, SpindleGuard, SpindleId } from "../types";
+import { SPINDLE_IDS } from "../types";
 import { machineQueue } from "../jobtools";
-import { atLeast, duration, jobPercent } from "../model";
+import { atLeast, duration, jobPercent, spindleNameKey } from "../model";
 import { JOB_TONE, stateKey } from "./Monitor";
 import type { TextKey } from "../i18n";
 
@@ -74,6 +75,8 @@ export function MachinePage({ id }: { id: string }) {
           <dd>{q.ready.length > 0 ? `${q.ready.length} · ${duration(q.readySeconds)}` : "-"}</dd>
         </dl>
       </Card>
+
+      <SpindleCard id={id} admin={atLeast(session.role, "admin")} />
 
       <HeadCard id={id} operator={operator} />
 
@@ -145,6 +148,74 @@ export function MachinePage({ id }: { id: string }) {
         )}
       </Card>
     </div>
+  );
+}
+
+/** The spindle the machine carries and what happens to a job that asks for more than it gives. Everybody reads it; an administrator changes it. */
+function SpindleCard({ id, admin }: { id: string; admin: boolean }) {
+  const { api, t, err, say } = useApp();
+  const { data, error, reload } = usePolled(() => api.spindle(id), 0, [id]);
+  const change = async (c: { spindle?: SpindleId | ""; guard?: SpindleGuard }) => {
+    try {
+      await api.setSpindle(id, c);
+      say(t("spindle_saved"), "ok");
+      reload();
+    } catch (e) {
+      say(err(e), "error");
+    }
+  };
+  return (
+    <Card title={t("spindle_title")} wide>
+      {error != null && !data && <p className="error">{err(error)}</p>}
+      {data && (
+        <div className="plan-grid">
+          <dl className="facts">
+            <dt>{t("spindle_which")}</dt>
+            <dd>
+              {admin ? (
+                <select value={data.spindle} onChange={(e) => void change({ spindle: e.target.value as SpindleId | "" })}>
+                  <option value="">{t("spindle_unset")}</option>
+                  {SPINDLE_IDS.map((s) => (
+                    <option key={s} value={s}>
+                      {t(spindleNameKey(s))}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                t(spindleNameKey(data.spindle))
+              )}
+            </dd>
+            <dt>{t("spindle_guard")}</dt>
+            <dd>
+              {admin ? (
+                <select value={data.guard} onChange={(e) => void change({ guard: e.target.value as SpindleGuard })}>
+                  <option value="reject">{t("spindle_guard_reject")}</option>
+                  <option value="warn">{t("spindle_guard_warn")}</option>
+                </select>
+              ) : (
+                t(data.guard === "warn" ? "spindle_guard_warn" : "spindle_guard_reject")
+              )}
+            </dd>
+            {data.active && (
+              <>
+                <dt>{t("spindle_limits")}</dt>
+                <dd>
+                  {t("spindle_limits_line", {
+                    min: data.active.min_rpm,
+                    max: data.active.max_rpm,
+                    xy: data.active.max_xy_mm_min,
+                    z: data.active.max_z_mm_min,
+                    bit: data.active.max_bit_mm,
+                  })}
+                </dd>
+                <dt>{t("spindle_node_rpm")}</dt>
+                <dd>{data.node_max_rpm}</dd>
+              </>
+            )}
+          </dl>
+        </div>
+      )}
+    </Card>
   );
 }
 

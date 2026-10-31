@@ -1,6 +1,18 @@
 /* What the pages decide with: the navigation and who may see what, the rules a name or a password must follow before it is sent, how the fleet is grouped, and
  * how a job is counted. Pure functions, tested on their own. GPL-3.0-or-later. */
-import type { Fleet, FleetMachine, JobState, JobSummary, Machine, MachineInput, Role } from "./types";
+import type { Fleet, FleetMachine, JobState, JobSummary, Machine, MachineInput, Role, SpindleFinding, SpindleId } from "./types";
+
+// ---- the spindle of a machine
+
+/** The text that says one excess of a job against the spindle of the machine (the four codes the server uses). */
+export function spindleFindingKey(code: SpindleFinding["code"]): "spindle_rpm_above_max" | "spindle_rpm_below_min" | "spindle_feed_xy_above_max" | "spindle_feed_z_above_max" {
+  return `spindle_${code}` as const;
+}
+
+/** The text of the name of a spindle, or of "not said" when the machine does not say which it carries. */
+export function spindleNameKey(id: SpindleId | ""): "spindle_unset" | "spindle_original" | "spindle_vfd" {
+  return id === "" ? "spindle_unset" : id === "original" ? "spindle_original" : "spindle_vfd";
+}
 
 // ---- the navigation: every page belongs to a group and needs a role
 

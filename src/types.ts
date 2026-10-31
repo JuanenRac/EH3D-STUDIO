@@ -44,9 +44,42 @@ export interface Machine {
   dcf: string;
   rcf: string;
   cfg: string;
+  spindle?: SpindleId | "";
+  spindle_guard?: string;
 }
 
 /** What is sent to create or change a machine; an empty node token keeps the stored one. */
+/** The limits of one spindle (`docs/API.md` of EH3D-SERVER, "the spindle of the machine"). */
+export interface SpindleLimits {
+  min_rpm: number;
+  max_rpm: number;
+  power_w: number;
+  max_xy_mm_min: number;
+  max_z_mm_min: number;
+  max_bit_mm: number;
+}
+
+export type SpindleId = "original" | "vfd";
+export type SpindleGuard = "reject" | "warn";
+export const SPINDLE_IDS: SpindleId[] = ["original", "vfd"];
+
+/** The spindle a machine carries, what happens to a job beyond it, and the top speed its node should be set to. */
+export interface SpindleView {
+  spindle: SpindleId | "";
+  guard: SpindleGuard;
+  limits: Record<SpindleId, SpindleLimits>;
+  active: SpindleLimits | null;
+  node_max_rpm: number | null;
+}
+
+/** One thing a job asks for beyond the spindle (`spindle_warnings` of the view, when the machine's switch is on `warn`). */
+export interface SpindleFinding {
+  code: "rpm_above_max" | "rpm_below_min" | "feed_xy_above_max" | "feed_z_above_max";
+  tool: number;
+  value: number;
+  limit: number;
+}
+
 export interface MachineInput {
   id: string;
   name: string;
@@ -92,6 +125,7 @@ export interface JobView {
   hole_ends: number[];
   estimate_s: number | null;
   travel_mm: number | null;
+  spindle_warnings?: SpindleFinding[];
 }
 
 export interface Job extends JobSummary {
