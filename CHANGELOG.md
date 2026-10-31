@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.0.4] - G-code jobs, GRBL machines, pause and resume, the ring of LEDs and more
+
 - **GRBL machines:** a machine can be a GRBL controller on a serial port of the server (port and baud rate, checked as the server checks them), with the note that the server must be built with `--features serial`; the list shows the port and the speed, and the export and import of machines carry them.
 - **Free G-code jobs:** Prepare takes a G-code program (pasted or loaded from a file), previews it with its lines, size and time, keeps it ready on a simulator or a GRBL machine and refuses it on a node (and the other jobs on a GRBL machine) before it is sent. The safety switch that starts the spindle and the coolant again when a job goes on is off unless it is ticked.
 - **Hold, resume and go on after a stop:** a running G-code job is held and resumed from the list, from its page and from the overview; the job says the line it has got to and what it waits for in words (a tool change, the spindle, a hold, or the wait before the first move of a job that goes on); a job that failed or was stopped offers to go on from its line, with the program kept in the browser.
