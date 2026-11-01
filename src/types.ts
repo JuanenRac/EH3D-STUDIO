@@ -47,6 +47,8 @@ export interface Machine {
   cfg: string;
   spindle?: SpindleId | "";
   spindle_guard?: string;
+  /** Whether the G-code jobs of this machine may carry the `$` lines of GRBL (off unless an administrator turned it on). */
+  allow_dollar?: boolean;
 }
 
 /** What is sent to create or change a machine; an empty node token keeps the stored one. */
@@ -90,6 +92,8 @@ export interface MachineInput {
   dcf: string;
   rcf: string;
   cfg: string;
+  /** The safety switch of the `$` lines of GRBL; only an administrator may send it, and an update that leaves it out keeps it. */
+  allow_dollar?: boolean;
 }
 
 /** What a job is: a drilling job, a routing job, or the free G-code program of a GRBL machine or of the simulator. */
@@ -100,6 +104,18 @@ export const JOB_KINDS: JobKind[] = ["drill", "route", "gcode"];
 export interface JobPause {
   kind: "tool_change" | "spindle_start" | "hold" | "resume" | string;
   tool?: number;
+}
+
+/** What `GET /jobs/:id/request` answers: the request of the job as it came, and where a stopped job goes on from (`null` for a job that did not stop). */
+export interface SavedRequest {
+  id: string;
+  machine: string;
+  kind: JobKind;
+  name: string;
+  state: JobState;
+  resumed_from: string;
+  next_skip: number | null;
+  request: Record<string, unknown>;
 }
 
 export type JobState = "ready" | "connecting" | "running" | "waiting_operator" | "done" | "cancelled" | "failed";
@@ -121,6 +137,8 @@ export interface JobSummary {
   holes_done: number;
   /** A G-code job: the line of the program text it has got to, which is where a job that goes on starts from; 0 for the others. */
   line?: number;
+  /** The job this one goes on from (made by `resume-from`); empty for the others. */
+  resumed_from?: string;
   message: string | null;
   pause: JobPause | null;
   estimate_s: number | null;

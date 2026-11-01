@@ -124,7 +124,7 @@ export function toInput(m: Machine): MachineInput {
   const c = m.connection;
   const connection: MachineInput["connection"] =
     c.kind === "grbl" ? { kind: "grbl", port: c.port ?? c.address, baud: c.baud ?? DEFAULT_BAUD } : { kind: c.kind, address: c.address, token: "" };
-  return { id: m.id, name: m.name, model: m.model, station: m.station, connection, dcf: m.dcf, rcf: m.rcf, cfg: m.cfg };
+  return { id: m.id, name: m.name, model: m.model, station: m.station, connection, dcf: m.dcf, rcf: m.rcf, cfg: m.cfg, allow_dollar: m.allow_dollar === true };
 }
 
 /** The connection as the server wants it: the simulator carries nothing, a GRBL machine its port and baud rate, a node its address (and the token only when typed). */
@@ -251,6 +251,16 @@ export function jobActions(
     cancel: operator && (j.state === "ready" || isActive(j)),
     remove: operator && (j.state === "ready" || isFinished(j)),
   };
+}
+
+/** Whether the person may make a new job from a job that stopped (cancelled or failed), with the work done left out: the server kept what was asked, so the file is not picked again. */
+export function canGoOn(j: { state: JobState }, role: Role): boolean {
+  return atLeast(role, "operator") && (j.state === "failed" || j.state === "cancelled");
+}
+
+/** Whether the switch of the `$` lines of GRBL means anything for a machine (only the connections that take G-code) and who may change it. */
+export function dollarSwitchShown(connection: string, role: Role): boolean {
+  return role === "admin" && takesJob(connection, "gcode");
 }
 
 /** `1 h 05 min`, `3 min 20 s`, `45 s`. */

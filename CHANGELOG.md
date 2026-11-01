@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Go on from where a job stopped, without picking the file again:** a job that failed or was cancelled has a button "Go on from where it stopped" (drilling, routing and G-code) that asks the server for a new job made from the request it kept, with the holes, paths or lines already done left out; the new job opens ready, never started, and says which job it goes on from. A G-code program is no longer kept in the browser for this.
+- **The $ lines of GRBL, per machine:** the form of a machine has, for an administrator and for the connections that take G-code, a safety switch that allows the `$` lines (`$H`, `$X`, `$G`...) in the G-code jobs of that machine; it is off by default, comes with a warning, is never copied to a copy of the machine nor carried by the export and import of machines, and the list of machines marks the ones that have it on.
+- 5 tests more (73 in all), the new texts and the refusal `not_stopped` in the eight languages.
+
 ## [0.0.5] - The version shown in the page follows package.json
 
 - **The version shown in the page is the one of `package.json`:** it was written by hand in the code and the footer and the About page said 0.0.2 in the version 0.0.4; now the build takes it from `package.json` (and a test checks it), so it cannot fall behind.

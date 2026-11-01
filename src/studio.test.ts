@@ -6,6 +6,8 @@ import type { TextKey } from "./i18n";
 import {
   PAGES,
   atLeast,
+  canGoOn,
+  dollarSwitchShown,
   cfgKeys,
   countJobs,
   duration,
@@ -416,6 +418,50 @@ describe("free G-code jobs, the GRBL connection, hold and resume", () => {
     await api.setHeadLight("m 1", { on: false, level: 140, tone: "warm" });
     expect(f.calls[1].url).toBe("/api/v1/machines/m%201/head/light?on=0&level=100&tone=warm");
     await expect(api.headInspection("m 1")).rejects.toMatchObject({ code: "no_inspection" });
+  });
+});
+
+describe("going on from a stopped job and the $ lines of GRBL", () => {
+  it("offers to go on to an operator, and only from a job that was cancelled or failed", () => {
+    expect(canGoOn({ state: "failed" }, "operator")).toBe(true);
+    expect(canGoOn({ state: "cancelled" }, "admin")).toBe(true);
+    expect(canGoOn({ state: "failed" }, "viewer")).toBe(false);
+    for (const state of ["ready", "connecting", "running", "waiting_operator", "done"] as const) expect(canGoOn({ state }, "admin"), state).toBe(false);
+  });
+
+  it("asks the server for the saved request and for the new job through the address of the job", async () => {
+    const f = fakeFetch([
+      { status: 200, body: { id: "a b", next_skip: 3, request: {} } },
+      { status: 200, body: { id: "j2", resumed_from: "a b" } },
+      { status: 200, body: { id: "j3" } },
+    ]);
+    const api = new Api("t", f.fetcher);
+    expect((await api.jobRequest("a b")).next_skip).toBe(3);
+    expect((await api.resumeFrom("a b")).id).toBe("j2");
+    await api.resumeFrom("a b", { skip: 5, restore_outputs: false });
+    expect(f.calls.map((c) => c.url)).toEqual(["/api/v1/jobs/a%20b/request", "/api/v1/jobs/a%20b/resume-from", "/api/v1/jobs/a%20b/resume-from"]);
+    expect(f.calls.map((c) => c.init?.method)).toEqual(["GET", "POST", "POST"]);
+    expect(JSON.parse(String(f.calls[2].init?.body))).toEqual({ skip: 5, restore_outputs: false });
+  });
+
+  it("shows the switch of the $ lines only to an administrator and only for a connection that takes G-code", () => {
+    expect([dollarSwitchShown("grbl", "admin"), dollarSwitchShown("demo", "admin"), dollarSwitchShown("node", "admin")]).toEqual([true, true, false]);
+    expect([dollarSwitchShown("grbl", "operator"), dollarSwitchShown("grbl", "viewer")]).toEqual([false, false]);
+  });
+
+  it("reads the switch of a machine into the form, off unless the server says it is on", () => {
+    const m: Machine = { id: "g1", name: "Router", model: "ccd-mtc", station: "", connection: { kind: "grbl", address: "COM3", token_set: false, port: "COM3", baud: 115200 }, dcf: "", rcf: "", cfg: "" };
+    expect(toInput(m).allow_dollar).toBe(false);
+    expect(toInput({ ...m, allow_dollar: true }).allow_dollar).toBe(true);
+    expect(emptyMachine().allow_dollar).toBeFalsy();
+  });
+
+  it("tells the new texts and the new refusal in every language", () => {
+    for (const key of ["act_go_on", "job_go_on_help", "job_resumed_new", "job_goes_on_from", "mach_allow_dollar", "mach_allow_dollar_hint", "mach_dollar_on"] as const) {
+      expect(ROWS, key).toHaveProperty(key);
+      for (const lang of LANGS) expect(text(lang, key), `${key}/${lang}`).not.toBe("");
+    }
+    for (const lang of LANGS) expect(errorText(lang, new ApiError(409, "not_stopped", "")), `not_stopped/${lang}`).not.toContain("not_stopped");
   });
 });
 

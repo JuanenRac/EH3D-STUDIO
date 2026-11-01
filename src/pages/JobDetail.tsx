@@ -2,8 +2,8 @@
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Progress } from "../components/ui";
 import { PlanDownload, PlanView } from "../components/PlanView";
-import { resumeHref, took } from "../jobtools";
-import { duration, isActive, jobActions, jobKindKey, jobPercent, pauseKey, resumeLine, spindleFindingKey } from "../model";
+import { took } from "../jobtools";
+import { canGoOn, duration, isActive, jobActions, jobKindKey, jobPercent, pauseKey, resumeLine, spindleFindingKey } from "../model";
 import { ToolTable } from "./Prepare";
 import { JOB_TONE, stateKey } from "./Monitor";
 
@@ -34,7 +34,6 @@ export function JobPage({ id }: { id: string }) {
   if (!job) return <Empty>…</Empty>;
   const a = jobActions(job, session.role);
   const from = resumeLine(job);
-  const operator = session.role !== "viewer";
   const pct = jobPercent(job);
   const tone = job.state === "failed" ? "bad" : job.state === "waiting_operator" ? "wait" : job.state === "done" ? "ok" : "run";
   return (
@@ -63,10 +62,19 @@ export function JobPage({ id }: { id: string }) {
                 {t("act_resume")}
               </button>
             )}
-            {from != null && operator && (
-              <a className="button primary" href={resumeHref(job.machine, from, job.id)}>
-                {t("job_resume_from", { line: from })}
-              </a>
+            {canGoOn(job, session.role) && (
+              <button
+                className="primary"
+                onClick={() =>
+                  void act(async () => {
+                    const next = await api.resumeFrom(job.id);
+                    say(t("job_resumed_new"), "ok");
+                    window.location.hash = `#/job/${encodeURIComponent(next.id)}`;
+                  })
+                }
+              >
+                {t("act_go_on")}
+              </button>
             )}
             {a.cancel && <button onClick={() => void act(() => api.cancelJob(job.id))}>{isActive(job) ? t("act_stop") : t("act_cancel")}</button>}
             {a.remove && <DangerButton label={t("act_delete")} onConfirm={() => void act(() => api.deleteJob(job.id), () => (window.location.hash = "#/jobs"))} />}
@@ -80,7 +88,12 @@ export function JobPage({ id }: { id: string }) {
         </div>
         {job.message && <p className="warn">{job.message}</p>}
         {job.pause && <p className="warn">{t("job_waits_for", { what: t(pauseKey(job.pause), { tool: job.pause.tool ?? "" }) })}</p>}
-        {from != null && <p className="hint">{t("job_resume_help", { line: from })}</p>}
+        {canGoOn(job, session.role) && <p className="hint">{from != null ? t("job_resume_help", { line: from }) : t("job_go_on_help")}</p>}
+        {job.resumed_from && (
+          <p className="hint">
+            {t("job_goes_on_from")} <a href={`#/job/${encodeURIComponent(job.resumed_from)}`}>{job.resumed_from}</a>
+          </p>
+        )}
         {(job.view?.spindle_warnings?.length ?? 0) > 0 && (
           <div className="spindle-warning" role="alert">
             <strong>{t("spindle_warn_title")}</strong>

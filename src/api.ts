@@ -3,7 +3,7 @@
  * `{ "error": code, "detail": text }` with a status, and that is what an ApiError carries. The pages never build a URL by hand.
  * Copyright (C) 2026 JuanenRac (Electro Hobby 3D). GPL-3.0-or-later.
  */
-import type { Fleet, HeadInspection, HeadLight, HeadMeasure, HeadStatus, Health, Job, JobView, JobSummary, Machine, MachineInput, NewToken, Role, Session, SpindleGuard, SpindleId, SpindleView, TokenInfo, UpdatesView, UserInfo } from "./types";
+import type { Fleet, HeadInspection, HeadLight, HeadMeasure, HeadStatus, Health, Job, JobView, JobSummary, Machine, MachineInput, NewToken, Role, SavedRequest, Session, SpindleGuard, SpindleId, SpindleView, TokenInfo, UpdatesView, UserInfo } from "./types";
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string, public detail: string) {
@@ -110,6 +110,11 @@ export class Api {
   /** Hold a running G-code job (the controller holds its movement) and let it go on: the resume also answers the wait of a job that goes on after a stop. */
   pauseJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/pause`, {});
   resumeJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/resume`, {});
+  /** What was asked of a job as it came, and where a stopped one should go on from (`next_skip`). */
+  jobRequest = (id: string) => this.request<SavedRequest>("GET", `/jobs/${encodeURIComponent(id)}/request`);
+  /** A new job, ready and not started, from the saved request of a cancelled or failed one with the work done left out: the file is not asked for again. */
+  resumeFrom = (id: string, change: { skip?: number; skip_tools?: number[]; restore_outputs?: boolean; name?: string } = {}) =>
+    this.request<Job>("POST", `/jobs/${encodeURIComponent(id)}/resume-from`, change);
 
   // ---- the node of the drill head, through the server
   headStatus = (machine: string) => this.request<HeadStatus>("GET", `/machines/${encodeURIComponent(machine)}/head/status`);

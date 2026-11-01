@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Field } from "../components/ui";
-import { cfgKeys, connectionBody, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, toInput, updatable, updatesBusy, validName, validPassword } from "../model";
+import { cfgKeys, connectionBody, dollarSwitchShown, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, toInput, updatable, updatesBusy, validName, validPassword } from "../model";
 import type { MachineProblem } from "../model";
 import { copyId, machineExport, machineImport } from "../jobtools";
 import type { ConnectionKind, MachineInput, Role } from "../types";
@@ -13,7 +13,7 @@ import type { TextKey } from "../i18n";
 const MODELS = ["ccd-mtc", "ccd-atc", "ccd2-mtc", "ccd2-atc", "ccd-premium-mtc", "ccd-premium-atc"];
 
 export function MachinesPage() {
-  const { api, t, err, say } = useApp();
+  const { api, session, t, err, say } = useApp();
   const { data, error, reload } = usePolled(() => api.machines(), 0);
   const [form, setForm] = useState<{ isNew: boolean; m: MachineInput } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -27,6 +27,8 @@ export function MachinesPage() {
     setSaving(true);
     try {
       const body: MachineInput = { ...form.m, connection: connectionBody(form.m.connection) };
+      // the switch of the `$` lines is the administrator's own; a connection that takes no G-code never turns it on
+      body.allow_dollar = dollarSwitchShown(body.connection.kind, session.role) && form.m.allow_dollar === true;
       if (form.isNew) await api.addMachine(body);
       else await api.updateMachine(form.m.id, body);
       say(t("mach_saved"), "ok");
@@ -125,6 +127,7 @@ export function MachinesPage() {
                   <td>
                     <Badge tone={m.connection.kind === "demo" ? "dim" : "run"}>{t(connectionKey(m.connection.kind))}</Badge>
                     {m.connection.kind === "node" && <small>{m.connection.address}</small>}
+                    {m.allow_dollar === true && <small className="warn">{t("mach_dollar_on")}</small>}
                     {m.connection.kind === "grbl" && (
                       <small>
                         {m.connection.port ?? m.connection.address} · {m.connection.baud ?? DEFAULT_BAUD}
@@ -134,7 +137,7 @@ export function MachinesPage() {
                   <td>{cfgKeys(m.cfg).length}</td>
                   <td className="row-actions">
                     <button onClick={() => setForm({ isNew: false, m: toInput(m) })}>{t("act_edit")}</button>
-                    <button onClick={() => setForm({ isNew: true, m: { ...toInput(m), id: copyId(m.id, (data ?? []).map((x) => x.id)), name: `${m.name} (${t("mach_copy")})` } })}>{t("act_copy")}</button>
+                    <button onClick={() => setForm({ isNew: true, m: { ...toInput(m), allow_dollar: false, id: copyId(m.id, (data ?? []).map((x) => x.id)), name: `${m.name} (${t("mach_copy")})` } })}>{t("act_copy")}</button>
                     <DangerButton label={t("act_delete")} onConfirm={() => void remove(m.id)} />
                   </td>
                 </tr>
@@ -195,6 +198,15 @@ export function MachinesPage() {
               </>
             )}
           </div>
+          {dollarSwitchShown(form.m.connection.kind, session.role) && (
+            <label className="check-row">
+              <input type="checkbox" checked={form.m.allow_dollar === true} onChange={(e) => set({ allow_dollar: e.target.checked })} />
+              <span>
+                <strong>{t("mach_allow_dollar")}</strong>
+                <small className="hint">{t("mach_allow_dollar_hint")}</small>
+              </span>
+            </label>
+          )}
           <div className="form-grid wide-fields">
             <Field label={t("mach_dcf")}>
               <textarea rows={6} value={form.m.dcf} onChange={(e) => set({ dcf: e.target.value })} />
