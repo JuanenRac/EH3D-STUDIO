@@ -262,6 +262,6 @@ export const LIGHT_TONES = ["white", "cool", "warm", "red", "green", "blue"] as 
 /** The last quality check of the work through the camera of the head (`GET .../head/inspect`): only what the page shows is listed. */
 export interface HeadInspection {
   verdict: "ok" | "not_ok" | "unknown";
-  quality?: number;
+  quality?: Record<string, number> | null;
   findings?: { code: string; hole?: number; fails?: boolean }[];
 }

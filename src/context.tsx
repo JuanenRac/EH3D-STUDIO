@@ -42,9 +42,12 @@ export function makeErr(lang: Lang) {
 
 /** Runs `load` now and then every `seconds` while the page is shown; the answer of a request that finished after the page was left is dropped. */
 export function usePolled<T>(load: () => Promise<T>, seconds: number, deps: unknown[] = []): { data: T | null; error: unknown; reload: () => void } {
-  const [data, setData] = useState<T | null>(null);
+  const [held, setHeld] = useState<{ key: string; value: T } | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [tick, setTick] = useState(0);
+  // what was loaded belongs to the `deps` it was asked with: after they change (another machine) the old answer is not shown
+  const key = JSON.stringify(deps);
+  const data = held !== null && held.key === key ? held.value : null;
   const loadRef = useRef(load);
   loadRef.current = load;
   useEffect(() => {
@@ -53,7 +56,7 @@ export function usePolled<T>(load: () => Promise<T>, seconds: number, deps: unkn
       loadRef.current().then(
         (d) => {
           if (alive) {
-            setData(d);
+            setHeld({ key, value: d });
             setError(null);
           }
         },
@@ -69,7 +72,7 @@ export function usePolled<T>(load: () => Promise<T>, seconds: number, deps: unkn
       if (id) clearInterval(id);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seconds, tick, ...deps]);
+  }, [seconds, tick, key, ...deps]);
   const reload = useCallback(() => setTick((n) => n + 1), []);
   return { data, error, reload };
 }

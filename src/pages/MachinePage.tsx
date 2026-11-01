@@ -300,7 +300,6 @@ function HeadLightCard({ id, operator }: { id: string; operator: boolean }) {
       {check.data && (
         <p>
           <Badge tone={check.data.verdict === "ok" ? "ok" : check.data.verdict === "not_ok" ? "bad" : "dim"}>{t(`verdict_${check.data.verdict}` as TextKey)}</Badge>{" "}
-          {check.data.quality != null ? `${Math.round(check.data.quality)} % · ` : ""}
           {t("head_inspect_findings", { n: check.data.findings?.length ?? 0, fails })}
         </p>
       )}

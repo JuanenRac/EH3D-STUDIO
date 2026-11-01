@@ -121,6 +121,18 @@ describe("the rules checked before a request goes out", () => {
     expect(machineProblems(m)).toEqual([]);
   });
 
+  it("refuses the ids the server refuses", () => {
+    const m = emptyMachine();
+    m.name = "M";
+    for (const bad of ["Drill_1", "taller.1", "A"]) {
+      m.id = bad;
+      expect(machineProblems(m)).toEqual(["id"]);
+    }
+    m.id = "drill-1";
+    m.station = "Taller";
+    expect(machineProblems(m)).toEqual(["station"]);
+  });
+
   it("starts a form from a machine without showing its token", () => {
     const m: Machine = { id: "m", name: "M", model: "ccd-mtc", station: "", connection: { kind: "node", address: "h:1", token_set: true }, dcf: "d", rcf: "r", cfg: "a = 1" };
     const i = toInput(m);

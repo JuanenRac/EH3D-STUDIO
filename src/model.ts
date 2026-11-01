@@ -73,6 +73,13 @@ export function validName(s: string): boolean {
   return NAME.test(s);
 }
 
+const MACHINE_ID = /^[a-z0-9-]{1,32}$/;
+
+/** A machine id or a station: lowercase letters, digits and `-` up to 32 (the server refuses the rest). */
+export function validMachineId(s: string): boolean {
+  return MACHINE_ID.test(s);
+}
+
 /** Passwords are 8 to 128 characters. */
 export function validPassword(s: string): boolean {
   const n = [...s].length;
@@ -104,9 +111,9 @@ export type MachineProblem = "id" | "name" | "station" | "address" | "port" | "b
 /** What is wrong with a machine before it is sent (the server checks again, and says more: unknown keys of the configuration, for one). */
 export function machineProblems(m: MachineInput): MachineProblem[] {
   const out: MachineProblem[] = [];
-  if (!validName(m.id)) out.push("id");
+  if (!validMachineId(m.id)) out.push("id");
   if (m.name.trim() === "" || m.name.length > 64) out.push("name");
-  if (m.station !== "" && !validName(m.station)) out.push("station");
+  if (m.station !== "" && !validMachineId(m.station)) out.push("station");
   if (m.connection.kind === "node" && !validAddress(m.connection.address ?? "")) out.push("address");
   if (m.connection.kind === "grbl") {
     if (!validPort(m.connection.port ?? "")) out.push("port");

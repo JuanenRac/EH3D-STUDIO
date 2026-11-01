@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The refusals of the server are written in the eight languages:** the login, the setup code, the password, the names, the ids, the jobs and the busy-server codes no longer show the raw code.
+- **Machine ids and stations** are checked the way the server checks them (lowercase letters, digits and hyphens).
+- **The last quality check** no longer shows `NaN %`, and the pages that reload when the machine changes do not paint the answer of the previous machine.
+
 ## [0.0.6] - Follow a stopped job without choosing the file and the switch for GRBL dollar lines
 
 - **Go on from where a job stopped, without picking the file again:** a job that failed or was cancelled has a button "Go on from where it stopped" (drilling, routing and G-code) that asks the server for a new job made from the request it kept, with the holes, paths or lines already done left out; the new job opens ready, never started, and says which job it goes on from. A G-code program is no longer kept in the browser for this.
