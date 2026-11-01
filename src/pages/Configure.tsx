@@ -6,6 +6,7 @@ import { Badge, Card, DangerButton, Empty, Field } from "../components/ui";
 import { cfgKeys, connectionBody, dollarSwitchShown, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, toInput, updatable, updatesBusy, validName, validPassword } from "../model";
 import type { MachineProblem } from "../model";
 import { copyId, machineExport, machineImport } from "../jobtools";
+import { copyText } from "../clipboard";
 import type { ConnectionKind, MachineInput, Role } from "../types";
 import { CONNECTION_KINDS, ROLES } from "../types";
 import type { TextKey } from "../i18n";
@@ -238,6 +239,7 @@ export function AccessPage() {
   const [nu, setNu] = useState({ name: "", role: "operator" as Role, password: "" });
   const [nt, setNt] = useState({ name: "", role: "operator" as Role });
   const [shown, setShown] = useState<{ name: string; token: string } | null>(null);
+  const [copied, setCopied] = useState<boolean | null>(null);
 
   const guard = async (what: () => Promise<unknown>, done: () => void) => {
     try {
@@ -320,8 +322,9 @@ export function AccessPage() {
           <div className="secret" role="alert">
             <strong>{t("acc_token_once", { name: shown.name })}</strong>
             <code>{shown.token}</code>
-            <button onClick={() => void navigator.clipboard?.writeText(shown.token)}>{t("act_copy")}</button>
-            <button onClick={() => setShown(null)}>{t("act_close")}</button>
+            <button onClick={() => void copyText(shown.token).then(setCopied)}>{t("act_copy")}</button>
+            {copied !== null && <span role="status">{copied ? t("act_copied") : t("act_copy_failed")}</span>}
+            <button onClick={() => { setShown(null); setCopied(null); }}>{t("act_close")}</button>
           </div>
         )}
         {tokens.data && tokens.data.length === 0 && <Empty>{t("acc_tokens_empty")}</Empty>}
@@ -371,7 +374,7 @@ export function AccessPage() {
               void guard(
                 async () => {
                   const r = await api.addToken(nt.name.trim(), nt.role);
-                  setShown({ name: nt.name.trim(), token: r.token });
+                  setShown({ name: nt.name.trim(), token: r.token }); setCopied(null);
                 },
                 () => {
                   setNt({ name: "", role: "operator" });

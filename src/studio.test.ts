@@ -485,3 +485,32 @@ describe("the version of the page", () => {
     expect(__STUDIO_VERSION__).toBe(version);
   });
 });
+
+describe("the copy of a text", () => {
+  it("uses a hidden box and the copy command when the clipboard of the browser is not there (a page over plain HTTP)", async () => {
+    const { copyWithSelection } = await import("./clipboard");
+    const calls: string[] = [];
+    const box: Record<string, unknown> = {
+      style: {},
+      setAttribute: () => undefined,
+      focus: () => calls.push("focus"),
+      select: () => calls.push("select"),
+      setSelectionRange: () => calls.push("range"),
+    };
+    const body = { appendChild: () => calls.push("add"), removeChild: () => calls.push("remove") };
+    const doc = {
+      body,
+      activeElement: null,
+      createElement: () => box,
+      execCommand: (c: string) => {
+        calls.push(c);
+        return true;
+      },
+    } as unknown as Document;
+    expect(copyWithSelection("secret-token", doc)).toBe(true);
+    expect(box.value).toBe("secret-token");
+    expect(calls).toEqual(["add", "focus", "select", "range", "copy", "remove"]);
+    const failing = { ...doc, execCommand: () => false } as unknown as Document;
+    expect(copyWithSelection("x", failing)).toBe(false);
+  });
+});
