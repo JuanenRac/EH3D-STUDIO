@@ -30,7 +30,7 @@
 |---|---|
 | Versión | `0.0.6` |
 | Madurez | Andamiaje |
-| Pruebas | 74 pruebas (`npm test`) |
+| Pruebas | 76 pruebas (`npm test`) |
 | Pila tecnológica | React 19, TypeScript, Vite |
 | En hardware real | No con máquinas en un banco: vista en un navegador contra un servidor local con máquinas simuladas |
 
@@ -45,7 +45,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 | Área | Estado | Qué significa aquí |
 |---|---|---|
 | Software | 🟡 | La aplicación compila sin avisos (tipos, lint, compilación) y el servidor la sirve en la raíz de su dirección; se ha ejecutado en un navegador contra un servidor local. |
-| Pruebas | 🟡 | Pasan 74 pruebas (`npm test`): el cliente de la API con sus errores, las reglas de nombres, contraseñas y direcciones, el menú por rol, la flota por estación, las acciones de un trabajo y los ocho idiomas. |
+| Pruebas | 🟡 | Pasan 76 pruebas (`npm test`): el cliente de la API con sus errores, las reglas de nombres, contraseñas y direcciones, el menú por rol, la flota por estación, las acciones de un trabajo y los ocho idiomas. |
 | Páginas | 🟡 | Resumen, máquinas por estación, trabajos, eventos en vivo, máquinas, usuarios y tokens, servidor, cuenta, preferencias y acerca de están escritos; los trabajos y las máquinas se gestionan con la API real del servidor. Ninguna página la ha probado alguien que no sea el autor. |
 | Idiomas | 🟡 | Ocho idiomas en cada texto, incluidas las negativas del servidor; los textos los lee una prueba, pero solo el inglés y unas pocas frases de los demás las ha leído una persona. |
 | Máquinas reales | 🔴 | Nada se ha hecho con ella en un banco: no se ha añadido ninguna máquina, no se ha llegado a ningún nodo ni se ha ejecutado un trabajo a través de ella en una máquina real. |
@@ -148,6 +148,7 @@ Cómo encajan las partes de este repositorio: quién habla con él, qué contien
 * **Actualizaciones:** una página para el administrador compara el servidor y Studio instalados con las últimas versiones de GitHub, comprueba cuando se pide y actualiza lo que es más nuevo, mostrando lo que hace el ayudante del servidor mientras trabaja; cuando el propio servidor se reinicia, la página vuelve sola. La actualización necesita `updates_dir` en `server.cfg` y el ayudante de EH3D-SERVER instalado; se ha probado con simulaciones de GitHub y systemd, nunca en una instalación real.
 * **Preparar un trabajo aquí:** elige la máquina y da el trabajo como los ficheros que leen los programas (`.NCD` con su `.DTD`, `.PLT` con su `.RTD`) o como agujeros escritos a mano (herramienta, x e y, con el avance, la velocidad y el recorrido extra de cada herramienta); mira el plano, el tiempo y el recorrido que calcula el servidor, y deja el trabajo listo. Un trabajo nunca arranca solo.
 * **Una página para cada trabajo:** el plano con los agujeros ya hechos rellenos y el siguiente rodeado, cuánto lleva, quién lo hizo y cuándo, las herramientas, y los botones que corresponden a su estado (iniciar, confirmar, parar, borrar). Los trabajos que esperan al operador están arriba en el resumen con su botón Confirmar.
+* **Iniciar pide una confirmación más:** el botón Iniciar de la página del trabajo, de la lista del Monitor y de la cola de una máquina necesita un segundo toque (el primero cambia el botón a «¿Seguro?» y salir de él lo cancela), para que un toque por error no ponga la máquina en marcha.
 * **Una lista con la que se puede trabajar:** búsqueda por nombre, máquina, persona o estado, cinco órdenes, un CSV de lo que se ve y un botón que quita los trabajos terminados; el resumen suma lo que han hecho las máquinas (trabajos, agujeros, horas).
 * **Avisos:** el título de la pestaña cuenta los trabajos que esperan al operador y, si la persona lo activa, un sonido y una notificación del navegador avisan cuando uno nuevo empieza a esperar.
 * **Las máquinas pasan de un servidor a otro:** cada máquina se puede copiar, y las máquinas de un servidor se pueden exportar a un fichero e importar en otro (los tokens de acceso de los nodos nunca se exportan).
@@ -202,7 +203,7 @@ Copia `dist/` a la CM5 (por ejemplo a `/opt/eh3d-studio`), pon `studio_dir = /op
 
 ## 🧪 Pruebas
 
-`npm test` ejecuta 74 pruebas y pasan todas: el cliente de la API (el token, el cuerpo, la consulta, los errores, una red que falla, las rutas con nombres que necesitan escape), las reglas de nombres, contraseñas y direcciones de nodo, lo que está mal en una máquina, el menú de cada rol, las máquinas agrupadas por estación, los recuentos y las acciones de un trabajo, y los ocho idiomas (un texto en cada idioma, chino y japonés en su escritura, los mismos marcadores en todas partes). `npm run typecheck` y `npm run lint` también pasan.
+`npm test` ejecuta 76 pruebas y pasan todas: el cliente de la API (el token, el cuerpo, la consulta, los errores, una red que falla, las rutas con nombres que necesitan escape), las reglas de nombres, contraseñas y direcciones de nodo, lo que está mal en una máquina, el menú de cada rol, las máquinas agrupadas por estación, los recuentos y las acciones de un trabajo, y los ocho idiomas (un texto en cada idioma, chino y japonés en su escritura, los mismos marcadores en todas partes). `npm run typecheck` y `npm run lint` también pasan.
 
 ## 🏗️ Compilación y publicación
 

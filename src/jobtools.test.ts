@@ -31,6 +31,7 @@ import {
   toolColour,
   toolsUsed,
   totals,
+  twoSteps,
   waitingJobs,
 } from "./jobtools";
 import { PAGES, pagesFor, parseRoute } from "./model";
@@ -308,5 +309,16 @@ describe("free G-code programs and the work that is switched off or already done
     const [head, row] = jobsCsv([j]).split("\r\n");
     expect(head.split(",")).toContain("line");
     expect(row.split(",")[head.split(",").indexOf("line")]).toBe("5");
+  });
+});
+
+describe("the start button asks once more", () => {
+  it("arms on the first touch and fires on the second", () => {
+    const first = twoSteps(false);
+    expect(first).toEqual({ armed: true, fire: false });
+    const second = twoSteps(first.armed);
+    expect(second).toEqual({ armed: false, fire: true });
+    // after firing it is disarmed again: the next touch asks again
+    expect(twoSteps(second.armed)).toEqual({ armed: true, fire: false });
   });
 });

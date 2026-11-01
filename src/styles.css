@@ -350,6 +350,7 @@ button.primary { background: var(--accent); color: var(--accent-on); font-weight
 button.primary:hover:not(:disabled) { filter: brightness(1.1); background: var(--accent); }
 button.danger { border-color: var(--bad); color: var(--bad); }
 button.danger.armed { background: var(--bad); color: #fff; }
+button.primary.armed { outline: 2px solid var(--warn, #f0a020); }
 
 .error { color: var(--bad); }
 .spindle-warning { margin-top: 12px; padding: 10px 12px; border: 1px solid var(--wait, var(--accent)); border-radius: 6px; }

@@ -1,6 +1,6 @@
 /* One job on its own page: the plan with the holes already drilled, how far it has got, who did what and when, the tools, and the buttons that fit its state. */
 import { useApp, usePolled } from "../context";
-import { Badge, Card, DangerButton, Empty, Progress } from "../components/ui";
+import { Badge, Card, DangerButton, Empty, Progress, StartButton } from "../components/ui";
 import { PlanDownload, PlanView } from "../components/PlanView";
 import { took } from "../jobtools";
 import { canGoOn, duration, isActive, jobActions, jobKindKey, jobPercent, pauseKey, resumeLine, spindleFindingKey } from "../model";
@@ -47,9 +47,7 @@ export function JobPage({ id }: { id: string }) {
               {t("nav_jobs")}
             </a>
             {a.start && (
-              <button className="primary" onClick={() => void act(() => api.startJob(job.id))}>
-                {t("act_start")}
-              </button>
+              <StartButton label={t("act_start")} onConfirm={() => void act(() => api.startJob(job.id))} />
             )}
             {a.confirm && (
               <button className="primary" onClick={() => void act(() => api.confirmJob(job.id))}>

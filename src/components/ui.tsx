@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { useApp } from "../context";
+import { twoSteps } from "../jobtools";
 
 export function Card({ title, children, actions, wide }: { title?: string; children: ReactNode; actions?: ReactNode; wide?: boolean }) {
   return (
@@ -57,6 +58,30 @@ export function DangerButton({ label, onConfirm, disabled }: { label: string; on
         } else {
           setArmed(true);
         }
+      }}
+    >
+      {armed ? t("sure") : label}
+    </button>
+  );
+}
+
+/**
+ * The button that starts a job: the first touch asks ("Sure?"), the second one starts it, and leaving the button cancels. The same care that the apps take from the Prepare
+ * screen: a touch by mistake (a glove, a dirty screen) must not set the machine going.
+ */
+export function StartButton({ label, onConfirm, disabled }: { label: string; onConfirm: () => void; disabled?: boolean }) {
+  const { t } = useApp();
+  const [armed, setArmed] = useState(false);
+  return (
+    <button
+      type="button"
+      className={`primary${armed ? " armed" : ""}`}
+      disabled={disabled}
+      onBlur={() => setArmed(false)}
+      onClick={() => {
+        const next = twoSteps(armed);
+        setArmed(next.armed);
+        if (next.fire) onConfirm();
       }}
     >
       {armed ? t("sure") : label}

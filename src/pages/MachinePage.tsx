@@ -2,7 +2,7 @@
  * give it work. */
 import { useEffect, useState } from "react";
 import { useApp, usePolled } from "../context";
-import { Badge, Card, Empty, Progress } from "../components/ui";
+import { Badge, Card, Empty, Progress, StartButton } from "../components/ui";
 import { ApiError } from "../api";
 import type { HeadMeasure, SpindleGuard, SpindleId } from "../types";
 import { LIGHT_TONES } from "../types";
@@ -116,11 +116,7 @@ export function MachinePage({ id }: { id: string }) {
                   {j.by} · {duration(j.estimate_s)}
                 </small>
               </div>
-              {operator && m.state === "idle" && (
-                <button className="primary" onClick={() => void start(j.id)}>
-                  {t("act_start")}
-                </button>
-              )}
+              {operator && m.state === "idle" && <StartButton label={t("act_start")} onConfirm={() => void start(j.id)} />}
             </div>
           ))
         )}

@@ -1,7 +1,7 @@
 /* The four pages of the group Monitor: the overview, the machines by station, the jobs and the live events. */
 import { useEffect, useRef, useState } from "react";
 import { useApp, usePolled } from "../context";
-import { Badge, Card, DangerButton, Empty, Progress } from "../components/ui";
+import { Badge, Card, DangerButton, Empty, Progress, StartButton } from "../components/ui";
 import { atLeast, countJobs, duration, groupFleet, isActive, jobActions, jobKindKey, jobPercent, pauseKey } from "../model";
 import { JOB_ORDERS, finishedIds, jobsCsv, matchesQuery, sortJobs, totals, waitingJobs } from "../jobtools";
 import type { JobOrder } from "../jobtools";
@@ -304,7 +304,7 @@ export function JobsPage() {
                   <td>{j.by}</td>
                   <td>{duration(j.estimate_s)}</td>
                   <td className="row-actions">
-                    {a.start && <button onClick={() => void act(() => api.startJob(j.id))}>{t("act_start")}</button>}
+                    {a.start && <StartButton label={t("act_start")} onConfirm={() => void act(() => api.startJob(j.id))} />}
                     {a.confirm && <button onClick={() => void act(() => api.confirmJob(j.id))}>{t("act_confirm")}</button>}
                     {a.pause && <button onClick={() => void act(() => api.pauseJob(j.id))}>{t("act_pause")}</button>}
                     {a.resume && <button onClick={() => void act(() => api.resumeJob(j.id))}>{t("act_resume")}</button>}

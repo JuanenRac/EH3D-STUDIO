@@ -363,3 +363,8 @@ export function svgFile(svg: SVGSVGElement): string {
   bg?.setAttribute("fill", "#ffffff");
   return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone) + "\n";
 }
+
+/** A button that needs a second touch: the first one arms it (and the button asks), the second one fires. Leaving the button disarms it. */
+export function twoSteps(armed: boolean): { armed: boolean; fire: boolean } {
+  return armed ? { armed: false, fire: true } : { armed: true, fire: false };
+}

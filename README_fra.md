@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.0.6` |
 | Maturité | Échafaudage |
-| Tests | 74 tests (`npm test`) |
+| Tests | 76 tests (`npm test`) |
 | Pile technique | React 19, TypeScript, Vite |
 | Sur du matériel réel | Pas avec des machines sur un banc : vue dans un navigateur contre un serveur local avec des machines simulées |
 
@@ -45,7 +45,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Logiciel | 🟡 | L'application se construit sans avertissement (types, lint, build) et est servie par le serveur à la racine de son adresse ; elle a tourné dans un navigateur contre un serveur local. |
-| Tests | 🟡 | 74 tests réussissent (`npm test`) : le client de l'API avec ses erreurs, les règles des noms, mots de passe et adresses, le menu par rôle, la flotte par station, les actions d'un travail et les huit langues. |
+| Tests | 🟡 | 76 tests réussissent (`npm test`) : le client de l'API avec ses erreurs, les règles des noms, mots de passe et adresses, le menu par rôle, la flotte par station, les actions d'un travail et les huit langues. |
 | Pages | 🟡 | Aperçu, machines par station, travaux, événements en direct, machines, utilisateurs et jetons, serveur, compte, préférences et à propos sont écrits ; travaux et machines se gèrent avec la vraie API du serveur. Aucune page n'a été essayée par quelqu'un d'autre que l'auteur. |
 | Langues | 🟡 | Huit langues dans chaque texte, refus du serveur compris ; les textes sont lus par un test, mais seuls l'anglais et quelques phrases des autres ont été lus par une personne. |
 | Machines réelles | 🔴 | Rien n'a été fait avec elle sur un banc : aucune machine ajoutée, aucun nœud atteint et aucun travail exécuté par elle sur une vraie machine. |
@@ -148,6 +148,7 @@ Comment s'assemblent les parties de ce dépôt : qui lui parle, ce qu'il contien
 * **Mises à jour :** une page pour l'administrateur compare le serveur et Studio installés aux dernières versions sur GitHub, vérifie sur demande et met à jour ce qui est plus récent, en montrant ce que fait l'assistant du serveur pendant qu'il travaille ; quand le serveur lui-même redémarre, la page revient toute seule. La mise à jour demande `updates_dir` dans `server.cfg` et l'assistant d'EH3D-SERVER installé ; testée avec des doublures de GitHub et de systemd, jamais sur une installation réelle.
 * **Préparer un travail ici :** choisissez la machine et donnez le travail sous forme de fichiers que lisent les programmes (`.NCD` avec son `.DTD`, `.PLT` avec son `.RTD`) ou de trous saisis à la main (outil, x et y, avec l'avance, la vitesse et la course en plus de chaque outil) ; regardez le plan, le temps et le parcours que calcule le serveur, et gardez le travail prêt. Un travail ne démarre jamais seul.
 * **Une page pour chaque travail :** le plan avec les trous déjà percés remplis et le suivant entouré, où il en est, qui l'a fait et quand, les outils, et les boutons qui conviennent à son état (démarrer, confirmer, arrêter, supprimer). Les travaux qui attendent l'opérateur sont en haut de l'aperçu avec leur bouton Confirmer.
+* **Démarrer demande une confirmation de plus :** le bouton Démarrer de la page du travail, de la liste du Moniteur et de la file d'une machine demande un second toucher (le premier change le bouton en « Sûr ? » et le quitter annule), pour qu'un toucher par erreur ne mette pas la machine en marche.
 * **Une liste avec laquelle on peut travailler :** recherche par nom, machine, personne ou état, cinq tris, un CSV de ce qui est affiché et un bouton qui retire les travaux terminés ; l'aperçu additionne ce que les machines ont fait (travaux, trous, heures).
 * **Alertes :** le titre de l'onglet compte les travaux qui attendent l'opérateur et, si la personne l'active, un son et une notification du navigateur préviennent quand un nouveau se met à attendre.
 * **Les machines passent d'un serveur à l'autre :** chaque machine peut être copiée, et les machines d'un serveur peuvent être exportées dans un fichier et importées dans un autre (les jetons d'accès des nœuds ne sont jamais exportés).
@@ -202,7 +203,7 @@ Copiez `dist/` sur la CM5 (par exemple dans `/opt/eh3d-studio`), mettez `studio_
 
 ## 🧪 Tests
 
-`npm test` lance 74 tests et tous réussissent : le client de l'API (le jeton, le corps, la requête, les erreurs, un réseau qui tombe, les chemins avec des noms à échapper), les règles des noms, mots de passe et adresses de nœud, ce qui ne va pas dans une machine, le menu de chaque rôle, les machines groupées par station, les comptes et les actions d'un travail, et les huit langues (un texte dans chaque langue, chinois et japonais dans leur écriture, les mêmes marqueurs partout). `npm run typecheck` et `npm run lint` réussissent aussi.
+`npm test` lance 76 tests et tous réussissent : le client de l'API (le jeton, le corps, la requête, les erreurs, un réseau qui tombe, les chemins avec des noms à échapper), les règles des noms, mots de passe et adresses de nœud, ce qui ne va pas dans une machine, le menu de chaque rôle, les machines groupées par station, les comptes et les actions d'un travail, et les huit langues (un texte dans chaque langue, chinois et japonais dans leur écriture, les mêmes marqueurs partout). `npm run typecheck` et `npm run lint` réussissent aussi.
 
 ## 🏗️ Compilation et publication
 

@@ -30,7 +30,7 @@
 |---|---|
 | Versione | `0.0.6` |
 | Maturità | Impalcatura |
-| Test | 74 test (`npm test`) |
+| Test | 76 test (`npm test`) |
 | Stack tecnologico | React 19, TypeScript, Vite |
 | Su hardware reale | Non con macchine su un banco: vista in un browser contro un server locale con macchine simulate |
 
@@ -45,7 +45,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Area | Stato | Cosa significa qui |
 |---|---|---|
 | Software | 🟡 | L'applicazione compila senza avvisi (tipi, lint, build) ed è servita dal server alla radice del suo indirizzo; è stata eseguita in un browser contro un server locale. |
-| Test | 🟡 | 74 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le otto lingue. |
+| Test | 🟡 | 76 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le otto lingue. |
 | Pagine | 🟡 | Panoramica, macchine per stazione, lavori, eventi in tempo reale, macchine, utenti e token, server, account, preferenze e informazioni sono scritti; lavori e macchine si gestiscono con l'API reale del server. Nessuna pagina è stata provata da qualcuno che non sia l'autore. |
 | Lingue | 🟡 | Otto lingue in ogni testo, compresi i rifiuti del server; i testi sono letti da un test, ma solo l'inglese e poche frasi delle altre sono state lette da una persona. |
 | Macchine reali | 🔴 | Nulla è stato fatto su un banco: nessuna macchina aggiunta, nessun nodo raggiunto e nessun lavoro eseguito tramite essa su una macchina reale. |
@@ -148,6 +148,7 @@ Come si incastrano le parti di questo repository: chi parla con esso, cosa conti
 * **Aggiornamenti:** una pagina per l'amministratore confronta il server e Studio installati con le ultime release su GitHub, controlla quando richiesto e aggiorna ciò che è più nuovo, mostrando cosa fa l'helper del server mentre lavora; quando il server stesso si riavvia, la pagina torna da sola. L'aggiornamento richiede `updates_dir` in `server.cfg` e l'helper di EH3D-SERVER installato; è stato provato con simulazioni di GitHub e systemd, mai su un'installazione reale.
 * **Preparare un lavoro qui:** scegli la macchina e dai il lavoro come i file che leggono i programmi (`.NCD` con il suo `.DTD`, `.PLT` con il suo `.RTD`) oppure come fori scritti a mano (utensile, x e y, con avanzamento, velocità e corsa extra di ogni utensile); guarda il disegno, il tempo e il percorso che calcola il server e lascia il lavoro pronto. Un lavoro non parte mai da solo.
 * **Una pagina per ogni lavoro:** il disegno con i fori già fatti riempiti e il prossimo cerchiato, a che punto è, chi l'ha fatto e quando, gli utensili e i pulsanti adatti al suo stato (avvia, conferma, ferma, elimina). I lavori che aspettano l'operatore sono in alto nella panoramica con il loro pulsante Conferma.
+* **Avvia chiede un'altra conferma:** il pulsante Avvia della pagina del lavoro, dell'elenco del Monitor e della coda di una macchina richiede un secondo tocco (il primo cambia il pulsante in «Sicuro?» e uscirne annulla), così un tocco per errore non mette in moto la macchina.
 * **Un elenco con cui si può lavorare:** ricerca per nome, macchina, persona o stato, cinque ordinamenti, un CSV di ciò che si vede e un pulsante che rimuove i lavori terminati; la panoramica somma ciò che hanno fatto le macchine (lavori, fori, ore).
 * **Avvisi:** il titolo della scheda conta i lavori che aspettano l'operatore e, se la persona lo attiva, un suono e una notifica del browser avvisano quando uno nuovo inizia ad aspettare.
 * **Le macchine passano da un server all'altro:** ogni macchina si può copiare e le macchine di un server si possono esportare in un file e importare in un altro (i token di accesso dei nodi non vengono mai esportati).
@@ -202,7 +203,7 @@ Copia `dist/` sulla CM5 (ad esempio in `/opt/eh3d-studio`), metti `studio_dir = 
 
 ## 🧪 Test
 
-`npm test` esegue 74 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le otto lingue (un testo in ogni lingua, cinese e giapponese nella loro scrittura, gli stessi segnaposto ovunque). Passano anche `npm run typecheck` e `npm run lint`.
+`npm test` esegue 76 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le otto lingue (un testo in ogni lingua, cinese e giapponese nella loro scrittura, gli stessi segnaposto ovunque). Passano anche `npm run typecheck` e `npm run lint`.
 
 ## 🏗️ Compilazione e rilascio
 
