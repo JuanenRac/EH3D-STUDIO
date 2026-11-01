@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.0.7] - A stop that reaches the machine at once, refusals in the eight languages and a last quality check
+
 - **Start asks once more:** the Start button of the job page, of the Monitor list and of the queue of a machine needs a second touch (the first one asks "Sure?"); a touch by mistake no longer sets the machine going.
 - **The stop button reaches the machine at once:** stopping an active job asks the server to stop the machine (`POST /machines/:id/stop`) instead of cancelling the job, and the camera and the live events ask for a one-use ticket instead of putting the token of the session in the address.
 
