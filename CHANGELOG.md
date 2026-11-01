@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The stop button reaches the machine at once:** stopping an active job asks the server to stop the machine (`POST /machines/:id/stop`) instead of cancelling the job, and the camera and the live events ask for a one-use ticket instead of putting the token of the session in the address.
+
+- **The status lights are checked in the CI** and the ones the evidence does not support are yellow.
+
 - **The refusals of the server are written in the eight languages:** the login, the setup code, the password, the names, the ids, the jobs and the busy-server codes no longer show the raw code.
 - **Machine ids and stations** are checked the way the server checks them (lowercase letters, digits and hyphens).
 - **The last quality check** no longer shows `NaN %`, and the pages that reload when the machine changes do not paint the answer of the previous machine.

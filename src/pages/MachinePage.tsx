@@ -1,6 +1,6 @@
 /* One machine on its own page: what it is doing, the jobs that wait for it (and how long they will take together), the last ones it finished, and the ways to
  * give it work. */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, Empty, Progress } from "../components/ui";
 import { ApiError } from "../api";
@@ -307,6 +307,23 @@ function HeadLightCard({ id, operator }: { id: string; operator: boolean }) {
   );
 }
 
+/** The picture of the camera: it asks for a ticket first, because the address of a picture cannot carry the token of the session. */
+function CameraPicture({ machine }: { machine: string }) {
+  const { api, t } = useApp();
+  const [src, setSrc] = useState<string | null>(null);
+  useEffect(() => {
+    let alive = true;
+    api.ticket().then(
+      ({ ticket }) => alive && setSrc(api.headStreamUrl(machine, ticket)),
+      () => alive && setSrc(null),
+    );
+    return () => {
+      alive = false;
+    };
+  }, [api, machine]);
+  return src ? <img className="head-camera" src={src} alt={t("head_title")} /> : null;
+}
+
 /** The node of the drill head of this machine, through the server: what it says, its camera and a measure of the table. Not shown when the machine has no node. */
 function HeadCard({ id, operator }: { id: string; operator: boolean }) {
   const { api, t, err, say, refreshS } = useApp();
@@ -367,7 +384,7 @@ function HeadCard({ id, operator }: { id: string; operator: boolean }) {
               </>
             )}
           </dl>
-          {camera && data.camera && <img className="head-camera" src={api.headStreamUrl(id)} alt={t("head_title")} />}
+          {camera && data.camera && <CameraPicture machine={id} />}
         </div>
       )}
     </Card>

@@ -308,7 +308,7 @@ export function JobsPage() {
                     {a.confirm && <button onClick={() => void act(() => api.confirmJob(j.id))}>{t("act_confirm")}</button>}
                     {a.pause && <button onClick={() => void act(() => api.pauseJob(j.id))}>{t("act_pause")}</button>}
                     {a.resume && <button onClick={() => void act(() => api.resumeJob(j.id))}>{t("act_resume")}</button>}
-                    {a.cancel && <button onClick={() => void act(() => api.cancelJob(j.id))}>{isActive(j) ? t("act_stop") : t("act_cancel")}</button>}
+                    {a.cancel && <button onClick={() => void act(() => (isActive(j) ? api.stopMachine(j.machine) : api.cancelJob(j.id)))}>{isActive(j) ? t("act_stop") : t("act_cancel")}</button>}
                     {a.remove && (
                       <button className="danger" onClick={() => void act(() => api.deleteJob(j.id))}>
                         {t("act_delete")}
@@ -352,20 +352,28 @@ export function LivePage() {
     let ws: WebSocket | null = null;
     let closed = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    const again = () => {
+      setOpen(false);
+      if (!closed) {
+        retry.current = Math.min(retry.current + 1, 6);
+        timer = setTimeout(connect, 1000 * 2 ** retry.current);
+      }
+    };
     const connect = () => {
-      ws = new WebSocket(api.eventsUrl(window.location));
-      ws.onopen = () => {
-        setOpen(true);
-        retry.current = 0;
-      };
-      ws.onmessage = (m) => setLines((old) => [{ at: Date.now(), text: describeEvent(String(m.data)) }, ...old].slice(0, 200));
-      ws.onclose = () => {
-        setOpen(false);
-        if (!closed) {
-          retry.current = Math.min(retry.current + 1, 6);
-          timer = setTimeout(connect, 1000 * 2 ** retry.current);
-        }
-      };
+      // each connection asks for its own ticket: it is good for one use
+      api.ticket().then(
+        ({ ticket }) => {
+          if (closed) return;
+          ws = new WebSocket(api.eventsUrl(window.location, ticket));
+          ws.onopen = () => {
+            setOpen(true);
+            retry.current = 0;
+          };
+          ws.onmessage = (m) => setLines((old) => [{ at: Date.now(), text: describeEvent(String(m.data)) }, ...old].slice(0, 200));
+          ws.onclose = again;
+        },
+        again,
+      );
     };
     connect();
     return () => {

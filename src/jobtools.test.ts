@@ -210,7 +210,7 @@ describe("the address and the alert", () => {
     await api.headMeasure("bench-1");
     await api.headMeasure("bench-1", 5);
     expect(calls).toEqual(["GET /api/v1/machines/bench-1/head/status", "POST /api/v1/machines/bench-1/head/measure", "POST /api/v1/machines/bench-1/head/measure?samples=5"]);
-    expect(api.headStreamUrl("bench-1")).toBe("/api/v1/machines/bench-1/head/stream?token=tok%20en");
+    expect(api.headStreamUrl("bench-1", "t_ab c")).toBe("/api/v1/machines/bench-1/head/stream?ticket=t_ab%20c");
   });
 });
 

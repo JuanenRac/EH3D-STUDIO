@@ -78,10 +78,11 @@ describe("the client of the API", () => {
     expect(api.token).toBeNull();
   });
 
-  it("puts the token in the address of the websocket and escapes the names in the paths", () => {
+  it("puts a ticket, never the token, in the address of the websocket and escapes the names in the paths", () => {
     const api = new Api("a b");
-    expect(api.eventsUrl({ protocol: "http:", host: "cm5:18200" })).toBe("ws://cm5:18200/api/v1/events?token=a%20b");
-    expect(api.eventsUrl({ protocol: "https:", host: "x" }).startsWith("wss://")).toBe(true);
+    expect(api.eventsUrl({ protocol: "http:", host: "cm5:18200" }, "t_1 2")).toBe("ws://cm5:18200/api/v1/events?ticket=t_1%202");
+    expect(api.eventsUrl({ protocol: "https:", host: "x" }, "t").startsWith("wss://")).toBe(true);
+    expect(api.eventsUrl({ protocol: "http:", host: "x" }, "t")).not.toContain("a%20b");
   });
 
   it("encodes the names of users and machines", async () => {

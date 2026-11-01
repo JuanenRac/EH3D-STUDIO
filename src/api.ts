@@ -131,17 +131,21 @@ export class Api {
   };
   /** The last quality check of the machine (404 `no_inspection` until one is made after the server starts). */
   headInspection = (machine: string) => this.request<HeadInspection>("GET", `/machines/${encodeURIComponent(machine)}/head/inspect`);
-  /** The address of the camera picture of the node: the token goes in the address because a picture cannot carry a header. */
-  headStreamUrl = (machine: string) => `${BASE}/machines/${encodeURIComponent(machine)}/head/stream?token=${encodeURIComponent(this.token ?? "")}`;
+  /** A ticket for the camera or the websocket, good for one use within half a minute: the address carries it instead of the token of the session. */
+  ticket = () => this.request<{ ticket: string; expires_s: number }>("POST", "/tickets", {});
+  /** The address of the camera picture of the node: a picture cannot carry a header, so the address carries a ticket. */
+  headStreamUrl = (machine: string, ticket: string) => `${BASE}/machines/${encodeURIComponent(machine)}/head/stream?ticket=${encodeURIComponent(ticket)}`;
+  /** The stop button: ends the job that is active on the machine at once, whichever it is (the server reaches the machine without waiting for the line it is sending). */
+  stopMachine = (machine: string) => this.request<{ ok: boolean; stopped: boolean; job: string | null }>("POST", `/machines/${encodeURIComponent(machine)}/stop`, {});
 
   // ---- the updates of the installed services, from the releases of GitHub (administrator)
   updates = () => this.request<UpdatesView>("GET", "/updates");
   checkUpdates = () => this.request<unknown>("POST", "/updates/check", {});
   applyUpdates = (components: string[]) => this.request<unknown>("POST", "/updates/apply", { components });
 
-  /** The address of the websocket of the events: the token goes in the address because a browser cannot set a header on a websocket. */
-  eventsUrl(location: { protocol: string; host: string }): string {
+  /** The address of the websocket of the events: a browser cannot set a header on a websocket, so the address carries a ticket. */
+  eventsUrl(location: { protocol: string; host: string }, ticket: string): string {
     const scheme = location.protocol === "https:" ? "wss:" : "ws:";
-    return `${scheme}//${location.host}${BASE}/events?token=${encodeURIComponent(this.token ?? "")}`;
+    return `${scheme}//${location.host}${BASE}/events?ticket=${encodeURIComponent(ticket)}`;
   }
 }

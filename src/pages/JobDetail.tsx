@@ -76,7 +76,7 @@ export function JobPage({ id }: { id: string }) {
                 {t("act_go_on")}
               </button>
             )}
-            {a.cancel && <button onClick={() => void act(() => api.cancelJob(job.id))}>{isActive(job) ? t("act_stop") : t("act_cancel")}</button>}
+            {a.cancel && <button onClick={() => void act(() => (isActive(job) ? api.stopMachine(job.machine) : api.cancelJob(job.id)))}>{isActive(job) ? t("act_stop") : t("act_cancel")}</button>}
             {a.remove && <DangerButton label={t("act_delete")} onConfirm={() => void act(() => api.deleteJob(job.id), () => (window.location.hash = "#/jobs"))} />}
           </>
         }
