@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.0.6` |
 | Maturity | Scaffolding |
-| Tests | 73 tests (`npm test`) |
+| Tests | 74 tests (`npm test`) |
 | Stack | React 19, TypeScript, Vite |
 | On real hardware | Not against machines on a bench: looked at in a browser against a local server with simulated machines |
 
@@ -45,11 +45,11 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟡 | The application builds without warnings (typecheck, lint, build) and is served by the server at the root of its address; it has been run in a browser against a local server. |
-| Tests | 🟢 | 73 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the eight languages. |
+| Tests | 🟡 | 74 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the eight languages. |
 | Pages | 🟡 | Overview, machines by station, jobs, live events, machines, users and tokens, server, account, preferences and about are written; the jobs and the machines are managed against the real API of the server. No page has been tried by someone who is not the author. |
-| Languages | 🟢 | Eight languages in every text, the refusals of the server included; the texts are read by a test, but only English and a few phrases of the others have been read by a person. |
+| Languages | 🟡 | Eight languages in every text, the refusals of the server included; the texts are read by a test, but only English and a few phrases of the others have been read by a person. |
 | Real machines | 🔴 | Nothing has been done with it on a bench: no machine has been added, no node reached and no job run through it on a real machine. |
-| Documentation | 🟢 | README in eight languages, the settings of the server and how to put Studio on the CM5. |
+| Documentation | 🟡 | README in eight languages, the settings of the server and how to put Studio on the CM5. |
 
 ## 🎯 Overview
 
@@ -202,7 +202,7 @@ Copy `dist/` to the CM5 (for example to `/opt/eh3d-studio`), put `studio_dir = /
 
 ## 🧪 Testing
 
-`npm test` runs 73 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the eight languages (a text in every language, Chinese and Japanese in their own scripts, the same placeholders everywhere). `npm run typecheck` and `npm run lint` pass as well.
+`npm test` runs 74 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the eight languages (a text in every language, Chinese and Japanese in their own scripts, the same placeholders everywhere). `npm run typecheck` and `npm run lint` pass as well.
 
 ## 🏗️ Build & Release
 

@@ -30,7 +30,7 @@
 |---|---|
 | Versione | `0.0.6` |
 | Maturità | Impalcatura |
-| Test | 73 test (`npm test`) |
+| Test | 74 test (`npm test`) |
 | Stack tecnologico | React 19, TypeScript, Vite |
 | Su hardware reale | Non con macchine su un banco: vista in un browser contro un server locale con macchine simulate |
 
@@ -45,11 +45,11 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Area | Stato | Cosa significa qui |
 |---|---|---|
 | Software | 🟡 | L'applicazione compila senza avvisi (tipi, lint, build) ed è servita dal server alla radice del suo indirizzo; è stata eseguita in un browser contro un server locale. |
-| Test | 🟢 | 73 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le otto lingue. |
+| Test | 🟡 | 74 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le otto lingue. |
 | Pagine | 🟡 | Panoramica, macchine per stazione, lavori, eventi in tempo reale, macchine, utenti e token, server, account, preferenze e informazioni sono scritti; lavori e macchine si gestiscono con l'API reale del server. Nessuna pagina è stata provata da qualcuno che non sia l'autore. |
-| Lingue | 🟢 | Otto lingue in ogni testo, compresi i rifiuti del server; i testi sono letti da un test, ma solo l'inglese e poche frasi delle altre sono state lette da una persona. |
+| Lingue | 🟡 | Otto lingue in ogni testo, compresi i rifiuti del server; i testi sono letti da un test, ma solo l'inglese e poche frasi delle altre sono state lette da una persona. |
 | Macchine reali | 🔴 | Nulla è stato fatto su un banco: nessuna macchina aggiunta, nessun nodo raggiunto e nessun lavoro eseguito tramite essa su una macchina reale. |
-| Documentazione | 🟢 | README in otto lingue, le impostazioni del server e come mettere Studio sulla CM5. |
+| Documentazione | 🟡 | README in otto lingue, le impostazioni del server e come mettere Studio sulla CM5. |
 
 ## 🎯 Panoramica
 
@@ -202,7 +202,7 @@ Copia `dist/` sulla CM5 (ad esempio in `/opt/eh3d-studio`), metti `studio_dir = 
 
 ## 🧪 Test
 
-`npm test` esegue 73 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le otto lingue (un testo in ogni lingua, cinese e giapponese nella loro scrittura, gli stessi segnaposto ovunque). Passano anche `npm run typecheck` e `npm run lint`.
+`npm test` esegue 74 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le otto lingue (un testo in ogni lingua, cinese e giapponese nella loro scrittura, gli stessi segnaposto ovunque). Passano anche `npm run typecheck` e `npm run lint`.
 
 ## 🏗️ Compilazione e rilascio
 
