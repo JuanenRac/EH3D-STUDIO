@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/Stack-React%20%2B%20TypeScript-00599C.svg" alt="React and TypeScript">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
   <img src="https://img.shields.io/badge/Version-0.0.9-0f6cbd.svg" alt="Version">
-  <img src="https://img.shields.io/badge/Maturity-scaffolding-FFB020.svg" alt="Maturity">
+  <img src="https://img.shields.io/badge/Maturity-functional-4CAF50.svg" alt="Maturity">
 </p>
 
 ---
@@ -29,7 +29,7 @@
 | | |
 |---|---|
 | 版本 | `0.0.9` |
-| 成熟度 | 脚手架 |
+| 成熟度 | 可用 |
 | 测试 | 94 个测试（`npm test`） |
 | 技术栈 | React 19, TypeScript, Vite |
 | 真实硬件 | 未在试验台上用真实机床：已在浏览器中对接带模拟机床的本地服务器查看 |

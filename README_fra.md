@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/Stack-React%20%2B%20TypeScript-00599C.svg" alt="React and TypeScript">
   <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
   <img src="https://img.shields.io/badge/Version-0.0.9-0f6cbd.svg" alt="Version">
-  <img src="https://img.shields.io/badge/Maturity-scaffolding-FFB020.svg" alt="Maturity">
+  <img src="https://img.shields.io/badge/Maturity-functional-4CAF50.svg" alt="Maturity">
 </p>
 
 ---
@@ -29,7 +29,7 @@
 | | |
 |---|---|
 | Version | `0.0.9` |
-| Maturité | Échafaudage |
+| Maturité | Fonctionnel |
 | Tests | 94 tests (`npm test`) |
 | Pile technique | React 19, TypeScript, Vite |
 | Sur du matériel réel | Pas avec des machines sur un banc : vue dans un navigateur contre un serveur local avec des machines simulées |

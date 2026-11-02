@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The maturity is functional:** the manifest, the badge and the table of the eight README files say it, since it is used and tried with real files; the evidence stays as host tests.
 - **The notes of a release keep the names written between quotes as they are:** `api_revision` and `tests/examples/*.json` no longer lose their underscores and stars on the Updates page; only the markers of the bold and the quotes themselves go. With a test.
 ## [0.0.9] - Summary before starting, undo of an update and examples of the server
 
