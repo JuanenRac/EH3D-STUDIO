@@ -47,6 +47,8 @@ const SUMMARY: Record<string, Kind> = {
   started: "number|null",
   finished: "number|null",
   by: "string",
+  started_by: "string",
+  stopped_by: "string",
   items_total: "number",
   items_done: "number",
   holes_total: "number",

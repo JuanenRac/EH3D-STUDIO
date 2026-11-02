@@ -124,6 +124,18 @@ export function JobPage({ id }: { id: string }) {
               </dd>
               <dt>{t("jobs_by")}</dt>
               <dd>{job.by}</dd>
+              {job.started_by ? (
+                <>
+                  <dt>{t("jobs_started_by")}</dt>
+                  <dd>{job.started_by}</dd>
+                </>
+              ) : null}
+              {job.stopped_by ? (
+                <>
+                  <dt>{t("jobs_stopped_by")}</dt>
+                  <dd>{job.stopped_by}</dd>
+                </>
+              ) : null}
               <dt>{t("jobs_kind")}</dt>
               <dd>{t(jobKindKey(job.kind))}</dd>
               {job.kind === "gcode" ? (

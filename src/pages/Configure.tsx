@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Field } from "../components/ui";
-import { cfgKeys, connectionBody, dollarSwitchShown, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, parseReleaseNotes, splitStep, studioReplaced, toInput, updatable, updatesBusy, validName, validPassword } from "../model";
+import { cfgKeys, tokenDays, tokenState, connectionBody, dollarSwitchShown, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, parseReleaseNotes, splitStep, studioReplaced, toInput, updatable, updatesBusy, validName, validPassword } from "../model";
 import type { MachineProblem } from "../model";
 import { copyId, machineExport, machineImport } from "../jobtools";
 import { copyText } from "../clipboard";
@@ -237,7 +237,7 @@ export function AccessPage() {
   const users = usePolled(() => api.users(), 0);
   const tokens = usePolled(() => api.tokens(), 0);
   const [nu, setNu] = useState({ name: "", role: "operator" as Role, password: "" });
-  const [nt, setNt] = useState({ name: "", role: "operator" as Role });
+  const [nt, setNt] = useState({ name: "", role: "operator" as Role, days: "" });
   const [shown, setShown] = useState<{ name: string; token: string } | null>(null);
   const [copied, setCopied] = useState<boolean | null>(null);
 
@@ -335,20 +335,33 @@ export function AccessPage() {
                 <th>{t("acc_name")}</th>
                 <th>{t("acc_role")}</th>
                 <th>{t("acc_created")}</th>
+                <th>{t("acc_last_used")}</th>
+                <th>{t("acc_expires")}</th>
                 <th />
               </tr>
             </thead>
             <tbody>
-              {tokens.data.map((k) => (
+              {tokens.data.map((k) => {
+                const state = tokenState(k, Math.floor(Date.now() / 1000));
+                return (
                 <tr key={k.id}>
                   <td>{k.name}</td>
                   <td>{t(`role_${k.role}` as TextKey)}</td>
                   <td>{new Date(k.created * 1000).toLocaleString()}</td>
+                  <td>
+                    {k.last_used != null ? new Date(k.last_used * 1000).toLocaleString() : t("acc_unused")}
+                    {state === "stale" && <Badge tone="wait">{t("acc_stale")}</Badge>}
+                  </td>
+                  <td>
+                    {k.expires != null ? new Date(k.expires * 1000).toLocaleString() : t("acc_never")}
+                    {state === "expired" && <Badge tone="bad">{t("acc_expired")}</Badge>}
+                  </td>
                   <td className="row-actions">
                     <DangerButton label={t("act_delete")} onConfirm={() => void guard(() => api.deleteToken(k.id), tokens.reload)} />
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         )}
@@ -365,19 +378,22 @@ export function AccessPage() {
               ))}
             </select>
           </Field>
+          <Field label={t("acc_token_days")} hint={t("acc_token_days_hint")}>
+            <input inputMode="numeric" value={nt.days} onChange={(e) => setNt({ ...nt, days: e.target.value })} />
+          </Field>
         </div>
         <div className="form-actions">
           <button
             className="primary"
-            disabled={nt.name.trim() === ""}
+            disabled={nt.name.trim() === "" || tokenDays(nt.days) === null}
             onClick={() =>
               void guard(
                 async () => {
-                  const r = await api.addToken(nt.name.trim(), nt.role);
+                  const r = await api.addToken(nt.name.trim(), nt.role, tokenDays(nt.days) ?? undefined);
                   setShown({ name: nt.name.trim(), token: r.token }); setCopied(null);
                 },
                 () => {
-                  setNt({ name: "", role: "operator" });
+                  setNt({ name: "", role: "operator", days: "" });
                   tokens.reload();
                 },
               )
@@ -401,7 +417,19 @@ export const SERVER_SETTINGS: { key: string; value: string; text: TextKey }[] = 
   { key: "studio_dir", value: "-", text: "srv_studio_dir" },
   { key: "updates_dir", value: "-", text: "srv_updates_dir" },
   { key: "gcode_finish_wait_s", value: "900", text: "srv_gcode_finish_wait_s" },
+  { key: "exit_on_panic", value: "true", text: "srv_exit_on_panic" },
+  { key: "trust_forwarded_for", value: "false", text: "srv_trust_forwarded_for" },
+  { key: "persist_sessions", value: "true", text: "srv_persist_sessions" },
+  { key: "token_default_days", value: "0", text: "srv_token_default_days" },
+  { key: "events_ping_s", value: "30", text: "srv_events_ping_s" },
+  { key: "events_idle_s", value: "90", text: "srv_events_idle_s" },
+  { key: "audit_file", value: "true", text: "srv_audit_file" },
+  { key: "job_log", value: "true", text: "srv_job_log" },
+  { key: "log_max_kb", value: "1024", text: "srv_log_max_kb" },
 ];
+
+/** The switches the running server reports (`features` of the health check), in the order they are shown: the ones that change what it trusts or what happens on a failure first. */
+export const SWITCHES_SHOWN = ["trust_forwarded_for", "exit_on_panic", "persist_sessions", "url_token", "local_until_setup"] as const;
 
 export function ServerPage() {
   const { api, t } = useApp();
@@ -416,6 +444,23 @@ export function ServerPage() {
           <dd>{window.location.host}</dd>
         </dl>
       </Card>
+      {health.data?.features && (
+        <Card title={t("srv_in_force")} wide>
+          <p className="hint">{t("srv_in_force_help")}</p>
+          <dl className="facts">
+            {SWITCHES_SHOWN.filter((k) => health.data?.features && k in health.data.features).map((k) => (
+              <div key={k} style={{ display: "contents" }}>
+                <dt>
+                  <code>{k}</code>
+                </dt>
+                <dd>
+                  <Badge tone={health.data?.features?.[k] ? "ok" : "dim"}>{t(health.data?.features?.[k] ? "srv_on" : "srv_off")}</Badge>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </Card>
+      )}
       <Card title={t("srv_settings")} wide>
         <p className="hint">{t("srv_settings_help")}</p>
         <table className="table">

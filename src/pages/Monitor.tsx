@@ -334,10 +334,12 @@ interface LiveEvent {
 /** One line for an event of the server: `job` events say which job and where it is, the others are shown as they come. */
 export function describeEvent(raw: string): string {
   try {
-    const v = JSON.parse(raw) as { type?: string; job?: { name?: string; state?: string; machine?: string; items_done?: number; items_total?: number }; id?: string; jobs?: unknown[] };
+    const v = JSON.parse(raw) as { type?: string; job?: { name?: string; state?: string; machine?: string; items_done?: number; items_total?: number }; id?: string; jobs?: unknown[]; missed?: number };
     if (v.type === "hello") return `hello · ${v.jobs?.length ?? 0} jobs`;
     if (v.type === "job" && v.job) return `${v.job.name ?? "?"} · ${v.job.machine ?? "?"} · ${v.job.state ?? "?"} · ${v.job.items_done ?? 0}/${v.job.items_total ?? 0}`;
     if (v.type === "job_removed") return `removed · ${v.id ?? "?"}`;
+    // the server says the page missed events: what it shows from the polled views is current, this line only tells why the log has a gap
+    if (v.type === "resync") return `resync · ${v.missed ?? "?"} missed`;
     return raw.length > 200 ? raw.slice(0, 200) + "…" : raw;
   } catch {
     return raw.slice(0, 200);

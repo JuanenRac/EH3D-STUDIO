@@ -2,6 +2,28 @@
  * how a job is counted. Pure functions, tested on their own. GPL-3.0-or-later. */
 import type { Fleet, FleetMachine, JobKind, JobPause, JobState, JobSummary, Machine, MachineInput, Role, SpindleFinding, SpindleId, DryRunView, JobView, WorkWarning } from "./types";
 
+// ---- the tokens of the programs
+
+/** How long a token may stay unused before the list marks it, in days. */
+export const STALE_TOKEN_DAYS = 90;
+
+/** What the list says about a token: `expired`, `stale` (not used for more than 90 days, or never used and older than that), `unused` (never used, still young), or `ok`. */
+export function tokenState(k: { created: number; last_used?: number | null; expires?: number | null }, nowS: number): "expired" | "stale" | "unused" | "ok" {
+  if (k.expires != null && k.expires <= nowS) return "expired";
+  const idle = nowS - (k.last_used ?? k.created);
+  if (idle > STALE_TOKEN_DAYS * 86400) return "stale";
+  return k.last_used == null ? "unused" : "ok";
+}
+
+/** The days field of the form: empty is "the server decides", else a whole number from 1 to 3650; null when what was typed cannot be sent. */
+export function tokenDays(typed: string): number | undefined | null {
+  const s = typed.trim();
+  if (s === "") return undefined;
+  if (!/^\d+$/.test(s)) return null;
+  const n = Number(s);
+  return n >= 1 && n <= 3650 ? n : null;
+}
+
 // ---- the spindle of a machine
 
 /** The text that says one excess of a job against the spindle of the machine (the four codes the server uses). */

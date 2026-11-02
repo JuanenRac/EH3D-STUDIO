@@ -6,6 +6,8 @@ export const ROLES: Role[] = ["viewer", "operator", "admin"];
 export interface Health {
   name: string;
   version: string;
+  /** Only for whoever is logged in: the switches this build and these settings have (`serial`, `studio`, `updates`, `url_token`, `local_until_setup`, `trust_forwarded_for`, `exit_on_panic`, `persist_sessions`). */
+  features?: Record<string, boolean>;
 }
 
 export interface Session {
@@ -25,6 +27,10 @@ export interface TokenInfo {
   name: string;
   role: Role;
   created: number;
+  /** When the program last used it (seconds since 1970); null while it never did. */
+  last_used?: number | null;
+  /** When it stops working (seconds since 1970); null for one that does not expire. */
+  expires?: number | null;
 }
 
 export interface NewToken {
@@ -131,6 +137,9 @@ export interface JobSummary {
   started: number | null;
   finished: number | null;
   by: string;
+  /** Who started it and who stopped it (empty when nobody did). */
+  started_by?: string;
+  stopped_by?: string;
   items_total: number;
   items_done: number;
   holes_total: number;
