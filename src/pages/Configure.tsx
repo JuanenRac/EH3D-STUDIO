@@ -419,7 +419,7 @@ export const SERVER_SETTINGS: { key: string; value: string; text: TextKey }[] = 
   { key: "gcode_finish_wait_s", value: "900", text: "srv_gcode_finish_wait_s" },
   { key: "exit_on_panic", value: "true", text: "srv_exit_on_panic" },
   { key: "trust_forwarded_for", value: "false", text: "srv_trust_forwarded_for" },
-  { key: "persist_sessions", value: "true", text: "srv_persist_sessions" },
+  { key: "persist_sessions", value: "false", text: "srv_persist_sessions" },
   { key: "token_default_days", value: "0", text: "srv_token_default_days" },
   { key: "events_ping_s", value: "30", text: "srv_events_ping_s" },
   { key: "events_idle_s", value: "90", text: "srv_events_idle_s" },
