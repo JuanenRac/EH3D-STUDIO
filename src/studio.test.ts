@@ -547,6 +547,10 @@ describe("the updates page", () => {
       { kind: "item", text: "second point" },
       { kind: "text", text: "A plain paragraph" },
     ]);
+    // what is between the quotes of the code is kept as it is: the names with an underscore and the stars of a pattern
+    expect(parseReleaseNotes("- `api_revision` and `tests/examples/*.json`, **bold_name** and `deploy/eh3d-update.py`")[0]!.text).toBe(
+      "api_revision and tests/examples/*.json, bold_name and deploy/eh3d-update.py",
+    );
     expect(parseReleaseNotes("")).toEqual([]);
     expect(parseReleaseNotes("- " + "x".repeat(3000))[0]!.text.length).toBe(1500);
   });

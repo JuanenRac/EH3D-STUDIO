@@ -261,6 +261,14 @@ export function updatesBusy(view: { pending: boolean; state: string }): boolean 
   return view.pending || view.state === "checking" || view.state === "updating";
 }
 
+/** A line of the notes without its markers: the stars of the bold and the quotes of the code go, but what is inside the quotes stays as it is (`api_revision`, `*.json`). */
+function plainNotes(line: string): string {
+  return line
+    .split("`")
+    .map((part, i) => (i % 2 === 1 ? part : part.replace(/\*\*/g, "").replace(/(^|\s)\*(\S)/g, "$1$2")))
+    .join("");
+}
+
 /** The notes of a release (the CHANGELOG section of its version) as lines to show: a "- " line is a point of the list, anything else a paragraph. They are text from the internet: nothing in them is markup or a link. */
 export function parseReleaseNotes(notes: string): { kind: "item" | "text"; text: string }[] {
   const lines: { kind: "item" | "text"; text: string }[] = [];
@@ -268,7 +276,7 @@ export function parseReleaseNotes(notes: string): { kind: "item" | "text"; text:
     const line = raw.trim();
     if (!line || /^#{1,6}\s/.test(line)) continue;
     const item = /^[-*]\s+(.*)$/.exec(line);
-    lines.push({ kind: item ? "item" : "text", text: (item ? item[1]! : line).replace(/[*_`]/g, "").slice(0, 1500) });
+    lines.push({ kind: item ? "item" : "text", text: plainNotes(item ? item[1]! : line).slice(0, 1500) });
     if (lines.length >= 300) break;
   }
   return lines;

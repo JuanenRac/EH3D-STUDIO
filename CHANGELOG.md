@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The notes of a release keep the names written between quotes as they are:** `api_revision` and `tests/examples/*.json` no longer lose their underscores and stars on the Updates page; only the markers of the bold and the quotes themselves go. With a test.
 ## [0.0.9] - Summary before starting, undo of an update and examples of the server
 
 - **The answers of the server are read in the tests from its own examples:** the fleet, the jobs, a job, the preview, the spindle, an error and the updates are the files that the tests of the server make, so a change in the answers that the Studio does not follow fails here.
