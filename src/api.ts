@@ -142,6 +142,10 @@ export class Api {
   updates = () => this.request<UpdatesView>("GET", "/updates");
   checkUpdates = () => this.request<unknown>("POST", "/updates/check", {});
   applyUpdates = (components: string[]) => this.request<unknown>("POST", "/updates/apply", { components });
+  /** Puts back the version that the last update of those services left behind. */
+  undoUpdates = (components: string[]) => this.request<unknown>("POST", "/updates/undo", { components });
+  /** Empties the list of the jobs that the update helper did before. */
+  clearUpdateHistory = () => this.request<unknown>("POST", "/updates/clear-history", {});
 
   /** The address of the websocket of the events: a browser cannot set a header on a websocket, so the address carries a ticket. */
   eventsUrl(location: { protocol: string; host: string }, ticket: string): string {

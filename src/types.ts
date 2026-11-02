@@ -217,6 +217,10 @@ export interface UpdateComponent {
   installed: string | null;
   latest: string | null;
   newer: boolean;
+  /** The version that the last update left behind, when the helper knows it. A server that is older leaves it, and `can_undo`, out. */
+  previous?: string | null;
+  /** The version left behind is kept and can be put back. */
+  can_undo?: boolean;
   url: string | null;
   published: string | null;
   /** The text of the latest release (its CHANGELOG section). A server that is older leaves it out. */

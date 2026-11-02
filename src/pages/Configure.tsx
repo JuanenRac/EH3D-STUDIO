@@ -445,7 +445,7 @@ export function ServerPage() {
   );
 }
 
-const STEP_TEXT: Record<string, TextKey> = { download: "up_step_download", verify: "up_step_verify", install: "up_step_install", restart: "up_step_restart" };
+const STEP_TEXT: Record<string, TextKey> = { download: "up_step_download", verify: "up_step_verify", install: "up_step_install", restart: "up_step_restart", restore: "up_step_restore" };
 
 function Bar({ percent, tone }: { percent: number; tone: string }) {
   const p = Math.max(0, Math.min(100, percent));
@@ -552,6 +552,18 @@ export function UpdatesPage() {
                   <button className={c.newer ? "primary" : ""} disabled={busy || c.latest == null} onClick={() => void ask(() => api.applyUpdates([c.id]))}>
                     {c.newer ? t("up_update") : t("up_reinstall")}
                   </button>
+                  {c.can_undo === true && (
+                    <button
+                      disabled={busy}
+                      title={t("up_undo_help")}
+                      onClick={() => {
+                        const to = c.previous ?? t("up_undo_earlier");
+                        if (window.confirm(t("up_undo_ask", { name: c.name, v: to }))) void ask(() => api.undoUpdates([c.id]));
+                      }}
+                    >
+                      {c.previous ? t("up_undo_to", { v: c.previous }) : t("up_undo")}
+                    </button>
+                  )}
                   {c.latest != null && (
                     <button aria-expanded={open.has(c.id)} onClick={() => toggle(c.id)}>
                       {open.has(c.id) ? t("up_changes_hide") : t("up_changes")}
@@ -628,12 +640,20 @@ export function UpdatesPage() {
         </Card>
       )}
       {history.length > 0 && (
-        <Card title={t("up_history")} wide>
+        <Card
+          title={t("up_history")}
+          wide
+          actions={
+            <button disabled={busy} onClick={() => window.confirm(t("up_history_clear_ask")) && void ask(() => api.clearUpdateHistory())}>
+              {t("up_history_clear")}
+            </button>
+          }
+        >
           <ul className="up-history">
             {[...history].reverse().map((h) => (
               <li key={`${h.id}-${h.kind}`}>
                 <span>{new Date(h.started * 1000).toLocaleString()}</span>
-                <strong>{h.kind === "check" ? t("up_kind_check") : t("up_kind_apply")}</strong>
+                <strong>{h.kind === "check" ? t("up_kind_check") : h.kind === "undo" ? t("up_kind_undo") : t("up_kind_apply")}</strong>
                 <span>{h.kind === "check" ? "" : h.label}</span>
                 <Badge tone={h.state === "done" ? "ok" : "bad"}>{t(h.state === "done" ? "up_state_done" : "up_state_error")}</Badge>
               </li>

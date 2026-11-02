@@ -27,6 +27,7 @@ import {
   spindleFindingKey,
   spindleNameKey,
   toInput,
+  undoable,
   updatable,
   updatesBusy,
   parseReleaseNotes,
@@ -298,6 +299,26 @@ describe("the updates", () => {
     await expect(api.applyUpdates(["server"])).rejects.toBeInstanceOf(ApiError);
     expect(f.calls.map((c) => `${c.init?.method} ${c.url}`)).toEqual(["GET /api/v1/updates", "POST /api/v1/updates/check", "POST /api/v1/updates/apply", "POST /api/v1/updates/apply"]);
     expect(JSON.parse(String(f.calls[2].init?.body))).toEqual({ components: ["server", "studio"] });
+  });
+
+  it("offers to put back only the components that have an earlier version kept", () => {
+    const components = [
+      { id: "server", can_undo: false },
+      { id: "studio", can_undo: true },
+      { id: "old" },
+    ];
+    expect(undoable({ components })).toEqual(["studio"]);
+    expect(undoable({ components: [] })).toEqual([]);
+  });
+
+  it("asks the server to put an update back and to empty the history", async () => {
+    const f = fakeFetch([{ status: 200, body: { ok: true } }, { status: 200, body: { ok: true } }, { status: 409, body: { error: "update_refused", detail: "there is no earlier version of 'server' kept to put back" } }]);
+    const api = new Api("tok", f.fetcher);
+    await api.undoUpdates(["studio"]);
+    await api.clearUpdateHistory();
+    await expect(api.undoUpdates(["server"])).rejects.toBeInstanceOf(ApiError);
+    expect(f.calls.map((c) => `${c.init?.method} ${c.url}`)).toEqual(["POST /api/v1/updates/undo", "POST /api/v1/updates/clear-history", "POST /api/v1/updates/undo"]);
+    expect(JSON.parse(String(f.calls[0].init?.body))).toEqual({ components: ["studio"] });
   });
 
   it("has every text of the page in the eight languages", () => {

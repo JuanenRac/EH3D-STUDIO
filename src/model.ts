@@ -251,6 +251,11 @@ export function updatable(view: { components: { id: string; newer: boolean }[] }
   return view.components.filter((c) => c.newer).map((c) => c.id);
 }
 
+/** The components whose earlier version is kept, so the last update of each can be put back. */
+export function undoable(view: { components: { id: string; can_undo?: boolean }[] }): string[] {
+  return view.components.filter((c) => c.can_undo === true).map((c) => c.id);
+}
+
 /** The helper is checking or updating, or a request waits for it: the page asks again soon and offers no new request. */
 export function updatesBusy(view: { pending: boolean; state: string }): boolean {
   return view.pending || view.state === "checking" || view.state === "updating";
