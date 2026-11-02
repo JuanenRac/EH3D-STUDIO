@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.0.9] - Summary before starting, undo of an update and examples of the server
+
 - **The answers of the server are read in the tests from its own examples:** the fleet, the jobs, a job, the preview, the spindle, an error and the updates are the files that the tests of the server make, so a change in the answers that the Studio does not follow fails here.
 - **Put back the earlier version:** a service that an update left a version behind for shows a button to put that version back (it asks first, and the page says which version it is when the helper knows it); the job shows its step and the history says it was a put back. Needs the matching server.
 - **Clear the history of the updates:** a button in the card of the earlier jobs empties the list (it asks first).
