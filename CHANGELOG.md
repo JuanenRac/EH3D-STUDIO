@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.1.0] - Time limits, token list, catalog check and who handled a job
+
 - **Every request has a time limit:** a request that gets no answer is cancelled and ends as the error `timeout` with a sentence in the eight languages (5 s for the health check, 15 s for the rest, 60 s for the planning of a job: its preview, creating and starting it); a server that accepts the connection and then says nothing no longer leaves the page waiting, and the indicator that says the server does not answer turns on. 4 tests.
 - **A page that asks again every few seconds waits for the last request:** `usePolled` starts no new request while the previous one is in flight, so a slow server does not collect a pile of them. 2 tests.
 - **The refusals of the server are checked against its catalog:** a test reads the list of codes that the server copies here and demands a sentence in the eight languages for every one, except an explicit list of codes shown with the words of the server. Ten refusals gained a sentence: `bad_days`, `internal`, `local_only`, `no_inspection`, `not_running`, `out_of_table`, `storage`, `unknown_token`, `update_refused` and `updates_off`. 4 tests.
