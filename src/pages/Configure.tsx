@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Field } from "../components/ui";
-import { cfgKeys, connectionBody, dollarSwitchShown, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, toInput, updatable, updatesBusy, validName, validPassword } from "../model";
+import { cfgKeys, connectionBody, dollarSwitchShown, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, parseReleaseNotes, splitStep, studioReplaced, toInput, updatable, updatesBusy, validName, validPassword } from "../model";
 import type { MachineProblem } from "../model";
 import { copyId, machineExport, machineImport } from "../jobtools";
 import { copyText } from "../clipboard";
@@ -445,13 +445,26 @@ export function ServerPage() {
   );
 }
 
-/** The updates of the installed services from the releases of GitHub: what is installed, what is the latest, and a button for the check and for the update. */
+const STEP_TEXT: Record<string, TextKey> = { download: "up_step_download", verify: "up_step_verify", install: "up_step_install", restart: "up_step_restart" };
+
+function Bar({ percent, tone }: { percent: number; tone: string }) {
+  const p = Math.max(0, Math.min(100, percent));
+  return (
+    <div className={`up-bar ${tone}`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(p)}>
+      <i style={{ width: `${p}%` }} />
+    </div>
+  );
+}
+
+/** The updates of the installed services from the releases of GitHub: what is installed and what is the latest (with what changes in it), a button for each service or for all,
+ * and, while the helper works, the steps of the job with a bar each, the bar of the whole, the log, and the earlier jobs. */
 export function UpdatesPage() {
   const { api, t, err, say } = useApp();
   const [fast, setFast] = useState(false);
-  const { data, error, reload } = usePolled(() => api.updates(), fast ? 2 : 10);
+  const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
+  const { data, error, reload } = usePolled(() => api.updates(), fast ? 1 : 10);
   const busy = data ? updatesBusy(data) : false;
-  // while the helper works the page asks every two seconds; when the server itself restarts the requests fail for a while and then answer again
+  // while the helper works the page asks every second; when the server itself restarts the requests fail for a while and then answer again
   if (busy !== fast) setFast(busy);
   const ask = async (what: () => Promise<unknown>) => {
     try {
@@ -473,6 +486,22 @@ export function UpdatesPage() {
     );
   }
   const todo = updatable(data);
+  const steps = data.steps ?? [];
+  const history = data.history ?? [];
+  const nameOf = (id: string) => data.components.find((c) => c.id === id)?.name ?? id;
+  const stepLabel = (id: string) => {
+    const { component, step } = splitStep(id);
+    const key = STEP_TEXT[step];
+    return `${nameOf(component)}: ${key ? t(key) : step}`;
+  };
+  const toggle = (id: string) =>
+    setOpen((cur) => {
+      const next = new Set(cur);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  const stateTone = data.state === "error" ? "bad" : data.state === "done" ? "ok" : data.state === "idle" ? "dim" : "run";
+  const showJob = data.state !== "idle" || steps.length > 0;
   return (
     <div className="stack">
       <Card
@@ -497,10 +526,11 @@ export function UpdatesPage() {
               <th>{t("up_installed")}</th>
               <th>{t("up_latest")}</th>
               <th>{t("up_status")}</th>
+              <th />
             </tr>
           </thead>
           <tbody>
-            {data.components.map((c) => (
+            {data.components.flatMap((c) => [
               <tr key={c.id}>
                 <td>{c.name}</td>
                 <td>
@@ -518,19 +548,99 @@ export function UpdatesPage() {
                 <td>
                   <Badge tone={c.latest == null ? "dim" : c.newer ? "wait" : "ok"}>{c.latest == null ? t("up_unknown") : c.newer ? t("up_newer") : t("up_current")}</Badge>
                 </td>
-              </tr>
-            ))}
+                <td className="up-actions">
+                  <button className={c.newer ? "primary" : ""} disabled={busy || c.latest == null} onClick={() => void ask(() => api.applyUpdates([c.id]))}>
+                    {c.newer ? t("up_update") : t("up_reinstall")}
+                  </button>
+                  {c.latest != null && (
+                    <button aria-expanded={open.has(c.id)} onClick={() => toggle(c.id)}>
+                      {open.has(c.id) ? t("up_changes_hide") : t("up_changes")}
+                    </button>
+                  )}
+                </td>
+              </tr>,
+              ...(open.has(c.id) && c.latest != null
+                ? [
+                    <tr key={`${c.id}-notes`} className="up-notes-row">
+                      <td colSpan={5}>
+                        <div className="up-notes" role="region" aria-label={t("up_changes_in", { v: c.latest })}>
+                          <strong>{t("up_changes_in", { v: c.latest })}</strong>
+                          {parseReleaseNotes(c.notes ?? "").length === 0 ? (
+                            <p className="hint">{t("up_changes_none")}</p>
+                          ) : (
+                            <ul>
+                              {parseReleaseNotes(c.notes ?? "").map((line, i) => (
+                                <li key={i} className={line.kind === "text" ? "up-note-text" : ""}>
+                                  {line.text}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </td>
+                    </tr>,
+                  ]
+                : []),
+            ])}
           </tbody>
         </table>
         {todo.length === 0 && data.components.some((c) => c.latest != null) && <p className="hint">{t("up_nothing")}</p>}
         <p className="hint">{t("up_restart")}</p>
       </Card>
-      <Card title={t("up_log")} wide>
-        <p>
-          <Badge tone={data.state === "error" ? "bad" : data.state === "done" ? "ok" : data.state === "idle" ? "dim" : "run"}>{t(`up_state_${data.state}` as TextKey)}</Badge> {data.message}
-        </p>
-        {data.log.length > 0 && <pre className="log">{data.log.join("\n")}</pre>}
-      </Card>
+      {showJob && (
+        <Card
+          title={t("up_job")}
+          wide
+          actions={
+            <button onClick={() => void copyText(data.log.join("\n")).then((ok) => say(t(ok ? "act_copied" : "act_copy_failed"), ok ? "ok" : "error"))}>{t("act_copy")}</button>
+          }
+        >
+          <p>
+            <Badge tone={stateTone}>{t(`up_state_${data.state}` as TextKey)}</Badge> {data.message}
+          </p>
+          {steps.length > 0 && (
+            <>
+              <div className="up-total">
+                <span>{t("up_total")}</span>
+                <Bar percent={data.percent ?? 0} tone={stateTone} />
+                <span>{data.percent ?? 0} %</span>
+              </div>
+              <ul className="up-steps">
+                {steps.map((st) => (
+                  <li key={st.id} className={st.state}>
+                    <span>{stepLabel(st.id)}</span>
+                    <Bar percent={st.state === "done" || st.state === "skipped" ? 100 : st.percent} tone={st.state} />
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {error != null && busy && <p className="hint">{t("up_waiting")}</p>}
+          {studioReplaced(data) && (
+            <p>
+              <button className="primary" onClick={() => window.location.reload()}>
+                {t("up_reload")}
+              </button>{" "}
+              <span className="hint">{t("up_reload_help")}</span>
+            </p>
+          )}
+          {data.log.length > 0 && <pre className="log">{data.log.join("\n")}</pre>}
+        </Card>
+      )}
+      {history.length > 0 && (
+        <Card title={t("up_history")} wide>
+          <ul className="up-history">
+            {[...history].reverse().map((h) => (
+              <li key={`${h.id}-${h.kind}`}>
+                <span>{new Date(h.started * 1000).toLocaleString()}</span>
+                <strong>{h.kind === "check" ? t("up_kind_check") : t("up_kind_apply")}</strong>
+                <span>{h.kind === "check" ? "" : h.label}</span>
+                <Badge tone={h.state === "done" ? "ok" : "bad"}>{t(h.state === "done" ? "up_state_done" : "up_state_error")}</Badge>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
     </div>
   );
 }

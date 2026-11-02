@@ -199,9 +199,28 @@ export interface UpdateComponent {
   newer: boolean;
   url: string | null;
   published: string | null;
+  /** The text of the latest release (its CHANGELOG section). A server that is older leaves it out. */
+  notes?: string;
 }
 
 export type UpdateState = "idle" | "checking" | "updating" | "done" | "error";
+export type StepState = "pending" | "running" | "done" | "failed" | "skipped";
+
+/** A step of an update job: `<component>.<download|verify|install|restart>`. */
+export interface UpdateStep {
+  id: string;
+  state: StepState;
+  percent: number;
+}
+
+/** A job that the helper did before. */
+export interface UpdateHistoryEntry {
+  id: string;
+  started: number;
+  kind: string;
+  label: string;
+  state: "done" | "failed";
+}
 
 export interface UpdatesView {
   enabled: boolean;
@@ -209,6 +228,10 @@ export interface UpdatesView {
   state: UpdateState;
   message: string;
   log: string[];
+  /** How much of the whole job is done (0 to 100). A server that is older leaves it, the steps and the history out. */
+  percent?: number;
+  steps?: UpdateStep[];
+  history?: UpdateHistoryEntry[];
   components: UpdateComponent[];
 }
 

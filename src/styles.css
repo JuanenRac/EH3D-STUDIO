@@ -456,3 +456,29 @@ a { color: var(--accent); }
 .check-row { display: flex; gap: 8px; align-items: flex-start; }
 .check-row input { margin-top: 4px; }
 .gcode-text { font-family: ui-monospace, Consolas, monospace; font-size: 0.85rem; }
+
+/* the updates: the bars of a job, the notes of a release and the earlier jobs */
+.up-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.up-notes-row td { border-top: 0; padding-top: 0; }
+.up-notes { padding: 10px 12px; background: var(--panel-raised, rgba(255, 255, 255, 0.04)); border: 1px solid var(--line, rgba(255, 255, 255, 0.12)); border-radius: 6px; }
+.up-notes ul { margin: 6px 0 0; padding-left: 18px; }
+.up-notes li { margin: 3px 0; }
+.up-notes .up-note-text { list-style: none; margin-left: -18px; color: var(--muted); }
+.up-bar { height: 8px; border-radius: 4px; background: var(--line, rgba(255, 255, 255, 0.12)); overflow: hidden; }
+.up-bar i { display: block; height: 100%; width: 0; background: var(--run); transition: width 0.4s ease; }
+.up-bar.ok i, .up-bar.done i { background: var(--ok); }
+.up-bar.bad i, .up-bar.failed i { background: var(--bad); }
+.up-bar.dim i, .up-bar.pending i { background: var(--muted); }
+.up-total { display: grid; grid-template-columns: 9em 1fr 3.5em; align-items: center; gap: 10px; margin: 10px 0; }
+.up-total span:last-child { text-align: right; color: var(--muted); }
+.up-steps { list-style: none; margin: 8px 0 12px; padding: 0; display: grid; gap: 8px; }
+.up-steps li { display: grid; grid-template-columns: 14em 1fr; align-items: center; gap: 10px; }
+.up-steps li.pending { color: var(--muted); }
+.up-steps li.failed { color: var(--bad); }
+.up-history { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.up-history li { display: grid; grid-template-columns: 12em 8em 1fr auto; gap: 10px; align-items: center; }
+@media (max-width: 640px) {
+  .up-total { grid-template-columns: 1fr; }
+  .up-steps li { grid-template-columns: 1fr; gap: 4px; }
+  .up-history li { grid-template-columns: 1fr auto; }
+}

@@ -29,6 +29,9 @@ import {
   toInput,
   updatable,
   updatesBusy,
+  parseReleaseNotes,
+  splitStep,
+  studioReplaced,
   validAddress,
   validName,
   validPassword,
@@ -512,5 +515,31 @@ describe("the copy of a text", () => {
     expect(calls).toEqual(["add", "focus", "select", "range", "copy", "remove"]);
     const failing = { ...doc, execCommand: () => false } as unknown as Document;
     expect(copyWithSelection("x", failing)).toBe(false);
+  });
+});
+
+describe("the updates page", () => {
+  it("turns the notes of a release into points and paragraphs, never markup", () => {
+    const lines = parseReleaseNotes("## 0.0.8 - Title\n\n- **A stop** that reaches the machine\n* second `point`\nA plain paragraph\n");
+    expect(lines).toEqual([
+      { kind: "item", text: "A stop that reaches the machine" },
+      { kind: "item", text: "second point" },
+      { kind: "text", text: "A plain paragraph" },
+    ]);
+    expect(parseReleaseNotes("")).toEqual([]);
+    expect(parseReleaseNotes("- " + "x".repeat(3000))[0]!.text.length).toBe(1500);
+  });
+
+  it("splits the id of a step into the component and the step", () => {
+    expect(splitStep("studio.verify")).toEqual({ component: "studio", step: "verify" });
+    expect(splitStep("loose")).toEqual({ component: "", step: "loose" });
+  });
+
+  it("asks to load the page again only when the pages of Studio were installed", () => {
+    const done = [{ id: "studio.install", state: "done" }];
+    expect(studioReplaced({ state: "done", steps: done })).toBe(true);
+    expect(studioReplaced({ state: "updating", steps: done })).toBe(false);
+    expect(studioReplaced({ state: "done", steps: [{ id: "server.install", state: "done" }] })).toBe(false);
+    expect(studioReplaced({ state: "done" })).toBe(false);
   });
 });

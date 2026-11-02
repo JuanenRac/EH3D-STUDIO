@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.0.8] - An update page that shows its steps, the version of the package that was left behind and what changes in each release
+
+- **The version that was installed is the version that is shown:** the package of 0.0.7 was built with the number of 0.0.6 inside (`package.json` was left behind), so after an update the page still said 0.0.6 and the server took the update for not done. A test now fails when `package.json`, `package-lock.json` and the manifest do not agree.
+- **An update page that shows what is happening:** the service that is updated shows its steps (download, check the file, install and, where there is one, restart) with a bar each, a bar for the whole job, the state, the log with a button to copy it, and the earlier jobs below. While the server restarts the page says so and goes on by itself.
+- **What changes in each release:** a button beside each service opens the notes of the latest release, read from its changelog, as text.
+- **An update button for each service** (and a reinstall for the one that is current), besides the one that updates everything that is newer.
+- **Reload after the pages are replaced:** when Studio itself was updated the page offers a button to load it again, and says why.
+- **Texts:** eighteen new texts in the eight languages; tests for the notes, the steps and the reload.
+
 ## [0.0.7] - A stop that reaches the machine at once, refusals in the eight languages and a last quality check
 
 - **Start asks once more:** the Start button of the job page, of the Monitor list and of the queue of a machine needs a second touch (the first one asks "Sure?"); a touch by mistake no longer sets the machine going.

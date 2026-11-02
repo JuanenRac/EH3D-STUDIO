@@ -191,6 +191,30 @@ export function updatesBusy(view: { pending: boolean; state: string }): boolean 
   return view.pending || view.state === "checking" || view.state === "updating";
 }
 
+/** The notes of a release (the CHANGELOG section of its version) as lines to show: a "- " line is a point of the list, anything else a paragraph. They are text from the internet: nothing in them is markup or a link. */
+export function parseReleaseNotes(notes: string): { kind: "item" | "text"; text: string }[] {
+  const lines: { kind: "item" | "text"; text: string }[] = [];
+  for (const raw of notes.replace(/\r\n?/g, "\n").split("\n")) {
+    const line = raw.trim();
+    if (!line || /^#{1,6}\s/.test(line)) continue;
+    const item = /^[-*]\s+(.*)$/.exec(line);
+    lines.push({ kind: item ? "item" : "text", text: (item ? item[1]! : line).replace(/[*_`]/g, "").slice(0, 1500) });
+    if (lines.length >= 300) break;
+  }
+  return lines;
+}
+
+/** The component and the step of a step id (`studio.verify` is `studio` and `verify`). */
+export function splitStep(id: string): { component: string; step: string } {
+  const dot = id.indexOf(".");
+  return dot < 0 ? { component: "", step: id } : { component: id.slice(0, dot), step: id.slice(dot + 1) };
+}
+
+/** The pages of Studio were replaced by the last update: the page has to be loaded again to show the new ones. */
+export function studioReplaced(view: { state: string; steps?: { id: string; state: string }[] }): boolean {
+  return view.state === "done" && (view.steps ?? []).some((s) => s.id === "studio.install" && s.state === "done");
+}
+
 // ---- the fleet and the jobs
 
 export interface StationGroup {
