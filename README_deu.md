@@ -18,7 +18,7 @@
 
 ---
 
-**Ehrlichkeitscheck - was heute läuft:** eine Webanwendung in React und TypeScript, die sich bei EH3D-SERVER anmeldet und zeigt und ändert, was dieser enthält: die Maschinen mit Station, Knoten und Konfigurationsdateien, die Aufträge, die Benutzer und die Tokens, die Live-Ereignisse. Der Client der API, die Regeln der Formulare, das Menü je Rolle und die acht Sprachen sind durch 94 Tests abgedeckt, und die Seiten wurden in einem Browser gegen einen lokalen Server mit simulierten Maschinen angesehen. **Sie wurde nicht mit Maschinen auf einem Prüfstand benutzt**, und der Server beendet TLS noch nicht.
+**Ehrlichkeitscheck - was heute läuft:** eine Webanwendung in React und TypeScript, die sich bei EH3D-SERVER anmeldet und zeigt und ändert, was dieser enthält: die Maschinen mit Station, Knoten und Konfigurationsdateien, die Aufträge, die Benutzer und die Tokens, die Live-Ereignisse. Der Client der API, die Regeln der Formulare, das Menü je Rolle und die acht Sprachen sind durch 110 Tests abgedeckt, und die Seiten wurden in einem Browser gegen einen lokalen Server mit simulierten Maschinen angesehen. **Sie wurde nicht mit Maschinen auf einem Prüfstand benutzt**, und der Server beendet TLS noch nicht.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.0.9` |
 | Reifegrad | Funktionsfähig |
-| Tests | 94 Tests (`npm test`) |
+| Tests | 110 Tests (`npm test`) |
 | Technologie-Stack | React 19, TypeScript, Vite |
 | Auf echter Hardware | Nicht mit Maschinen auf einem Prüfstand: im Browser gegen einen lokalen Server mit simulierten Maschinen angesehen |
 
@@ -45,7 +45,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Software | 🟡 | Die Anwendung baut ohne Warnungen (Typen, Lint, Build) und wird vom Server an der Wurzel seiner Adresse ausgeliefert; sie lief in einem Browser gegen einen lokalen Server. |
-| Tests | 🟡 | 94 Tests bestehen (`npm test`): der Client der API mit seinen Fehlern, die Regeln für Namen, Passwörter und Adressen, das Menü je Rolle, die Flotte je Station, die Aktionen eines Auftrags und die acht Sprachen. |
+| Tests | 🟡 | 110 Tests bestehen (`npm test`): der Client der API mit seinen Fehlern, die Regeln für Namen, Passwörter und Adressen, das Menü je Rolle, die Flotte je Station, die Aktionen eines Auftrags und die acht Sprachen. |
 | Seiten | 🟡 | Übersicht, Maschinen je Station, Aufträge, Live-Ereignisse, Maschinen, Benutzer und Tokens, Server, Konto, Einstellungen und Info sind geschrieben; Aufträge und Maschinen werden gegen die echte API des Servers verwaltet. Keine Seite wurde von jemand anderem als dem Autor erprobt. |
 | Sprachen | 🟡 | Acht Sprachen in jedem Text, auch in den Ablehnungen des Servers; die Texte liest ein Test, aber nur Englisch und wenige Sätze der anderen hat ein Mensch gelesen. |
 | Echte Maschinen | 🔴 | Auf einem Prüfstand wurde nichts damit gemacht: keine Maschine hinzugefügt, kein Knoten erreicht und kein Auftrag über sie auf einer echten Maschine ausgeführt. |
@@ -158,6 +158,7 @@ Wie die Teile dieses Repositorys zusammenpassen: wer mit ihm spricht, was es ent
 * **Die Spindel auf der Seite einer Maschine:** alle lesen, welche Spindel die Maschine trägt (die originale oder die mit Umrichter), was mit einem Auftrag geschieht, der mehr verlangt, als sie gibt, die Grenzen der verwendeten Spindel und die Höchstdrehzahl für den Knoten der Maschine; ein Administrator ändert die Spindel und den Sicherheitsschalter (den Auftrag ablehnen, was der Standard ist, oder warnen und die Drehzahl auf das Maximum der Spindel kürzen). Wird ein Auftrag mit dem Schalter auf `warn` vorbereitet, listet der Plan Werkzeug für Werkzeug auf, was über die Spindel hinausgeht; mit `reject` lehnt der Server ihn ab und Studio sagt warum. Nicht an einer echten Maschine erprobt.
 * **Freie G-Code-Aufträge und GRBL-Maschinen:** Eine Maschine kann eine GRBL-Steuerung an einer seriellen Schnittstelle des Servers sein (Schnittstelle und Baudrate; der Server muss mit `--features serial` gebaut sein), und ein Administrator legt sie in Konfiguration an oder ändert sie. In Vorbereiten wird ein G-Code-Programm (eingefügt oder aus einer Datei geladen) wie jeder Auftrag in der Vorschau gezeigt und bereitgelegt, mit einem Sicherheitsschalter, der Spindel und Kühlmittel beim Fortsetzen wieder startet, standardmäßig aus. Ein laufender G-Code-Auftrag wird in der Liste, auf seiner Seite und in der Übersicht angehalten und fortgesetzt; sie nennen die erreichte Zeile und worauf er wartet (ein Halt oder das Warten vor der ersten Bewegung eines fortgesetzten Auftrags); ein angehaltener Auftrag bietet an, dort fortzufahren, wo er angehalten hat: der Server hat die Anfrage gespeichert, die Datei muss nicht erneut gewählt werden. Bohr- und Fräsaufträge nehmen abgeschaltete Werkzeuge und bereits erledigte Bohrungen oder Pfade an, und die Referenz der Servereinstellungen nennt `gcode_finish_wait_s` und `updates_dir`. Am Simulator und an einem Ersatz erprobt, nie an einer echten GRBL-Steuerung. Ein Administrator kann je Maschine die `$`-Zeilen von GRBL (etwa `$H`) mit einem Sicherheitsschalter in der Konfiguration erlauben, standardmäßig aus und mit einer Warnung.
 * **Der LED-Ring und die letzte Qualitätsprüfung auf der Seite einer Maschine:** Ein Bediener schaltet den Ring ein oder aus und stellt Stufe und Farbton ein, und alle sehen das Urteil der letzten Prüfung der Arbeit. Gegen einen Ersatz getestet, nie an einem echten Knoten.
+* **Eine Zeitgrenze für jede Anfrage und prüfbare Tokens:** eine Anfrage ohne Antwort endet nach 5 bis 60 Sekunden als Fehler, eine Seite, die erneut fragt, wartet auf die letzte Anfrage, die Liste der Programm-Tokens zeigt, wann jedes zuletzt verwendet wurde und wann es abläuft (und markiert die seit 90 Tagen ungenutzten und erlaubt, die Gültigkeitsdauer eines neuen Tokens in Tagen anzugeben), ein Auftrag sagt, wer ihn gestartet und gestoppt hat, die Server-Seite zeigt die Schalter, die der laufende Server meldet, und jede Ablehnung des Servers hat einen Satz in den acht Sprachen, geprüft gegen die Liste der Codes, die der Server veröffentlicht.
 
 ## 🔒 Sicherheit und Schutz
 
@@ -204,7 +205,7 @@ Kopieren Sie `dist/` auf die CM5 (zum Beispiel nach `/opt/eh3d-studio`), tragen 
 
 ## 🧪 Tests
 
-`npm test` führt 94 Tests aus und alle bestehen: der Client der API (das Token, der Rumpf, die Abfrage, die Fehler, ein ausfallendes Netz, die Pfade mit zu maskierenden Namen), die Regeln für Namen, Passwörter und Knotenadressen, was an einer Maschine falsch ist, das Menü jeder Rolle, die nach Station gruppierten Maschinen, die Zählungen und Aktionen eines Auftrags und die acht Sprachen (ein Text in jeder Sprache, Chinesisch und Japanisch in ihrer Schrift, überall dieselben Platzhalter). `npm run typecheck` und `npm run lint` bestehen ebenfalls. Es liest auch die Beispiele der Antworten, die die Tests des Servers erzeugen; eine Antwort, die sich ändert, ohne dass Studio folgt, schlägt hier fehl.
+`npm test` führt 110 Tests aus und alle bestehen: der Client der API (das Token, der Rumpf, die Abfrage, die Fehler, ein ausfallendes Netz, die Pfade mit zu maskierenden Namen), die Regeln für Namen, Passwörter und Knotenadressen, was an einer Maschine falsch ist, das Menü jeder Rolle, die nach Station gruppierten Maschinen, die Zählungen und Aktionen eines Auftrags und die acht Sprachen (ein Text in jeder Sprache, Chinesisch und Japanisch in ihrer Schrift, überall dieselben Platzhalter). `npm run typecheck` und `npm run lint` bestehen ebenfalls. Es liest auch die Beispiele der Antworten, die die Tests des Servers erzeugen; eine Antwort, die sich ändert, ohne dass Studio folgt, schlägt hier fehl. Außerdem werden die Zeitgrenze jeder Anfrage (mit einer von Hand gestellten Uhr), die Abfrage, die auf die letzte Anfrage wartet, die Texte gegen den Katalog der Fehlercodes des Servers und die Regeln für die Programm-Tokens getestet.
 
 ## 🏗️ Build und Veröffentlichung
 
