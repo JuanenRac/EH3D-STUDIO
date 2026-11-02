@@ -58,6 +58,7 @@ Each line is one part of this repository and the light says how far it is today.
 * **Account:** the password of the person, the language, the theme and how often the pages ask the server again.
 * **The look of BUNGARD-GUI:** the Forge theme by default (warm black, amber, cards with two cut corners, amber-outlined chips) and three more: Paper, Neon and Midnight.
 * **Served by the server:** with `studio_dir` in `server.cfg` the server serves these pages at the root of its own address, so there is nothing else to install and no cross-origin setting.
+* **A summary before a job starts:** the Start button of a job opens a window with what the job does, how long it takes, how far each axis goes (the dry run of the exact plan that the server measures) and what looks wrong in the file (a unit that is probably wrong, a work bigger than the table, a scale that is not 1, an axis that would go past its course); Start in the window starts it. The preferences have a switch for it (on by default); off, the button asks "Sure?" as before.
 
 ## 🧩 Role in EH3D
 

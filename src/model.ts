@@ -1,12 +1,77 @@
 /* What the pages decide with: the navigation and who may see what, the rules a name or a password must follow before it is sent, how the fleet is grouped, and
  * how a job is counted. Pure functions, tested on their own. GPL-3.0-or-later. */
-import type { Fleet, FleetMachine, JobKind, JobPause, JobState, JobSummary, Machine, MachineInput, Role, SpindleFinding, SpindleId } from "./types";
+import type { Fleet, FleetMachine, JobKind, JobPause, JobState, JobSummary, Machine, MachineInput, Role, SpindleFinding, SpindleId, DryRunView, JobView, WorkWarning } from "./types";
 
 // ---- the spindle of a machine
 
 /** The text that says one excess of a job against the spindle of the machine (the four codes the server uses). */
 export function spindleFindingKey(code: SpindleFinding["code"]): "spindle_rpm_above_max" | "spindle_rpm_below_min" | "spindle_feed_xy_above_max" | "spindle_feed_z_above_max" {
   return `spindle_${code}` as const;
+}
+
+/** The text that says one thing that looks wrong in the work of a job. */
+export function warningKey(code: WorkWarning["code"]): "warn_tiny" | "warn_too_big" | "warn_far" | "warn_scale" | "warn_out_of_course" {
+  return `warn_${code}` as const;
+}
+
+/** The numbers a warning is written with, in the names its text uses. */
+export function warningVars(w: WorkWarning): Record<string, string | number> {
+  const v = w.values.map((n) => Math.round(n * 10) / 10);
+  switch (w.code) {
+    case "tiny":
+      return { w: v[0], h: v[1] };
+    case "too_big":
+      return { w: v[0], h: v[1], tx: v[2], ty: v[3] };
+    case "far":
+      return { d: v[0] };
+    case "scale":
+      return { x: w.values[0], y: w.values[1] };
+    case "out_of_course":
+      return { axis: w.axis ?? "", mm: v[0] };
+  }
+}
+
+/** What the person is shown before a job starts: the facts of the view, how far the axes go, and the warnings. */
+export interface StartSummary {
+  count: number;
+  tools: number;
+  sizeMm: [number, number] | null;
+  seconds: number | null;
+  reach: DryRunView | null;
+  warnings: { key: ReturnType<typeof warningKey>; vars: Record<string, string | number> }[];
+  /** The exact plan goes past the course of an axis. */
+  outOfCourse: boolean;
+}
+
+export function startSummary(view: JobView): StartSummary {
+  const count = view.kind === "route" ? view.paths.length : view.kind === "drill" ? view.holes.length : view.items;
+  const b = view.bounds_mm;
+  const reach = view.dry_run ?? null;
+  return {
+    count,
+    tools: view.tools.length,
+    sizeMm: b ? [Math.round((b[2] - b[0]) * 10) / 10, Math.round((b[3] - b[1]) * 10) / 10] : null,
+    seconds: reach ? reach.seconds : view.estimate_s,
+    reach,
+    warnings: (view.warnings ?? []).map((w) => ({ key: warningKey(w.code), vars: warningVars(w) })),
+    outOfCourse: reach ? !reach.within_course : false,
+  };
+}
+
+/** The reach of the axes written on one line, in mm. */
+export function reachLine(r: DryRunView): string {
+  const f = (a: number, b: number) => `${a.toFixed(1)}..${b.toFixed(1)}`;
+  return `X ${f(r.min_mm[0], r.max_mm[0])}   Y ${f(r.min_mm[1], r.max_mm[1])}   Z ${f(r.min_mm[2], r.max_mm[2])}`;
+}
+
+/** Whether the summary is shown before a job starts: on unless the person turned it off in the preferences. Kept in the browser. */
+export const CONFIRM_KEY = "eh3d-studio.confirm_start";
+export function confirmStartOn(store: Pick<Storage, "getItem"> | null): boolean {
+  try {
+    return store === null || store.getItem(CONFIRM_KEY) !== "0";
+  } catch {
+    return true;
+  }
 }
 
 /** The text of the name of a spindle, or of "not said" when the machine does not say which it carries. */

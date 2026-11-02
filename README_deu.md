@@ -58,6 +58,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 * **Konto:** das Passwort der Person, die Sprache, das Thema und wie oft die Seiten den Server erneut fragen.
 * **Das Aussehen von BUNGARD-GUI:** das Thema Forge als Standard (warmes Schwarz, Bernstein, Karten mit zwei abgeschnittenen Ecken, Chips mit Bernsteinrand) und drei weitere: Papier, Neon und Mitternacht.
 * **Vom Server ausgeliefert:** mit `studio_dir` in `server.cfg` liefert der Server diese Seiten an der Wurzel seiner eigenen Adresse aus, es ist also nichts weiter zu installieren und keine Cross-Origin-Einstellung nötig.
+* **Eine Zusammenfassung vor dem Start eines Auftrags:** die Starttaste eines Auftrags öffnet ein Fenster mit dem, was er tut, wie lange er dauert, wie weit jede Achse fährt (der Trockenlauf des genauen Plans, den der Server misst) und was in der Datei falsch aussieht (eine wahrscheinlich falsche Einheit, eine Arbeit größer als der Tisch, ein Maßstab ungleich 1, eine Achse, die ihren Verfahrweg verlassen würde); Start im Fenster startet ihn. Die Einstellungen haben dafür einen Schalter (standardmäßig an); aus, fragt die Taste wie bisher «Sicher?».
 
 ## 🧩 Rolle in EH3D
 

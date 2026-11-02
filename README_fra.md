@@ -58,6 +58,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 * **Compte :** le mot de passe de la personne, la langue, le thème et la fréquence à laquelle les pages interrogent à nouveau le serveur.
 * **Le style de BUNGARD-GUI :** le thème Forge par défaut (noir chaud, ambre, cartes à deux coins coupés, boutons à contour ambre) et trois autres : Papier, Néon et Minuit.
 * **Servi par le serveur :** avec `studio_dir` dans `server.cfg` le serveur sert ces pages à la racine de sa propre adresse : rien d'autre à installer et aucun réglage d'origine croisée.
+* **Un résumé avant le démarrage d'un travail :** le bouton Démarrer d'un travail ouvre une fenêtre avec ce que fait le travail, sa durée, jusqu'où va chaque axe (l'essai à blanc du plan exact que mesure le serveur) et ce qui semble faux dans le fichier (une unité probablement fausse, un travail plus grand que la table, une échelle différente de 1, un axe qui sortirait de sa course) ; Démarrer dans la fenêtre le lance. Les préférences ont un interrupteur (activé par défaut) ; désactivé, le bouton demande « Sûr ? » comme avant.
 
 ## 🧩 Rôle dans EH3D
 

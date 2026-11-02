@@ -356,6 +356,11 @@ button.primary.armed { outline: 2px solid var(--warn, #f0a020); }
 .spindle-warning { margin-top: 12px; padding: 10px 12px; border: 1px solid var(--wait, var(--accent)); border-radius: 6px; }
 .spindle-warning ul { margin: 6px 0 0; padding-left: 18px; }
 .warn { color: var(--wait); }
+.start-summary { display: grid; gap: 8px; }
+.sum-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); display: grid; place-items: center; z-index: 50; padding: 16px; }
+.sum-box { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px; max-width: 560px; width: 100%; max-height: 90vh; overflow: auto; }
+.sum-box h3 { margin-top: 0; }
+.sum-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
 .empty { color: var(--muted); padding: 18px 0; }
 .events { list-style: none; margin: 0; padding: 0; font-family: "Cascadia Mono", "Consolas", monospace; font-size: 0.86rem; }
 .events li { padding: 5px 0; border-bottom: 1px solid var(--line); }

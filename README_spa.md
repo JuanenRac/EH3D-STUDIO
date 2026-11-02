@@ -58,6 +58,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 * **Cuenta:** la contraseña de la persona, el idioma, el tema y cada cuánto vuelven a preguntar las páginas al servidor.
 * **El aspecto de BUNGARD-GUI:** el tema Forge por defecto (negro cálido, ámbar, tarjetas con dos esquinas cortadas, botones con borde ámbar) y tres más: Papel, Neón y Medianoche.
 * **Servido por el servidor:** con `studio_dir` en `server.cfg` el servidor sirve estas páginas en la raíz de su propia dirección, así que no hay nada más que instalar ni ajuste de origen cruzado.
+* **Un resumen antes de empezar un trabajo:** el botón Iniciar de un trabajo abre una ventana con lo que hace, cuánto tarda, hasta dónde llega cada eje (la simulación en seco del plan exacto que mide el servidor) y qué parece mal en el archivo (una unidad probablemente equivocada, un trabajo mayor que la mesa, una escala distinta de 1, un eje que se saldría de su recorrido); Iniciar en la ventana lo arranca. Las preferencias tienen un interruptor (activado por defecto); desactivado, el botón pregunta «¿Seguro?» como antes.
 
 ## 🧩 Papel en EH3D
 

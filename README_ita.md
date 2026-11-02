@@ -58,6 +58,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 * **Account:** la password della persona, la lingua, il tema e ogni quanto le pagine interrogano di nuovo il server.
 * **L'aspetto di BUNGARD-GUI:** il tema Forge di default (nero caldo, ambra, schede con due angoli tagliati, pulsanti con bordo ambra) e altri tre: Carta, Neon e Mezzanotte.
 * **Servito dal server:** con `studio_dir` in `server.cfg` il server serve queste pagine alla radice del proprio indirizzo, quindi non c'è altro da installare né impostazioni di origine incrociata.
+* **Un riepilogo prima di avviare un lavoro:** il pulsante Avvia di un lavoro apre una finestra con cosa fa, quanto dura, fin dove arriva ogni asse (la prova a secco del piano esatto misurata dal server) e cosa sembra sbagliato nel file (un'unità probabilmente sbagliata, un lavoro più grande del piano, una scala diversa da 1, un asse che uscirebbe dalla sua corsa); Avvia nella finestra lo avvia. Le preferenze hanno un interruttore (attivo per impostazione predefinita); disattivo, il pulsante chiede «Sicuro?» come prima.
 
 ## 🧩 Ruolo in EH3D
 

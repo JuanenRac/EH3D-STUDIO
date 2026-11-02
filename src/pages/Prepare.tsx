@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, Empty, Field } from "../components/ui";
 import { PlanDownload, PlanView } from "../components/PlanView";
+import { SummaryFacts } from "../components/StartJob";
 import { copyNames, defaultDrillTool, drillRequest, fileRequest, fileSlot, gcodeLineCount, gcodeRequest, keepProgram, keptProgram, kindOfFiles, nameFromFile, parseHoles, parseToolList, prepareRoute, toolColour, toolsUsed, withSkips } from "../jobtools";
 import type { DrillToolInput, SourceFiles } from "../jobtools";
 import { duration, spindleFindingKey, takesJob } from "../model";
@@ -374,6 +375,7 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
                 <dd>{view.bounds_mm ? `${(view.bounds_mm[2] - view.bounds_mm[0]).toFixed(1)} x ${(view.bounds_mm[3] - view.bounds_mm[1]).toFixed(1)} mm` : "-"}</dd>
               </dl>
               <ToolTable view={view} />
+              <SummaryFacts view={view} compact />
               {(view.spindle_warnings?.length ?? 0) > 0 && (
                 <div className="spindle-warning" role="alert">
                   <strong>{t("spindle_warn_title")}</strong>

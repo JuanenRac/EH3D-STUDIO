@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A summary before a job starts:** the Start button of a job (on its page, in the monitor and in the page of a machine) opens a window with what the job does, how long it takes, how far each axis goes (the dry run of the exact plan that the server measures), and what looks wrong in the file (a unit that is probably wrong, a work bigger than the table, a scale that is not 1, an axis that would go past its course); Start in the window starts it. A preference of the browser turns the window off (on by default) and the button then asks "Sure?" as before. The refusal `outside_course` of the server is told in the eight languages. 5 tests.
+- The preview of the Prepare page shows the same dry run and warnings.
+
 ## [0.0.8] - An update page that shows its steps, the version of the package that was left behind and what changes in each release
 
 - **The version that was installed is the version that is shown:** the package of 0.0.7 was built with the number of 0.0.6 inside (`package.json` was left behind), so after an update the page still said 0.0.6 and the server took the update for not done. A test now fails when `package.json`, `package-lock.json` and the manifest do not agree.

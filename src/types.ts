@@ -144,6 +144,23 @@ export interface JobSummary {
   estimate_s: number | null;
 }
 
+/** How far each axis goes in the exact plan (X, Y, Z, in mm from the switches) and how long the movements take. */
+export interface DryRunView {
+  min_mm: [number, number, number];
+  max_mm: [number, number, number];
+  end_mm: [number, number, number];
+  steps: number;
+  seconds: number;
+  within_course: boolean;
+}
+
+/** One thing that looks wrong in the work (`values` are the numbers it is about, in mm; `axis` is X, Y or Z for out_of_course). */
+export interface WorkWarning {
+  code: "tiny" | "too_big" | "far" | "scale" | "out_of_course";
+  axis?: string;
+  values: number[];
+}
+
 /** What a client draws and follows (docs/API.md of EH3D-SERVER, "the view"). */
 export interface JobView {
   kind: JobKind;
@@ -157,6 +174,9 @@ export interface JobView {
   estimate_s: number | null;
   travel_mm: number | null;
   spindle_warnings?: SpindleFinding[];
+  /** The dry run of the exact plan (absent for a G-code job) and what looks wrong in the work, as the server found them. */
+  dry_run?: DryRunView | null;
+  warnings?: WorkWarning[];
   /** The tools (or pens) that were switched off and how many holes or paths were already done, as the server left them out. */
   skipped_tools?: number[];
   skipped?: number;

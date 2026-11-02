@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useApp } from "../context";
 import { THEMES } from "../context";
 import { Card, Field } from "../components/ui";
-import { validPassword } from "../model";
+import { CONFIRM_KEY, confirmStartOn, validPassword } from "../model";
 import { LANGS, LANG_NAMES } from "../i18n";
 import type { Lang, TextKey } from "../i18n";
 import type { ThemeId } from "../context";
@@ -62,6 +62,13 @@ export function AccountPage() {
 
 export function PreferencesPage({ onLang, onTheme, onRefresh, onAlerts }: { onLang: (l: Lang) => void; onTheme: (t: ThemeId) => void; onRefresh: (s: number) => void; onAlerts: (on: boolean) => void }) {
   const { lang, theme, refreshS, alerts, t } = useApp();
+  const [confirm, setConfirm] = useState<boolean>(() => {
+    try {
+      return confirmStartOn(window.localStorage);
+    } catch {
+      return true;
+    }
+  });
   return (
     <Card title={t("nav_preferences")}>
       <div className="form-grid">
@@ -104,6 +111,24 @@ export function PreferencesPage({ onLang, onTheme, onRefresh, onAlerts }: { onLa
               }}
             />
             {t("pref_alerts_on")}
+          </span>
+        </Field>
+        <Field label={t("pref_confirm_start")} hint={t("pref_confirm_start_hint")}>
+          <span className="check">
+            <input
+              type="checkbox"
+              checked={confirm}
+              onChange={(e) => {
+                const on = e.target.checked;
+                setConfirm(on);
+                try {
+                  window.localStorage.setItem(CONFIRM_KEY, on ? "1" : "0");
+                } catch {
+                  /* a browser that keeps nothing: the choice lasts until the page is closed */
+                }
+              }}
+            />
+            {t("pref_confirm_start")}
           </span>
         </Field>
       </div>
