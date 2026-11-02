@@ -18,7 +18,7 @@
 
 ---
 
-**Ehrlichkeitscheck - was heute läuft:** eine Webanwendung in React und TypeScript, die sich bei EH3D-SERVER anmeldet und zeigt und ändert, was dieser enthält: die Maschinen mit Station, Knoten und Konfigurationsdateien, die Aufträge, die Benutzer und die Tokens, die Live-Ereignisse. Der Client der API, die Regeln der Formulare, das Menü je Rolle und die acht Sprachen sind durch 73 Tests abgedeckt, und die Seiten wurden in einem Browser gegen einen lokalen Server mit simulierten Maschinen angesehen. **Sie wurde nicht mit Maschinen auf einem Prüfstand benutzt**, und der Server beendet TLS noch nicht.
+**Ehrlichkeitscheck - was heute läuft:** eine Webanwendung in React und TypeScript, die sich bei EH3D-SERVER anmeldet und zeigt und ändert, was dieser enthält: die Maschinen mit Station, Knoten und Konfigurationsdateien, die Aufträge, die Benutzer und die Tokens, die Live-Ereignisse. Der Client der API, die Regeln der Formulare, das Menü je Rolle und die acht Sprachen sind durch 94 Tests abgedeckt, und die Seiten wurden in einem Browser gegen einen lokalen Server mit simulierten Maschinen angesehen. **Sie wurde nicht mit Maschinen auf einem Prüfstand benutzt**, und der Server beendet TLS noch nicht.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.0.8` |
 | Reifegrad | Gerüst |
-| Tests | 76 Tests (`npm test`) |
+| Tests | 94 Tests (`npm test`) |
 | Technologie-Stack | React 19, TypeScript, Vite |
 | Auf echter Hardware | Nicht mit Maschinen auf einem Prüfstand: im Browser gegen einen lokalen Server mit simulierten Maschinen angesehen |
 
@@ -45,7 +45,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Software | 🟡 | Die Anwendung baut ohne Warnungen (Typen, Lint, Build) und wird vom Server an der Wurzel seiner Adresse ausgeliefert; sie lief in einem Browser gegen einen lokalen Server. |
-| Tests | 🟡 | 76 Tests bestehen (`npm test`): der Client der API mit seinen Fehlern, die Regeln für Namen, Passwörter und Adressen, das Menü je Rolle, die Flotte je Station, die Aktionen eines Auftrags und die acht Sprachen. |
+| Tests | 🟡 | 94 Tests bestehen (`npm test`): der Client der API mit seinen Fehlern, die Regeln für Namen, Passwörter und Adressen, das Menü je Rolle, die Flotte je Station, die Aktionen eines Auftrags und die acht Sprachen. |
 | Seiten | 🟡 | Übersicht, Maschinen je Station, Aufträge, Live-Ereignisse, Maschinen, Benutzer und Tokens, Server, Konto, Einstellungen und Info sind geschrieben; Aufträge und Maschinen werden gegen die echte API des Servers verwaltet. Keine Seite wurde von jemand anderem als dem Autor erprobt. |
 | Sprachen | 🟡 | Acht Sprachen in jedem Text, auch in den Ablehnungen des Servers; die Texte liest ein Test, aber nur Englisch und wenige Sätze der anderen hat ein Mensch gelesen. |
 | Echte Maschinen | 🔴 | Auf einem Prüfstand wurde nichts damit gemacht: keine Maschine hinzugefügt, kein Knoten erreicht und kein Auftrag über sie auf einer echten Maschine ausgeführt. |
@@ -204,7 +204,7 @@ Kopieren Sie `dist/` auf die CM5 (zum Beispiel nach `/opt/eh3d-studio`), tragen 
 
 ## 🧪 Tests
 
-`npm test` führt 76 Tests aus und alle bestehen: der Client der API (das Token, der Rumpf, die Abfrage, die Fehler, ein ausfallendes Netz, die Pfade mit zu maskierenden Namen), die Regeln für Namen, Passwörter und Knotenadressen, was an einer Maschine falsch ist, das Menü jeder Rolle, die nach Station gruppierten Maschinen, die Zählungen und Aktionen eines Auftrags und die acht Sprachen (ein Text in jeder Sprache, Chinesisch und Japanisch in ihrer Schrift, überall dieselben Platzhalter). `npm run typecheck` und `npm run lint` bestehen ebenfalls.
+`npm test` führt 94 Tests aus und alle bestehen: der Client der API (das Token, der Rumpf, die Abfrage, die Fehler, ein ausfallendes Netz, die Pfade mit zu maskierenden Namen), die Regeln für Namen, Passwörter und Knotenadressen, was an einer Maschine falsch ist, das Menü jeder Rolle, die nach Station gruppierten Maschinen, die Zählungen und Aktionen eines Auftrags und die acht Sprachen (ein Text in jeder Sprache, Chinesisch und Japanisch in ihrer Schrift, überall dieselben Platzhalter). `npm run typecheck` und `npm run lint` bestehen ebenfalls. Es liest auch die Beispiele der Antworten, die die Tests des Servers erzeugen; eine Antwort, die sich ändert, ohne dass Studio folgt, schlägt hier fehl.
 
 ## 🏗️ Build und Veröffentlichung
 

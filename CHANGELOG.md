@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The answers of the server are read in the tests from its own examples:** the fleet, the jobs, a job, the preview, the spindle, an error and the updates are the files that the tests of the server make, so a change in the answers that the Studio does not follow fails here.
 - **Put back the earlier version:** a service that an update left a version behind for shows a button to put that version back (it asks first, and the page says which version it is when the helper knows it); the job shows its step and the history says it was a put back. Needs the matching server.
 - **Clear the history of the updates:** a button in the card of the earlier jobs empties the list (it asks first).
 - **A summary before a job starts:** the Start button of a job (on its page, in the monitor and in the page of a machine) opens a window with what the job does, how long it takes, how far each axis goes (the dry run of the exact plan that the server measures), and what looks wrong in the file (a unit that is probably wrong, a work bigger than the table, a scale that is not 1, an axis that would go past its course); Start in the window starts it. A preference of the browser turns the window off (on by default) and the button then asks "Sure?" as before. The refusal `outside_course` of the server is told in the eight languages. 5 tests.

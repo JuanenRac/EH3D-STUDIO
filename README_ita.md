@@ -18,7 +18,7 @@
 
 ---
 
-**Verifica di onestà - cosa gira oggi:** un'applicazione web in React e TypeScript che accede a EH3D-SERVER e mostra e modifica ciò che contiene: le macchine con la loro stazione, il loro nodo e i file di configurazione, i lavori, gli utenti e i token, gli eventi in tempo reale. Il client dell'API, le regole dei moduli, il menu per ruolo e le otto lingue sono coperti da 73 test, e le pagine sono state viste in un browser contro un server locale con macchine simulate. **Non è stata usata con macchine su un banco di prova**, e il server non termina ancora TLS.
+**Verifica di onestà - cosa gira oggi:** un'applicazione web in React e TypeScript che accede a EH3D-SERVER e mostra e modifica ciò che contiene: le macchine con la loro stazione, il loro nodo e i file di configurazione, i lavori, gli utenti e i token, gli eventi in tempo reale. Il client dell'API, le regole dei moduli, il menu per ruolo e le otto lingue sono coperti da 94 test, e le pagine sono state viste in un browser contro un server locale con macchine simulate. **Non è stata usata con macchine su un banco di prova**, e il server non termina ancora TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Versione | `0.0.8` |
 | Maturità | Impalcatura |
-| Test | 76 test (`npm test`) |
+| Test | 94 test (`npm test`) |
 | Stack tecnologico | React 19, TypeScript, Vite |
 | Su hardware reale | Non con macchine su un banco: vista in un browser contro un server locale con macchine simulate |
 
@@ -45,7 +45,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Area | Stato | Cosa significa qui |
 |---|---|---|
 | Software | 🟡 | L'applicazione compila senza avvisi (tipi, lint, build) ed è servita dal server alla radice del suo indirizzo; è stata eseguita in un browser contro un server locale. |
-| Test | 🟡 | 76 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le otto lingue. |
+| Test | 🟡 | 94 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le otto lingue. |
 | Pagine | 🟡 | Panoramica, macchine per stazione, lavori, eventi in tempo reale, macchine, utenti e token, server, account, preferenze e informazioni sono scritti; lavori e macchine si gestiscono con l'API reale del server. Nessuna pagina è stata provata da qualcuno che non sia l'autore. |
 | Lingue | 🟡 | Otto lingue in ogni testo, compresi i rifiuti del server; i testi sono letti da un test, ma solo l'inglese e poche frasi delle altre sono state lette da una persona. |
 | Macchine reali | 🔴 | Nulla è stato fatto su un banco: nessuna macchina aggiunta, nessun nodo raggiunto e nessun lavoro eseguito tramite essa su una macchina reale. |
@@ -204,7 +204,7 @@ Copia `dist/` sulla CM5 (ad esempio in `/opt/eh3d-studio`), metti `studio_dir = 
 
 ## 🧪 Test
 
-`npm test` esegue 76 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le otto lingue (un testo in ogni lingua, cinese e giapponese nella loro scrittura, gli stessi segnaposto ovunque). Passano anche `npm run typecheck` e `npm run lint`.
+`npm test` esegue 94 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le otto lingue (un testo in ogni lingua, cinese e giapponese nella loro scrittura, gli stessi segnaposto ovunque). Passano anche `npm run typecheck` e `npm run lint`. Legge anche gli esempi di risposte prodotti dai test del server, così una risposta che cambia senza che Studio la segua fa fallire i test.
 
 ## 🏗️ Compilazione e rilascio
 
