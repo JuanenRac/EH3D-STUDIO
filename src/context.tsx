@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import type { Api } from "./api";
 import { errorText, text } from "./i18n";
 import type { Lang, TextKey } from "./i18n";
+import { skipWhileBusy } from "./polling";
 import type { Session } from "./types";
 
 export const THEMES = ["forge", "paper", "neon", "midnight"] as const;
@@ -52,7 +53,8 @@ export function usePolled<T>(load: () => Promise<T>, seconds: number, deps: unkn
   loadRef.current = load;
   useEffect(() => {
     let alive = true;
-    const run = () => {
+    // a new request waits for the last one to end (or to time out): a slow server does not get a pile of them
+    const run = skipWhileBusy(() =>
       loadRef.current().then(
         (d) => {
           if (alive) {
@@ -63,8 +65,8 @@ export function usePolled<T>(load: () => Promise<T>, seconds: number, deps: unkn
         (e) => {
           if (alive) setError(e);
         },
-      );
-    };
+      ),
+    );
     run();
     const id = seconds > 0 ? setInterval(run, seconds * 1000) : undefined;
     return () => {

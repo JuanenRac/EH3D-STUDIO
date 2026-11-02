@@ -15,27 +15,50 @@ type Fetcher = (input: string, init?: RequestInit) => Promise<Response>;
 
 const BASE = "/api/v1";
 
+/** How long a request may take before it is given up, in milliseconds: the health check is short (it is what says whether the server answers at all), the planning of a big file is long. */
+export type Timeouts = { normal: number; health: number; long: number };
+export const DEFAULT_TIMEOUTS: Timeouts = { normal: 15000, health: 5000, long: 60000 };
+
 export class Api {
   /** The login token of this person (kept by the application, never by this class). */
   token: string | null;
   private fetcher: Fetcher;
+  private timeouts: Timeouts;
 
-  constructor(token: string | null = null, fetcher?: Fetcher) {
+  constructor(token: string | null = null, fetcher?: Fetcher, timeouts: Partial<Timeouts> = {}) {
     this.token = token;
     this.fetcher = fetcher ?? ((input, init) => fetch(input, init));
+    this.timeouts = { ...DEFAULT_TIMEOUTS, ...timeouts };
   }
 
-  private async request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  /** A request that gets no answer in time ends as the error `timeout`, and the request in flight is cancelled; a server that accepts the connection and then says nothing must not hold the page. */
+  private async request<T>(method: string, path: string, body?: unknown, long = false): Promise<T> {
     const headers: Record<string, string> = {};
     if (this.token) headers.authorization = `Bearer ${this.token}`;
     if (body !== undefined) headers["content-type"] = "application/json";
+    const limit = path === "/health" ? this.timeouts.health : long ? this.timeouts.long : this.timeouts.normal;
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const late = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        controller.abort();
+        reject(new ApiError(0, "timeout", `${limit} ms`));
+      }, limit);
+    });
     let response: Response;
+    let text: string;
     try {
-      response = await this.fetcher(BASE + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+      const answer = async () => {
+        const r = await this.fetcher(BASE + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal: controller.signal });
+        return [r, await r.text()] as const;
+      };
+      [response, text] = await Promise.race([answer(), late]);
     } catch (e) {
-      throw new ApiError(0, "unreachable", e instanceof Error ? e.message : String(e));
+      if (e instanceof ApiError) throw e;
+      throw new ApiError(0, controller.signal.aborted ? "timeout" : "unreachable", e instanceof Error ? e.message : String(e));
+    } finally {
+      clearTimeout(timer);
     }
-    const text = await response.text();
     let data: unknown = null;
     if (text) {
       try {
@@ -77,7 +100,8 @@ export class Api {
     this.request<unknown>("PUT", `/users/${encodeURIComponent(name)}`, change);
   deleteUser = (name: string) => this.request<unknown>("DELETE", `/users/${encodeURIComponent(name)}`);
   tokens = () => this.request<TokenInfo[]>("GET", "/tokens");
-  addToken = (name: string, role: Role) => this.request<NewToken>("POST", "/tokens", { name, role });
+  /** With `days` the token stops working after them (1 to 3650); without, it takes the server's default (which is no expiry unless `token_default_days` says otherwise). */
+  addToken = (name: string, role: Role, days?: number) => this.request<NewToken>("POST", "/tokens", days === undefined ? { name, role } : { name, role, days });
   deleteToken = (id: string) => this.request<unknown>("DELETE", `/tokens/${encodeURIComponent(id)}`);
 
   // ---- machines and the fleet
@@ -101,9 +125,9 @@ export class Api {
     return this.request<JobSummary[]>("GET", "/jobs" + (s ? `?${s}` : ""));
   };
   job = (id: string) => this.request<Job>("GET", `/jobs/${encodeURIComponent(id)}`);
-  previewJob = (machine: string, request: unknown) => this.request<JobView>("POST", `/machines/${encodeURIComponent(machine)}/preview`, request);
-  createJob = (machine: string, request: unknown) => this.request<Job>("POST", `/machines/${encodeURIComponent(machine)}/jobs`, request);
-  startJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/start`, {});
+  previewJob = (machine: string, request: unknown) => this.request<JobView>("POST", `/machines/${encodeURIComponent(machine)}/preview`, request, true);
+  createJob = (machine: string, request: unknown) => this.request<Job>("POST", `/machines/${encodeURIComponent(machine)}/jobs`, request, true);
+  startJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/start`, {}, true);
   confirmJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/confirm`, {});
   cancelJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/cancel`, {});
   deleteJob = (id: string) => this.request<unknown>("DELETE", `/jobs/${encodeURIComponent(id)}`);
@@ -114,7 +138,7 @@ export class Api {
   jobRequest = (id: string) => this.request<SavedRequest>("GET", `/jobs/${encodeURIComponent(id)}/request`);
   /** A new job, ready and not started, from the saved request of a cancelled or failed one with the work done left out: the file is not asked for again. */
   resumeFrom = (id: string, change: { skip?: number; skip_tools?: number[]; restore_outputs?: boolean; name?: string } = {}) =>
-    this.request<Job>("POST", `/jobs/${encodeURIComponent(id)}/resume-from`, change);
+    this.request<Job>("POST", `/jobs/${encodeURIComponent(id)}/resume-from`, change, true);
 
   // ---- the node of the drill head, through the server
   headStatus = (machine: string) => this.request<HeadStatus>("GET", `/machines/${encodeURIComponent(machine)}/head/status`);

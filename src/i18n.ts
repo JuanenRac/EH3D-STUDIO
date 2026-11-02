@@ -44,6 +44,6 @@ export function text(lang: Lang, key: TextKey, vars?: Record<string, string | nu
 export function errorText(lang: Lang, e: unknown): string {
   if (!(e instanceof ApiError)) return e instanceof Error ? e.message : String(e);
   const key = `err_${e.code}` as TextKey;
-  if (key in ROWS) return text(lang, key) + (e.detail && e.code !== "unreachable" ? ` (${e.detail})` : "");
+  if (key in ROWS) return text(lang, key) + (e.detail && e.code !== "unreachable" && e.code !== "timeout" ? ` (${e.detail})` : "");
   return e.detail ? `${e.code}: ${e.detail}` : e.code;
 }
