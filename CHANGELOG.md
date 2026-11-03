@@ -5,6 +5,8 @@ All notable changes to this project are documented here.
 ## [Unreleased]
 - **Shared checks updated:** the validator also compares the badge and the Version row of the README with the manifest, fails when one of its checks cannot run, and the CHANGELOG step of the workflow reads the base branch from the environment.
 - **The workflows are hardened:** every action is pinned by its commit with its version in a comment, the checkouts keep no credentials, and the release workflow runs only for the owner on main, with no cache and the values of the matrix passed by environment.
+- **More tests:** the title and the alert, the page that asks again, the copy to the clipboard, the languages and the texts in each of them, and the sentences of the errors.
+- **The page of the updates says what the helper does with the file of signers:** a release is installed only with a valid signature when the file is there.
 
 ## [0.1.0] - Time limits, token list, catalog check and who handled a job
 
