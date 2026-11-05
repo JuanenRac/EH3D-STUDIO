@@ -9,7 +9,7 @@ const names = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort
 const quoted = (s: string) => [...s.matchAll(/`[^`]*`/g)].map((m) => m[0]);
 const NEW_LANGS = LANGS.filter((l) => !(CORE_LANGS as readonly string[]).includes(l));
 // languages whose file is still the empty one (their texts come from English until they are translated); this list shrinks to nothing
-const PENDING: string[] = ["hu", "ga", "lv", "lt", "mt", "pl", "ro", "sk", "sl", "sv", "no", "is", "uk", "ru", "sr", "sq", "ca", "gl", "eu"];
+const PENDING: string[] = ["lv", "lt", "mt", "pl", "ro", "sk", "sl", "sv", "no", "is", "uk", "ru", "sr", "sq", "ca", "gl", "eu"];
 const FULL = NEW_LANGS.filter((l) => !(l in VARIANT_OF) && !PENDING.includes(l));
 const VARIANTS = NEW_LANGS.filter((l) => l in VARIANT_OF);
 
