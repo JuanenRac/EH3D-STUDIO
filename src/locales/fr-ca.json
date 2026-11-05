@@ -1,1 +1,7 @@
-{}
+{
+ "srv_settings": "Paramètres du serveur",
+ "mach_allow_dollar_hint": "Interrupteur de sécurité, désactivé par défaut et réservé à l'administrateur. Une ligne comme $H (prise d'origine) ou $X (déverrouillage) peut envoyer la machine aux fins de course ou modifier les paramètres du contrôleur : ne l'activez que pour une machine avec quelqu'un présent. $RST et les caractères temps réel sont refusés quand même.",
+ "prep_gcode_hint": "Collez le texte ou chargez un fichier. Les commentaires et les lignes vides ne sont pas envoyés ; les paramètres et commandes temps réel du contrôleur ($, !, ~, ?) sont refusés.",
+ "err_bad_gcode": "Le programme a une ligne qui n'est pas du G-code : les paramètres et commandes temps réel du contrôleur ($, !, ~, ?), les caractères de contrôle et les lignes de plus de 200 caractères sont refusés.",
+ "err_outside_course": "Les pas exacts du plan emmènent un axe au-delà de sa course. Déplacez le travail sur la table, ou mettez dry_run = warn dans le paramètre de la machine si vous savez ce que vous faites."
+}

@@ -8,9 +8,7 @@ const english = (k: TextKey) => (ROWS[k] as readonly string[])[0];
 const names = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
 const quoted = (s: string) => [...s.matchAll(/`[^`]*`/g)].map((m) => m[0]);
 const NEW_LANGS = LANGS.filter((l) => !(CORE_LANGS as readonly string[]).includes(l));
-// languages whose file is still the empty one (their texts come from English until they are translated); this list shrinks to nothing
-const PENDING: string[] = [];
-const FULL = NEW_LANGS.filter((l) => !(l in VARIANT_OF) && !PENDING.includes(l));
+const FULL = NEW_LANGS.filter((l) => !(l in VARIANT_OF));
 const VARIANTS = NEW_LANGS.filter((l) => l in VARIANT_OF);
 
 describe("the 29 languages added to the eight", () => {
@@ -19,11 +17,6 @@ describe("the 29 languages added to the eight", () => {
     expect(Object.keys(LOCALES).sort()).toEqual([...NEW_LANGS].sort());
     expect(new Set(Object.values(LANG_NAMES)).size).toBe(37);
     expect(VARIANTS).toEqual(["pt-br", "fr-ca"]);
-  });
-
-  it("have an empty file only while they are listed as pending", () => {
-    for (const l of PENDING) expect(Object.keys(LOCALES[l]), l).toHaveLength(0);
-    for (const l of NEW_LANGS.filter((x) => !PENDING.includes(x) && !(x in VARIANT_OF))) expect(Object.keys(LOCALES[l]).length, l).toBeGreaterThan(0);
   });
 
   it("have every key of Studio in each full language, with no text empty or with blanks around it", () => {
@@ -69,11 +62,10 @@ describe("the 29 languages added to the eight", () => {
 
   it("write Bulgarian, Ukrainian, Russian and Serbian in Cyrillic and Greek in Greek", () => {
     const cyrillic = /[Ѐ-ӿ]/;
-    const done = (l: string) => !PENDING.includes(l);
     const greek = /[Ͱ-Ͽ]/;
     const wordy = KEYS.filter((k) => english(k).replace(/\{\w+\}|`[^`]*`/g, "").replace(/[^A-Za-z]/g, "").length >= 6);
-    for (const l of ["bg", "uk", "ru", "sr"].filter(done)) for (const k of wordy) expect(cyrillic.test(LOCALES[l][k]), `${k} in ${l}`).toBe(true);
-    if (done("el")) for (const k of wordy) expect(greek.test(LOCALES.el[k]), `${k} in el`).toBe(true);
+    for (const l of ["bg", "uk", "ru", "sr"]) for (const k of wordy) expect(cyrillic.test(LOCALES[l][k]), `${k} in ${l}`).toBe(true);
+    for (const k of wordy) expect(greek.test(LOCALES.el[k]), `${k} in el`).toBe(true);
     // the other new languages are written in the Latin script
     for (const l of FULL.filter((x) => !["bg", "uk", "ru", "sr", "el"].includes(x))) {
       for (const k of KEYS) expect(cyrillic.test(LOCALES[l][k]) || greek.test(LOCALES[l][k]), `${k} in ${l}`).toBe(false);
