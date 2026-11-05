@@ -112,7 +112,7 @@
 "err_bad_credentials": "Níl an t-ainm nó an focal faire ceart.",
 "err_bad_setup": "Níl an cód socraithe ceart.",
 "err_weak_password": "Caithfidh 8 go 128 carachtar a bheith san fhocal faire.",
-"err_bad_name": "Níl an t-ainm bailí: litreacha, digití,ponc, béim íochtair agus fleiscín, suas le 32 charachtar.",
+"err_bad_name": "Níl an t-ainm bailí: litreacha, digití, ponc, béim íochtair agus fleiscín, suas le 32 charachtar.",
 "err_bad_id": "Caithfidh an t-aitheantóir a bheith ina litreacha beaga, digití agus fleiscíní, suas le 32 charachtar.",
 "err_bad_station": "Caithfidh an stáisiún a bheith ina litreacha beaga, digití agus fleiscíní, suas le 32 charachtar.",
 "err_user_exists": "Tá an t-úsáideoir sin ann cheana.",
