@@ -6,19 +6,19 @@
 
 <p align="center"><a href="README.md">🇺🇸 English</a> | <a href="README_spa.md">🇪🇸 Español</a> | <a href="README_fra.md">🇫🇷 Français</a> | <a href="README_ita.md">🇮🇹 Italiano</a> | 🇩🇪 <b>Deutsch</b> | <a href="README_zho.md">🇨🇳 中文</a> | <a href="README_jpn.md">🇯🇵 日本語</a> | <a href="README_por.md">🇵🇹 Português</a></p>
 
-### Das Konfigurationspanel des EH3D-Servers: die Maschinen und ihre Stationen, die Aufträge, die Benutzer und die Tokens der Programme, alles gegliedert und im Aussehen von BUNGARD-GUI, in acht Sprachen.
+### Das Konfigurationspanel des EH3D-Servers: die Maschinen und ihre Stationen, die Aufträge, die Benutzer und die Tokens der Programme, alles gegliedert und im Aussehen von BUNGARD-GUI, in 37 Sprachen.
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
   <img src="https://img.shields.io/badge/Stack-React%20%2B%20TypeScript-00599C.svg" alt="React and TypeScript">
-  <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
+  <img src="https://img.shields.io/badge/Languages-37-00E5FF.svg" alt="Languages">
   <img src="https://img.shields.io/badge/Version-0.1.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-4CAF50.svg" alt="Maturity">
 </p>
 
 ---
 
-**Ehrlichkeitscheck - was heute läuft:** eine Webanwendung in React und TypeScript, die sich bei EH3D-SERVER anmeldet und zeigt und ändert, was dieser enthält: die Maschinen mit Station, Knoten und Konfigurationsdateien, die Aufträge, die Benutzer und die Tokens, die Live-Ereignisse. Der Client der API, die Regeln der Formulare, das Menü je Rolle und die acht Sprachen sind durch 165 Tests abgedeckt, und die Seiten wurden in einem Browser gegen einen lokalen Server mit simulierten Maschinen angesehen. **Sie wurde nicht mit Maschinen auf einem Prüfstand benutzt**, und der Server beendet TLS noch nicht.
+**Ehrlichkeitscheck - was heute läuft:** eine Webanwendung in React und TypeScript, die sich bei EH3D-SERVER anmeldet und zeigt und ändert, was dieser enthält: die Maschinen mit Station, Knoten und Konfigurationsdateien, die Aufträge, die Benutzer und die Tokens, die Live-Ereignisse. Der Client der API, die Regeln der Formulare, das Menü je Rolle und die 37 Sprachen sind durch 174 Tests abgedeckt, und die Seiten wurden in einem Browser gegen einen lokalen Server mit simulierten Maschinen angesehen. **Sie wurde nicht mit Maschinen auf einem Prüfstand benutzt**, und der Server beendet TLS noch nicht.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.1.0` |
 | Reifegrad | Funktionsfähig |
-| Tests | 165 Tests (`npm test`) |
+| Tests | 174 Tests (`npm test`) |
 | Technologie-Stack | React 19, TypeScript, Vite |
 | Auf echter Hardware | Nicht mit Maschinen auf einem Prüfstand: im Browser gegen einen lokalen Server mit simulierten Maschinen angesehen |
 
@@ -45,9 +45,9 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Software | 🟡 | Die Anwendung baut ohne Warnungen (Typen, Lint, Build) und wird vom Server an der Wurzel seiner Adresse ausgeliefert; sie lief in einem Browser gegen einen lokalen Server. |
-| Tests | 🟡 | 165 Tests bestehen (`npm test`): der Client der API mit seinen Fehlern, die Regeln für Namen, Passwörter und Adressen, das Menü je Rolle, die Flotte je Station, die Aktionen eines Auftrags und die acht Sprachen. |
+| Tests | 🟡 | 174 Tests bestehen (`npm test`): der Client der API mit seinen Fehlern, die Regeln für Namen, Passwörter und Adressen, das Menü je Rolle, die Flotte je Station, die Aktionen eines Auftrags und die 37 Sprachen. |
 | Seiten | 🟡 | Übersicht, Maschinen je Station, Aufträge, Live-Ereignisse, Maschinen, Benutzer und Tokens, Server, Konto, Einstellungen und Info sind geschrieben; Aufträge und Maschinen werden gegen die echte API des Servers verwaltet. Keine Seite wurde von jemand anderem als dem Autor erprobt. |
-| Sprachen | 🟡 | Acht Sprachen in jedem Text, auch in den Ablehnungen des Servers; die Texte liest ein Test, aber nur Englisch und wenige Sätze der anderen hat ein Mensch gelesen. |
+| Sprachen | 🟡 | 37 Sprachen in jedem Text, auch in den Ablehnungen des Servers; die Texte liest ein Test, aber nur Englisch und wenige Sätze der anderen hat ein Mensch gelesen; die 29 Sprachen nach den ersten acht sind Übersetzungen des Modells, die auf die Prüfung durch Muttersprachler warten. |
 | Echte Maschinen | 🔴 | Auf einem Prüfstand wurde nichts damit gemacht: keine Maschine hinzugefügt, kein Knoten erreicht und kein Auftrag über sie auf einer echten Maschine ausgeführt. |
 | Dokumentation | 🟡 | README in acht Sprachen, die Einstellungen des Servers und wie man Studio auf die CM5 bringt. |
 
@@ -158,7 +158,7 @@ Wie die Teile dieses Repositorys zusammenpassen: wer mit ihm spricht, was es ent
 * **Die Spindel auf der Seite einer Maschine:** alle lesen, welche Spindel die Maschine trägt (die originale oder die mit Umrichter), was mit einem Auftrag geschieht, der mehr verlangt, als sie gibt, die Grenzen der verwendeten Spindel und die Höchstdrehzahl für den Knoten der Maschine; ein Administrator ändert die Spindel und den Sicherheitsschalter (den Auftrag ablehnen, was der Standard ist, oder warnen und die Drehzahl auf das Maximum der Spindel kürzen). Wird ein Auftrag mit dem Schalter auf `warn` vorbereitet, listet der Plan Werkzeug für Werkzeug auf, was über die Spindel hinausgeht; mit `reject` lehnt der Server ihn ab und Studio sagt warum. Nicht an einer echten Maschine erprobt.
 * **Freie G-Code-Aufträge und GRBL-Maschinen:** Eine Maschine kann eine GRBL-Steuerung an einer seriellen Schnittstelle des Servers sein (Schnittstelle und Baudrate; der Server muss mit `--features serial` gebaut sein), und ein Administrator legt sie in Konfiguration an oder ändert sie. In Vorbereiten wird ein G-Code-Programm (eingefügt oder aus einer Datei geladen) wie jeder Auftrag in der Vorschau gezeigt und bereitgelegt, mit einem Sicherheitsschalter, der Spindel und Kühlmittel beim Fortsetzen wieder startet, standardmäßig aus. Ein laufender G-Code-Auftrag wird in der Liste, auf seiner Seite und in der Übersicht angehalten und fortgesetzt; sie nennen die erreichte Zeile und worauf er wartet (ein Halt oder das Warten vor der ersten Bewegung eines fortgesetzten Auftrags); ein angehaltener Auftrag bietet an, dort fortzufahren, wo er angehalten hat: der Server hat die Anfrage gespeichert, die Datei muss nicht erneut gewählt werden. Bohr- und Fräsaufträge nehmen abgeschaltete Werkzeuge und bereits erledigte Bohrungen oder Pfade an, und die Referenz der Servereinstellungen nennt `gcode_finish_wait_s` und `updates_dir`. Am Simulator und an einem Ersatz erprobt, nie an einer echten GRBL-Steuerung. Ein Administrator kann je Maschine die `$`-Zeilen von GRBL (etwa `$H`) mit einem Sicherheitsschalter in der Konfiguration erlauben, standardmäßig aus und mit einer Warnung.
 * **Der LED-Ring und die letzte Qualitätsprüfung auf der Seite einer Maschine:** Ein Bediener schaltet den Ring ein oder aus und stellt Stufe und Farbton ein, und alle sehen das Urteil der letzten Prüfung der Arbeit. Gegen einen Ersatz getestet, nie an einem echten Knoten.
-* **Eine Zeitgrenze für jede Anfrage und prüfbare Tokens:** eine Anfrage ohne Antwort endet nach 5 bis 60 Sekunden als Fehler, eine Seite, die erneut fragt, wartet auf die letzte Anfrage, die Liste der Programm-Tokens zeigt, wann jedes zuletzt verwendet wurde und wann es abläuft (und markiert die seit 90 Tagen ungenutzten und erlaubt, die Gültigkeitsdauer eines neuen Tokens in Tagen anzugeben), ein Auftrag sagt, wer ihn gestartet und gestoppt hat, die Server-Seite zeigt die Schalter, die der laufende Server meldet, und jede Ablehnung des Servers hat einen Satz in den acht Sprachen, geprüft gegen die Liste der Codes, die der Server veröffentlicht.
+* **Eine Zeitgrenze für jede Anfrage und prüfbare Tokens:** eine Anfrage ohne Antwort endet nach 5 bis 60 Sekunden als Fehler, eine Seite, die erneut fragt, wartet auf die letzte Anfrage, die Liste der Programm-Tokens zeigt, wann jedes zuletzt verwendet wurde und wann es abläuft (und markiert die seit 90 Tagen ungenutzten und erlaubt, die Gültigkeitsdauer eines neuen Tokens in Tagen anzugeben), ein Auftrag sagt, wer ihn gestartet und gestoppt hat, die Server-Seite zeigt die Schalter, die der laufende Server meldet, und jede Ablehnung des Servers hat einen Satz in den 37 Sprachen, geprüft gegen die Liste der Codes, die der Server veröffentlicht.
 
 ## 🔒 Sicherheit und Schutz
 
@@ -187,7 +187,7 @@ Studio hat keine eigene Einstellungsdatei: die Einstellungen des Servers stehen 
 |---|---|---|---|
 | `studio_dir` | none | a folder | in der `server.cfg` des Servers: die Seiten dieses Ordners an seiner Wurzel ausliefern |
 | `EH3D_SERVER` | `http://127.0.0.1:18200` | a URL | bei der Entwicklung (`run.sh`): der Server, mit dem die Seiten sprechen |
-| `eh3d-studio.lang` | the browser's | `en es it de fr pt zh ja` | die Sprache der Seite |
+| `eh3d-studio.lang` | the browser's | `en es it de fr pt zh ja bg hr cs da nl et fi el hu ga lv lt mt pl ro sk sl sv no is uk ru sr sq ca gl eu pt-br fr-ca` | die Sprache der Seite |
 | `eh3d-studio.theme` | `forge` | `forge paper neon midnight` | das Thema der Seite |
 | `eh3d-studio.refresh` | 5 | 0, 2, 5, 10, 30 | Sekunden zwischen zwei Abfragen des Servers (0: nur auf Anforderung) |
 
@@ -205,7 +205,7 @@ Kopieren Sie `dist/` auf die CM5 (zum Beispiel nach `/opt/eh3d-studio`), tragen 
 
 ## 🧪 Tests
 
-`npm test` führt 165 Tests aus und alle bestehen: der Client der API (das Token, der Rumpf, die Abfrage, die Fehler, ein ausfallendes Netz, die Pfade mit zu maskierenden Namen), die Regeln für Namen, Passwörter und Knotenadressen, was an einer Maschine falsch ist, das Menü jeder Rolle, die nach Station gruppierten Maschinen, die Zählungen und Aktionen eines Auftrags und die acht Sprachen (ein Text in jeder Sprache, Chinesisch und Japanisch in ihrer Schrift, überall dieselben Platzhalter). `npm run typecheck` und `npm run lint` bestehen ebenfalls. Es liest auch die Beispiele der Antworten, die die Tests des Servers erzeugen; eine Antwort, die sich ändert, ohne dass Studio folgt, schlägt hier fehl. Außerdem werden die Zeitgrenze jeder Anfrage (mit einer von Hand gestellten Uhr), die Abfrage, die auf die letzte Anfrage wartet, die Texte gegen den Katalog der Fehlercodes des Servers und die Regeln für die Programm-Tokens getestet.
+`npm test` führt 174 Tests aus und alle bestehen: der Client der API (das Token, der Rumpf, die Abfrage, die Fehler, ein ausfallendes Netz, die Pfade mit zu maskierenden Namen), die Regeln für Namen, Passwörter und Knotenadressen, was an einer Maschine falsch ist, das Menü jeder Rolle, die nach Station gruppierten Maschinen, die Zählungen und Aktionen eines Auftrags und die 37 Sprachen (jede Sprache hat jeden Text, überall dieselben Platzhalter, die beiden Varianten nur mit Schlüsseln der Quelle, Chinesisch und Japanisch in ihrer Schrift, keine von rechts nach links geschrieben). `npm run typecheck` und `npm run lint` bestehen ebenfalls. Es liest auch die Beispiele der Antworten, die die Tests des Servers erzeugen; eine Antwort, die sich ändert, ohne dass Studio folgt, schlägt hier fehl. Außerdem werden die Zeitgrenze jeder Anfrage (mit einer von Hand gestellten Uhr), die Abfrage, die auf die letzte Anfrage wartet, die Texte gegen den Katalog der Fehlercodes des Servers und die Regeln für die Programm-Tokens getestet.
 
 ## 🏗️ Build und Veröffentlichung
 
@@ -236,7 +236,7 @@ EH3D-STUDIO/
 │   ├── api.ts types.ts                          der Client der Server-API
 │   ├── model.ts                                 Rollen, Formularregeln, Flotte und Aufträge
 │   ├── jobtools.ts attention.ts                 die Auftragswerkzeuge: Löcher, Anfragen, Plan, Suche, CSV
-│   ├── i18n.ts texts.ts                         die acht Sprachen
+│   ├── i18n.ts texts.ts locales/                die 37 Sprachen
 │   ├── pages/                                   Überwachung, Konfiguration, Konto und Anmeldung
 │   └── styles.css                               das Thema Forge und drei weitere
 ├── tools/
@@ -281,7 +281,25 @@ EH3D-STUDIO/
 
 ## 🌍 Sprachen
 
-README und Texte gibt es auf Englisch, Spanisch, Französisch, Italienisch, Deutsch, Chinesisch, Japanisch und europäischem Portugiesisch.
+Die Seiten sprechen 37 Sprachen: die ersten acht (Englisch, Spanisch, Italienisch, Deutsch, Französisch, europäisches Portugiesisch, Chinesisch und Japanisch) und 29 weitere. Das README gibt es in den ersten acht; die Wörter der übrigen 29 sind Übersetzungen des Modells, die auf die Prüfung durch Muttersprachler warten.
+
+Die Sprache wird in dieser Reihenfolge gewählt: die im Browser gespeicherte (die Auswahl auf der Anmeldeseite und in den Einstellungen, eine scrollbare Liste, die jede Sprache mit ihrem eigenen Namen zeigt), die Sprache des Browsers (Brasilien ergibt brasilianisches Portugiesisch, Kanada kanadisches Französisch, `nb` und `nn` ergeben Norwegisch), dann Englisch. Ein Text, den eine Sprache nicht hat, wird bei einer Variante aus der Hauptsprache genommen, dann aus dem Englischen, dann aus dem Spanischen. Keine der 37 wird von rechts nach links geschrieben, daher hat Studio kein Layout von rechts nach links.
+
+| Code | Sprache | Code | Sprache | Code | Sprache |
+|---|---|---|---|---|---|
+| `en` | English | `es` | Español | `it` | Italiano |
+| `de` | Deutsch | `fr` | Français | `pt` | Português (Portugal) |
+| `zh` | 中文 | `ja` | 日本語 | `bg` | Български |
+| `hr` | Hrvatski | `cs` | Čeština | `da` | Dansk |
+| `nl` | Nederlands | `et` | Eesti | `fi` | Suomi |
+| `el` | Ελληνικά | `hu` | Magyar | `ga` | Gaeilge |
+| `lv` | Latviešu | `lt` | Lietuvių | `mt` | Malti |
+| `pl` | Polski | `ro` | Română | `sk` | Slovenčina |
+| `sl` | Slovenščina | `sv` | Svenska | `no` | Norsk |
+| `is` | Íslenska | `uk` | Українська | `ru` | Русский |
+| `sr` | Српски | `sq` | Shqip | `ca` | Català |
+| `gl` | Galego | `eu` | Euskara | `pt-br` | Português (Brasil) |
+| `fr-ca` | Français (Canada) |  |  |  |  |
 
 ## 🔗 Verwandte Projekte
 
@@ -302,7 +320,7 @@ README und Texte gibt es auf Englisch, Spanisch, Französisch, Italienisch, Deut
 
 * Führen Sie vor einem Pull Request `npm run typecheck`, `npm run lint`, `npm test` und `npm run build` sowie `python -I tools/ci_validate.py` aus: alles muss bestehen. Siehe [CONTRIBUTING.md](CONTRIBUTING.md) und den [Verhaltenskodex](CODE_OF_CONDUCT.md).
 * Das README gibt es in acht Sprachen: Eine Textänderung wird in allen acht Dateien gemacht, und die beiden Bilder werden aus `docs/architecture.json` und `docs/structure.json` mit `tools/make_architecture.py` und `tools/make_structure.py` gezeichnet.
-* Ein Text der Seite ist eine Zeile mit acht Einträgen in `src/texts.ts`; ein Test liest jede Zeile.
+* Die ersten acht Sprachen sind eine Zeile mit acht Einträgen je Text in `src/texts.ts`; die anderen 29 sind je eine JSON-Datei in `src/locales/` (`pt-br` und `fr-ca` enthalten nur, was von `pt` und `fr` abweicht); ein Test liest jeden Text jeder Sprache.
 * Eine Schwachstelle bitte privat melden: [SECURITY.md](SECURITY.md). Fragen, Ideen und Meldungen: electrohobby3d@gmail.com ([SUPPORT.md](SUPPORT.md)).
 
 ## 👤 AUTOR

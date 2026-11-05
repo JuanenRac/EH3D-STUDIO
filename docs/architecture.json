@@ -16,7 +16,7 @@
       "title": "A person in a browser",
       "lines": [
         "any role, in one of",
-        "the eight languages"
+        "the 37 languages"
       ]
     },
     {
@@ -37,14 +37,14 @@
       "id": "texts",
       "column": 1,
       "level": "tested",
-      "title": "Eight languages",
+      "title": "37 languages",
       "lines": [
-        "one row of eight per text,",
-        "read by a test"
+        "8 in texts.ts, 29 files,",
+        "all read by a test"
       ],
       "code": [
         "src/texts.ts",
-        "src/i18n.ts"
+        "src/locales/"
       ]
     },
     {

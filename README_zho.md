@@ -6,19 +6,19 @@
 
 <p align="center"><a href="README.md">🇺🇸 English</a> | <a href="README_spa.md">🇪🇸 Español</a> | <a href="README_fra.md">🇫🇷 Français</a> | <a href="README_ita.md">🇮🇹 Italiano</a> | <a href="README_deu.md">🇩🇪 Deutsch</a> | 🇨🇳 <b>中文</b> | <a href="README_jpn.md">🇯🇵 日本語</a> | <a href="README_por.md">🇵🇹 Português</a></p>
 
-### EH3D 服务器的配置面板：机床及其工位、作业、用户和程序令牌，结构清晰，外观与 BUNGARD-GUI 一致，支持八种语言。
+### EH3D 服务器的配置面板：机床及其工位、作业、用户和程序令牌，结构清晰，外观与 BUNGARD-GUI 一致，支持 37 种语言。
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
   <img src="https://img.shields.io/badge/Stack-React%20%2B%20TypeScript-00599C.svg" alt="React and TypeScript">
-  <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
+  <img src="https://img.shields.io/badge/Languages-37-00E5FF.svg" alt="Languages">
   <img src="https://img.shields.io/badge/Version-0.1.0-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-4CAF50.svg" alt="Maturity">
 </p>
 
 ---
 
-**诚实检查 - 今天实际能运行的内容：** 一个用 React 和 TypeScript 编写的网页应用，登录 EH3D-SERVER 并显示和修改其内容：带工位、节点和配置文件的机床、作业、用户和令牌、实时事件。API 客户端、表单规则、按角色划分的菜单和八种语言由 165 个测试覆盖，页面已在浏览器中对接带模拟机床的本地服务器查看过。**尚未在试验台的真实机床上使用过**，服务器也尚未终结 TLS。
+**诚实检查 - 今天实际能运行的内容：** 一个用 React 和 TypeScript 编写的网页应用，登录 EH3D-SERVER 并显示和修改其内容：带工位、节点和配置文件的机床、作业、用户和令牌、实时事件。API 客户端、表单规则、按角色划分的菜单和37 种语言由 174 个测试覆盖，页面已在浏览器中对接带模拟机床的本地服务器查看过。**尚未在试验台的真实机床上使用过**，服务器也尚未终结 TLS。
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | 版本 | `0.1.0` |
 | 成熟度 | 可用 |
-| 测试 | 165 个测试（`npm test`） |
+| 测试 | 174 个测试（`npm test`） |
 | 技术栈 | React 19, TypeScript, Vite |
 | 真实硬件 | 未在试验台上用真实机床：已在浏览器中对接带模拟机床的本地服务器查看 |
 
@@ -45,9 +45,9 @@
 | 领域 | 状态 | 在这里的含义 |
 |---|---|---|
 | 软件 | 🟡 | 应用构建无警告（类型检查、lint、构建），由服务器在其地址根路径提供；已在浏览器中对接本地服务器运行过。 |
-| 测试 | 🟡 | 165 个测试通过（`npm test`）：带错误处理的 API 客户端、名称/密码/地址规则、按角色划分的菜单、按工位划分的机群、作业的操作和八种语言。 |
+| 测试 | 🟡 | 174 个测试通过（`npm test`）：带错误处理的 API 客户端、名称/密码/地址规则、按角色划分的菜单、按工位划分的机群、作业的操作和 37 种语言。 |
 | 页面 | 🟡 | 概览、按工位的机床、作业、实时事件、机床、用户和令牌、服务器、账户、偏好设置和关于页面均已编写；作业和机床通过服务器的真实 API 管理。尚无作者以外的人试用过任何页面。 |
-| 语言 | 🟡 | 每条文本都有八种语言，包括服务器的拒绝信息；文本由测试读取，但只有英语和其他语言的少数语句被人读过。 |
+| 语言 | 🟡 | 每条文本都有 37 种语言，包括服务器的拒绝信息；文本由测试读取，但只有英语和其他语言的少数语句被人读过；前八种之后的 29 种语言是模型的翻译，等待母语者审阅。 |
 | 真实机床 | 🔴 | 尚未在试验台上做过任何事：没有添加机床、没有连到节点，也没有通过它在真实机床上运行作业。 |
 | 文档 | 🟡 | 八种语言的 README、服务器的设置，以及如何把 Studio 放到 CM5 上。 |
 
@@ -158,7 +158,7 @@ EH3D-STUDIO 之于 EH3D-SERVER，就像 ARMOR-STUDIO 之于 ARMOR 服务器：�
 * **机床页面上的主轴：** 所有人都能看到机床装的是哪个主轴（原装或带变频器的）、作业要求超出其能力时会怎样、当前主轴的限值，以及应在机床节点中设置的最高转速；管理员可更改主轴和安全开关（拒绝作业，这是默认值；或发出警告并把转速限制在主轴最大值）。开关为 `warn` 时准备作业，计划会逐把刀具列出超出主轴的部分；为 `reject` 时服务器拒绝，Studio 会说明原因。尚未在真实机床上试过。
 * **自由 G 代码作业与 GRBL 机床：** 机床可以是服务器串口上的 GRBL 控制器（端口和波特率；服务器必须用 `--features serial` 编译），管理员在“配置”中添加或修改。在“准备”中，G 代码程序（粘贴或从文件加载）与其他作业一样可预览并保存为就绪，并带有一个安全开关，用于在继续时重新启动主轴和冷却液，默认关闭。运行中的 G 代码作业可在列表、其自身页面和概览中暂停和继续，它们会显示已到达的行以及它在等待什么（暂停，或继续中的作业在第一次移动前的等待）；已停止的作业会提供从停止处继续的选项：服务器保存了请求内容，无需再次选择文件。钻孔和铣切作业支持已关闭的刀具以及已完成的孔或路径，服务器设置参考中列出了 `gcode_finish_wait_s` 和 `updates_dir`。仅在模拟器和替身上试过，从未在真实 GRBL 控制器上试过。管理员可以在“配置”中用安全开关按机床允许 GRBL 的 `$` 行（如 `$H`），默认关闭并带有警告。
 * **机床页面上的 LED 环与最近一次质量检查：** 操作员可以开关 LED 环并设置其亮度和色调，所有人都能看到最近一次工作检查的结论。仅用替身测试过，从未用真实节点测试。
-* **每个请求都有时间限制，令牌可审计：** 没有响应的请求会在 5 到 60 秒后作为错误结束，重复询问的页面会等待上一个请求；程序令牌列表显示每个令牌最后使用时间和到期时间（并标出 90 天未使用的令牌，新建令牌时可指定有效天数）；作业显示启动者和停止者；服务器页面显示运行中的服务器报告的开关；服务器的每一种拒绝都有八种语言的文字，并与服务器发布的代码列表核对。
+* **每个请求都有时间限制，令牌可审计：** 没有响应的请求会在 5 到 60 秒后作为错误结束，重复询问的页面会等待上一个请求；程序令牌列表显示每个令牌最后使用时间和到期时间（并标出 90 天未使用的令牌，新建令牌时可指定有效天数）；作业显示启动者和停止者；服务器页面显示运行中的服务器报告的开关；服务器的每一种拒绝都有37 种语言的文字，并与服务器发布的代码列表核对。
 
 ## 🔒 安全与防护
 
@@ -187,7 +187,7 @@ Studio 没有自己的设置文件：服务器的设置在它的 `server.cfg` �
 |---|---|---|---|
 | `studio_dir` | none | a folder | 在服务器的 `server.cfg` 中：在其根路径提供此文件夹中的页面 |
 | `EH3D_SERVER` | `http://127.0.0.1:18200` | a URL | 开发时（`run.sh`）：页面所对接的服务器 |
-| `eh3d-studio.lang` | the browser's | `en es it de fr pt zh ja` | 页面语言 |
+| `eh3d-studio.lang` | the browser's | `en es it de fr pt zh ja bg hr cs da nl et fi el hu ga lv lt mt pl ro sk sl sv no is uk ru sr sq ca gl eu pt-br fr-ca` | 页面语言 |
 | `eh3d-studio.theme` | `forge` | `forge paper neon midnight` | 页面主题 |
 | `eh3d-studio.refresh` | 5 | 0, 2, 5, 10, 30 | 两次读取服务器之间的秒数（0：仅在请求时） |
 
@@ -205,7 +205,7 @@ python -I tools/ci_validate.py
 
 ## 🧪 测试
 
-`npm test` 运行 165 个测试，全部通过：API 客户端（令牌、请求体、查询、错误、网络失败、需要转义名称的路径）、名称/密码/节点地址规则、机床的问题所在、各角色的菜单、按工位分组的机床、作业的计数和操作，以及八种语言（每种语言都有文本、中文和日文使用各自的文字、各处占位符一致）。`npm run typecheck` 和 `npm run lint` 同样通过。测试还会读取服务器测试生成的响应示例，因此响应发生变化而 Studio 未跟进时，这里会失败。 还测试了每个请求的时间限制（使用手动拨动的时钟）、等待上一个请求的轮询、文字与服务器错误代码目录的对照，以及程序令牌的规则。
+`npm test` 运行 174 个测试，全部通过：API 客户端（令牌、请求体、查询、错误、网络失败、需要转义名称的路径）、名称/密码/节点地址规则、机床的问题所在、各角色的菜单、按工位分组的机床、作业的计数和操作，以及 37 种语言（每种语言都有文本、中文和日文使用各自的文字、各处占位符一致）。`npm run typecheck` 和 `npm run lint` 同样通过。测试还会读取服务器测试生成的响应示例，因此响应发生变化而 Studio 未跟进时，这里会失败。 还测试了每个请求的时间限制（使用手动拨动的时钟）、等待上一个请求的轮询、文字与服务器错误代码目录的对照，以及程序令牌的规则。
 
 ## 🏗️ 构建与发布
 
@@ -236,7 +236,7 @@ EH3D-STUDIO/
 │   ├── api.ts types.ts                          服务器 API 的客户端
 │   ├── model.ts                                 角色、表单规则、机群和作业
 │   ├── jobtools.ts attention.ts                 作业工具：孔位、请求、图形、搜索、CSV
-│   ├── i18n.ts texts.ts                         八种语言
+│   ├── i18n.ts texts.ts locales/                37 种语言
 │   ├── pages/                                   监控、配置、账户和登录
 │   └── styles.css                               Forge 主题及另外三个
 ├── tools/
@@ -281,7 +281,25 @@ EH3D-STUDIO/
 
 ## 🌍 语言
 
-README 和文本提供英语、西班牙语、法语、意大利语、德语、汉语、日语和欧洲葡萄牙语版本。
+页面支持 37 种语言：前八种（英语、西班牙语、意大利语、德语、法语、欧洲葡萄牙语、中文和日语）以及另外 29 种。README 提供前八种；其余 29 种的文字是模型的翻译，等待母语者审阅。
+
+语言按以下顺序选择：浏览器中保存的语言（登录页和偏好设置中的选择器，可滚动的列表，每种语言用自己的名称显示）、浏览器的语言（巴西对应巴西葡萄牙语，加拿大对应加拿大法语，`nb` 和 `nn` 对应挪威语），最后是英语。某种语言没有的文本，变体取自其主语言，然后是英语，再然后是西班牙语。37 种语言都不是从右向左书写的，所以 Studio 没有从右向左的布局。
+
+| 代码 | 语言 | 代码 | 语言 | 代码 | 语言 |
+|---|---|---|---|---|---|
+| `en` | English | `es` | Español | `it` | Italiano |
+| `de` | Deutsch | `fr` | Français | `pt` | Português (Portugal) |
+| `zh` | 中文 | `ja` | 日本語 | `bg` | Български |
+| `hr` | Hrvatski | `cs` | Čeština | `da` | Dansk |
+| `nl` | Nederlands | `et` | Eesti | `fi` | Suomi |
+| `el` | Ελληνικά | `hu` | Magyar | `ga` | Gaeilge |
+| `lv` | Latviešu | `lt` | Lietuvių | `mt` | Malti |
+| `pl` | Polski | `ro` | Română | `sk` | Slovenčina |
+| `sl` | Slovenščina | `sv` | Svenska | `no` | Norsk |
+| `is` | Íslenska | `uk` | Українська | `ru` | Русский |
+| `sr` | Српски | `sq` | Shqip | `ca` | Català |
+| `gl` | Galego | `eu` | Euskara | `pt-br` | Português (Brasil) |
+| `fr-ca` | Français (Canada) |  |  |  |  |
 
 ## 🔗 相关项目
 
@@ -302,7 +320,7 @@ README 和文本提供英语、西班牙语、法语、意大利语、德语、�
 
 * 提交 pull request 之前请运行 `npm run typecheck`、`npm run lint`、`npm test` 和 `npm run build`，以及 `python -I tools/ci_validate.py`：必须全部通过。参见 [CONTRIBUTING.md](CONTRIBUTING.md) 和[行为准则](CODE_OF_CONDUCT.md)。
 * README 有八种语言：文本改动要在八个文件中同时进行，两幅图由 `tools/make_architecture.py` 和 `tools/make_structure.py` 根据 `docs/architecture.json` 和 `docs/structure.json` 绘制。
-* 页面上的一条文本就是 `src/texts.ts` 中的一行八项；测试会读取每一行。
+* 前八种语言是 `src/texts.ts` 中每条文本一行八项；其余 29 种各是 `src/locales/` 中的一个 JSON 文件（`pt-br` 和 `fr-ca` 只包含与 `pt` 和 `fr` 不同的内容）；测试会读取每种语言的每条文本。
 * 请私下报告漏洞：[SECURITY.md](SECURITY.md)。问题、想法和报告：electrohobby3d@gmail.com（[SUPPORT.md](SUPPORT.md)）。
 
 ## 👤 作者
