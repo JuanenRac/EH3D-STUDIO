@@ -18,7 +18,7 @@
 
 ---
 
-**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the eight languages are covered by 110 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
+**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the eight languages are covered by 165 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.1.0` |
 | Maturity | Functional |
-| Tests | 110 tests (`npm test`) |
+| Tests | 165 tests (`npm test`) |
 | Stack | React 19, TypeScript, Vite |
 | On real hardware | Not against machines on a bench: looked at in a browser against a local server with simulated machines |
 
@@ -45,7 +45,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟡 | The application builds without warnings (typecheck, lint, build) and is served by the server at the root of its address; it has been run in a browser against a local server. |
-| Tests | 🟡 | 110 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the eight languages. |
+| Tests | 🟡 | 165 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the eight languages. |
 | Pages | 🟡 | Overview, machines by station, jobs, live events, machines, users and tokens, server, account, preferences and about are written; the jobs and the machines are managed against the real API of the server. No page has been tried by someone who is not the author. |
 | Languages | 🟡 | Eight languages in every text, the refusals of the server included; the texts are read by a test, but only English and a few phrases of the others have been read by a person. |
 | Real machines | 🔴 | Nothing has been done with it on a bench: no machine has been added, no node reached and no job run through it on a real machine. |
@@ -205,7 +205,7 @@ Copy `dist/` to the CM5 (for example to `/opt/eh3d-studio`), put `studio_dir = /
 
 ## 🧪 Testing
 
-`npm test` runs 110 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the eight languages (a text in every language, Chinese and Japanese in their own scripts, the same placeholders everywhere). `npm run typecheck` and `npm run lint` pass as well. It also reads the examples of the answers that the tests of the server make, so an answer that changes without Studio following fails here. It also tests the time limit of every request (with a clock that is moved by hand), the polling that waits for the last request, the texts against the catalog of the error codes of the server, and the rules for the tokens of the programs.
+`npm test` runs 165 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the eight languages (a text in every language, Chinese and Japanese in their own scripts, the same placeholders everywhere). `npm run typecheck` and `npm run lint` pass as well. It also reads the examples of the answers that the tests of the server make, so an answer that changes without Studio following fails here. It also tests the time limit of every request (with a clock that is moved by hand), the polling that waits for the last request, the texts against the catalog of the error codes of the server, and the rules for the tokens of the programs.
 
 ## 🏗️ Build & Release
 

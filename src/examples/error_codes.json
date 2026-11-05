@@ -1,7 +1,17 @@
 [
   {
+    "code": "artifact_in_use",
+    "description": "A task still works on this artifact or made it: remove the task first.",
+    "status": 409
+  },
+  {
     "code": "bad_address",
     "description": "The address of a machine or of its drill head node is missing or is not host:port.",
+    "status": 422
+  },
+  {
+    "code": "bad_artifact",
+    "description": "The description of an artifact does not fit (name, format, result_type, inputs or params).",
     "status": 422
   },
   {
@@ -60,6 +70,11 @@
     "status": 422
   },
   {
+    "code": "bad_params",
+    "description": "The parameters of a task do not fit its engine, are not an object, or the idempotency key is not valid.",
+    "status": 422
+  },
+  {
     "code": "bad_path",
     "description": "A point of a path has a coordinate that is not a number.",
     "status": 422
@@ -85,9 +100,19 @@
     "status": 422
   },
   {
+    "code": "bad_scope",
+    "description": "A scope of a token is not one the server knows.",
+    "status": 422
+  },
+  {
     "code": "bad_setup",
     "description": "The set-up code is wrong, or the server already has a user.",
     "status": 403
+  },
+  {
+    "code": "bad_share",
+    "description": "The sharing does not fit: give a user or a token, not the owner, with an access that exists for it.",
+    "status": 422
   },
   {
     "code": "bad_sorting",
@@ -105,9 +130,24 @@
     "status": 422
   },
   {
+    "code": "bad_template",
+    "description": "The template of a token is not phoenix, cam, client or custom.",
+    "status": 422
+  },
+  {
     "code": "bad_tool",
     "description": "A tool has values out of range.",
     "status": 422
+  },
+  {
+    "code": "bad_upload",
+    "description": "The declaration of an upload or one of its parts does not fit (hash, empty part, a part past the declared size).",
+    "status": 422
+  },
+  {
+    "code": "blob_damaged",
+    "description": "The bytes of an artifact are missing or are not what their hash says.",
+    "status": 500
   },
   {
     "code": "both_sources",
@@ -115,9 +155,24 @@
     "status": 422
   },
   {
+    "code": "engine_missing",
+    "description": "The kind of task is known but this build has no engine for it.",
+    "status": 422
+  },
+  {
     "code": "forbidden",
     "description": "The role of the caller is not enough for this request.",
     "status": 403
+  },
+  {
+    "code": "forbidden_scope",
+    "description": "The token is limited to scopes that do not include this one, or a token of a design program was asked for a scope of the machines.",
+    "status": 403
+  },
+  {
+    "code": "hash_mismatch",
+    "description": "The bytes of the upload do not have the SHA-256 that was declared; the upload is discarded.",
+    "status": 422
   },
   {
     "code": "head_refused",
@@ -128,6 +183,11 @@
     "code": "head_unreachable",
     "description": "The node of the drill head does not answer.",
     "status": 502
+  },
+  {
+    "code": "idempotency_conflict",
+    "description": "The idempotency key was already used by this caller for a request with another body.",
+    "status": 409
   },
   {
     "code": "internal",
@@ -180,6 +240,11 @@
     "status": 404
   },
   {
+    "code": "no_project",
+    "description": "The artifact a task works on does not exist or cannot be seen.",
+    "status": 422
+  },
+  {
     "code": "no_work",
     "description": "The job has no holes, no paths and no lines to run.",
     "status": 422
@@ -225,9 +290,29 @@
     "status": 422
   },
   {
+    "code": "queue_full",
+    "description": "As many tasks are waiting or running as the server accepts (max_tasks).",
+    "status": 429
+  },
+  {
+    "code": "quota",
+    "description": "The caller already has as many tasks waiting or running as one user may (tasks_per_user).",
+    "status": 429
+  },
+  {
+    "code": "shares_off",
+    "description": "Sharing is switched off on this server (shares_enabled).",
+    "status": 501
+  },
+  {
     "code": "spindle_limit",
     "description": "The job asks for more than the spindle of the machine gives (the machine's switch is on reject).",
     "status": 422
+  },
+  {
+    "code": "stale_parent",
+    "description": "The revision does not follow the last one of the project: look at what changed first.",
+    "status": 409
   },
   {
     "code": "storage",
@@ -238,6 +323,21 @@
     "code": "store",
     "description": "The inspection profile could not be saved.",
     "status": 500
+  },
+  {
+    "code": "store_full",
+    "description": "The artifact store would pass artifact_store_gb.",
+    "status": 507
+  },
+  {
+    "code": "task_active",
+    "description": "The task has not finished: cancel it first.",
+    "status": 409
+  },
+  {
+    "code": "tasks_off",
+    "description": "The computing tasks are switched off on this server (tasks_enabled).",
+    "status": 501
   },
   {
     "code": "throttled",
@@ -260,13 +360,33 @@
     "status": 401
   },
   {
+    "code": "unknown_artifact",
+    "description": "There is no artifact with this id, or it belongs to somebody else.",
+    "status": 404
+  },
+  {
     "code": "unknown_job",
     "description": "There is no job with this id.",
     "status": 404
   },
   {
+    "code": "unknown_kind",
+    "description": "There is no such kind of task.",
+    "status": 422
+  },
+  {
     "code": "unknown_machine",
     "description": "There is no machine with this id.",
+    "status": 404
+  },
+  {
+    "code": "unknown_project",
+    "description": "There is no project with this id, or it belongs to somebody else.",
+    "status": 404
+  },
+  {
+    "code": "unknown_task",
+    "description": "There is no task with this id, or it belongs to somebody else.",
     "status": 404
   },
   {
@@ -278,6 +398,11 @@
     "code": "unknown_tool",
     "description": "The job uses a tool that it does not describe.",
     "status": 422
+  },
+  {
+    "code": "unknown_upload",
+    "description": "There is no upload with this id, or it belongs to somebody else.",
+    "status": 404
   },
   {
     "code": "unknown_user",
@@ -293,6 +418,16 @@
     "code": "updates_off",
     "description": "The updates are not set up on this server (updates_dir).",
     "status": 501
+  },
+  {
+    "code": "upload_conflict",
+    "description": "A part carries other bytes than the ones already received at the same place.",
+    "status": 409
+  },
+  {
+    "code": "upload_incomplete",
+    "description": "Parts are still missing: the upload cannot be completed.",
+    "status": 409
   },
   {
     "code": "user_exists",
