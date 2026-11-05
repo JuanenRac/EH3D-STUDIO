@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 declare const __STUDIO_VERSION__: string;
 import { Api, ApiError } from "./api";
-import { LANGS, browserLang, errorText, text } from "./i18n";
+import { CORE_LANGS, LANGS, browserLang, errorText, text } from "./i18n";
 import type { TextKey } from "./i18n";
 import {
   PAGES,
@@ -212,8 +212,8 @@ describe("the eight languages", () => {
   it("has eight texts in every row, none empty", () => {
     for (const k of keys) {
       const row = ROWS[k] as readonly string[];
-      expect(row.length, k).toBe(LANGS.length);
-      row.forEach((s, i) => expect(s.trim().length, `${k}/${LANGS[i]}`).toBeGreaterThan(0));
+      expect(row.length, k).toBe(CORE_LANGS.length);
+      row.forEach((s, i) => expect(s.trim().length, `${k}/${CORE_LANGS[i]}`).toBeGreaterThan(0));
     }
   });
 
@@ -235,7 +235,7 @@ describe("the eight languages", () => {
     for (const k of keys) {
       const row = ROWS[k] as readonly string[];
       const holes = (s: string) => (s.match(/\{[a-z]+\}/g) ?? []).sort().join();
-      row.forEach((s, i) => expect(holes(s), `${k}/${LANGS[i]}`).toBe(holes(row[0])));
+      row.forEach((s, i) => expect(holes(s), `${k}/${CORE_LANGS[i]}`).toBe(holes(row[0])));
     }
   });
 
@@ -250,7 +250,8 @@ describe("the eight languages", () => {
   it("fills the values in, picks the language of the browser and says a refusal in the language of the person", () => {
     expect(text("de", "fleet_ready", { n: 3 })).toBe("3 Aufträge bereit");
     expect(browserLang(["xx", "pt-PT", "en"])).toBe("pt");
-    expect(browserLang(["fr-CA"])).toBe("fr");
+    expect(browserLang(["fr-CA"])).toBe("fr-ca");
+    expect(browserLang(["pt-BR"])).toBe("pt-br");
     expect(browserLang(["ko"])).toBe("en");
     expect(errorText("es", new ApiError(409, "machine_busy", ""))).toBe(text("es", "err_machine_busy"));
     expect(errorText("en", new ApiError(400, "weird_code", "why"))).toBe("weird_code: why");

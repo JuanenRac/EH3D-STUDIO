@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Api, ApiError, DEFAULT_TIMEOUTS } from "./api";
-import { errorText, LANGS, text } from "./i18n";
+import { CORE_LANGS, errorText, LANGS, text } from "./i18n";
 import { skipWhileBusy } from "./polling";
 
 /** A fetch that never answers, and does not look at the signal either. */
@@ -57,13 +57,14 @@ describe("the time a request may take", () => {
     expect(await caught).toMatchObject({ code: "timeout" });
   });
 
-  it("says the timeout in all eight languages, without the detail of the time", () => {
+  it("says the timeout in all the languages, without the detail of the time", () => {
     const e = new ApiError(0, "timeout", "5000 ms");
     for (const lang of LANGS) {
       expect(errorText(lang, e)).toBe(text(lang, "err_timeout"));
       expect(errorText(lang, e)).not.toContain("5000");
     }
-    expect(new Set(LANGS.map((l) => text(l, "err_timeout"))).size).toBe(LANGS.length);
+    // the eight core languages say it each in its own words
+    expect(new Set(CORE_LANGS.map((l) => text(l, "err_timeout"))).size).toBe(CORE_LANGS.length);
   });
 });
 

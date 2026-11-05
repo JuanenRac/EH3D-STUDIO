@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ApiError } from "./api";
 import { shouldAlert, titleFor } from "./attention";
 import { copyWithSelection } from "./clipboard";
-import { LANGS, LANG_NAMES, browserLang, errorText, isLang, text } from "./i18n";
+import { CORE_LANGS, LANGS, LANG_NAMES, VARIANT_OF, browserLang, errorText, isLang, text } from "./i18n";
 import type { TextKey } from "./i18n";
 import { skipWhileBusy } from "./polling";
 import { ROWS } from "./texts";
@@ -115,39 +115,48 @@ describe("the copy to the clipboard with the old way", () => {
 });
 
 describe("the languages", () => {
-  it("are eight, with the names of each in itself and the Portuguese of Portugal", () => {
-    expect(LANGS).toHaveLength(8);
-    expect(new Set(LANGS).size).toBe(8);
+  it("are 37, with the names of each in itself and the Portuguese of Portugal", () => {
+    expect(LANGS).toHaveLength(37);
+    expect(new Set(LANGS).size).toBe(37);
+    expect(LANGS.slice(0, 8)).toEqual(["en", "es", "it", "de", "fr", "pt", "zh", "ja"]);
+    expect(Object.keys(VARIANT_OF)).toEqual(["pt-br", "fr-ca"]);
     for (const l of LANGS) expect(LANG_NAMES[l].trim().length).toBeGreaterThan(0);
     expect(LANG_NAMES.pt).toContain("Portugal");
   });
 
   it("are known by their code only, in lower case", () => {
     for (const l of LANGS) expect(isLang(l)).toBe(true);
-    for (const bad of ["", "EN", "pt-br", "xx", "en-US", " en"]) expect(isLang(bad)).toBe(false);
+    for (const bad of ["", "EN", "pt_br", "xx", "en-US", " en"]) expect(isLang(bad)).toBe(false);
     expect(isLang(null)).toBe(false);
     expect(isLang(undefined)).toBe(false);
   });
 
-  it("are chosen from the list of the browser: the first that is one of the eight, with or without a region", () => {
+  it("are chosen from the list of the browser: the first that is one of the 37, with or without a region", () => {
     expect(browserLang([])).toBe("en");
     expect(browserLang(["xx", "de-AT", "fr"])).toBe("de");
-    expect(browserLang(["PT-br"])).toBe("pt");
+    expect(browserLang(["PT-br"])).toBe("pt-br");
+    expect(browserLang(["pt-PT"])).toBe("pt");
+    expect(browserLang(["fr-CA"])).toBe("fr-ca");
+    expect(browserLang(["fr-BE"])).toBe("fr");
+    expect(browserLang(["nb-NO"])).toBe("no");
+    expect(browserLang(["nn"])).toBe("no");
+    expect(browserLang(["sr-RS", "en"])).toBe("sr");
+    expect(browserLang(["ga-IE"])).toBe("ga");
     expect(browserLang(["ko", "th"])).toBe("en");
     expect(browserLang(["zh-Hant-TW"])).toBe("zh");
-    expect(browserLang(["ja_JP"])).toBe("en");
+    expect(browserLang(["ja_JP"])).toBe("ja");
   });
 });
 
-describe("the texts in the eight languages", () => {
+describe("the texts in the eight core languages", () => {
   it("have a row of eight for every key and no text is empty or has blanks around it", () => {
     for (const k of KEYS) {
       const row = ROWS[k] as readonly string[];
       expect(row, k).toHaveLength(8);
       for (const [i, s] of row.entries()) {
-        expect(s.trim().length, `${k} in ${LANGS[i]}`).toBeGreaterThan(0);
-        expect(s, `${k} in ${LANGS[i]}`).toBe(s.trim());
-        expect(s, `${k} in ${LANGS[i]}`).not.toMatch(/TODO|FIXME|\?\?\?/);
+        expect(s.trim().length, `${k} in ${CORE_LANGS[i]}`).toBeGreaterThan(0);
+        expect(s, `${k} in ${CORE_LANGS[i]}`).toBe(s.trim());
+        expect(s, `${k} in ${CORE_LANGS[i]}`).not.toMatch(/TODO|FIXME|\?\?\?/);
       }
     }
   });
@@ -158,8 +167,8 @@ describe("the texts in the eight languages", () => {
       const row = ROWS[k] as readonly string[];
       const reference = names(row[0]);
       for (const [i, s] of row.entries()) {
-        expect(names(s), `${k} in ${LANGS[i]}`).toEqual(reference);
-        expect(s.split("{").length, `${k} in ${LANGS[i]}`).toBe(s.split("}").length);
+        expect(names(s), `${k} in ${CORE_LANGS[i]}`).toEqual(reference);
+        expect(s.split("{").length, `${k} in ${CORE_LANGS[i]}`).toBe(s.split("}").length);
       }
     }
   });
@@ -173,8 +182,8 @@ describe("the texts in the eight languages", () => {
       const hasCjk = (i: number) => cjk.test(row[i]);
       const plain = row[0].replace(/[^A-Za-z]/g, "").length === 0;
       if (plain) continue;
-      for (const code of ["zh", "ja"] as const) expect(hasCjk(LANGS.indexOf(code)), `${k} in ${code}`).toBe(true);
-      for (const code of ["en", "es", "it", "de", "fr", "pt"] as const) expect(hasCjk(LANGS.indexOf(code)), `${k} in ${code}`).toBe(false);
+      for (const code of ["zh", "ja"] as const) expect(hasCjk(CORE_LANGS.indexOf(code)), `${k} in ${code}`).toBe(true);
+      for (const code of ["en", "es", "it", "de", "fr", "pt"] as const) expect(hasCjk(CORE_LANGS.indexOf(code)), `${k} in ${code}`).toBe(false);
     }
   });
 

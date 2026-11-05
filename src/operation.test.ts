@@ -3,7 +3,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { Api, ApiError } from "./api";
-import { LANGS, errorText, text } from "./i18n";
+import { CORE_LANGS, errorText, text } from "./i18n";
 import { STALE_TOKEN_DAYS, tokenDays, tokenState } from "./model";
 import { ROWS } from "./texts";
 import { SERVER_SETTINGS, SWITCHES_SHOWN } from "./pages/Configure";
@@ -50,7 +50,7 @@ describe("the catalog of the error codes of the server", () => {
       const key = `err_${e.code}`;
       if (key in ROWS) {
         const row = (ROWS as Record<string, readonly string[]>)[key];
-        expect(row, key).toHaveLength(LANGS.length);
+        expect(row, key).toHaveLength(CORE_LANGS.length);
         for (const s of row) expect(s.trim().length, key).toBeGreaterThan(2);
       }
     }
@@ -112,7 +112,7 @@ describe("the settings of the server that are shown", () => {
     for (const k of ["exit_on_panic", "trust_forwarded_for", "persist_sessions", "token_default_days", "events_ping_s", "events_idle_s", "audit_file", "job_log", "log_max_kb"]) {
       expect(keys, k).toContain(k);
     }
-    for (const s of SERVER_SETTINGS) expect((ROWS as Record<string, readonly string[]>)[s.text], s.key).toHaveLength(LANGS.length);
+    for (const s of SERVER_SETTINGS) expect((ROWS as Record<string, readonly string[]>)[s.text], s.key).toHaveLength(CORE_LANGS.length);
   });
 
   it("start with the conservative defaults", () => {
