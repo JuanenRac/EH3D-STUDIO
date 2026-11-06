@@ -15,6 +15,9 @@ type Fetcher = (input: string, init?: RequestInit) => Promise<Response>;
 
 const BASE = "/api/v1";
 
+/** The application Studio says it logs in for (`POST /auth/login`): the server keeps it with the login and in the audit. */
+export const LOGIN_APP = "studio";
+
 /** How long a request may take before it is given up, in milliseconds: the health check is short (it is what says whether the server answers at all), the planning of a big file is long. */
 export type Timeouts = { normal: number; health: number; long: number };
 export const DEFAULT_TIMEOUTS: Timeouts = { normal: 15000, health: 5000, long: 60000 };
@@ -84,7 +87,7 @@ export class Api {
   setupNeeded = async () => (await this.request<{ needed: boolean }>("GET", "/setup")).needed;
   setup = (code: string, name: string, password: string) => this.request<unknown>("POST", "/setup", { code, name, password });
   login = async (name: string, password: string) => {
-    const r = await this.request<{ token: string; name: string; role: Role; expires_s: number }>("POST", "/login", { name, password });
+    const r = await this.request<{ token: string; name: string; role: Role; expires_s: number; app?: string; session_id?: string }>("POST", "/auth/login", { name, password, app: LOGIN_APP });
     this.token = r.token;
     return r;
   };

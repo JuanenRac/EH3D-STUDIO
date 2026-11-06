@@ -63,7 +63,8 @@ describe("the client of the API", () => {
     const login = await api.login("ana", "a-long-password");
     expect(login.role).toBe("admin");
     expect(api.token).toBe("tok");
-    expect(f.calls[1].init?.body).toBe(JSON.stringify({ name: "ana", password: "a-long-password" }));
+    expect(f.calls[1].url).toBe("/api/v1/auth/login");
+    expect(f.calls[1].init?.body).toBe(JSON.stringify({ name: "ana", password: "a-long-password", app: "studio" }));
   });
 
   it("turns a refusal into one kind of error", async () => {

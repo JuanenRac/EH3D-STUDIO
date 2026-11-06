@@ -219,6 +219,33 @@ export interface AuthPolicy {
   /** The keys that are looser than the recommended value. */
   attention: string[];
   extra_apps: string[];
+  /** The keys `PUT /auth/policy` can change while the server runs (absent on a server that cannot change any). */
+  editable?: string[];
+}
+
+/** One token of a program as `GET /auth/keys` lists it: the identifier and the age, never the secret. */
+export interface AuthKeyToken {
+  id: string;
+  name: string;
+  role: string;
+  created: number;
+  last_used?: number | null;
+  expires?: number | null;
+  age_s: number;
+  template?: string | null;
+}
+
+export interface AuthKeys {
+  tokens: AuthKeyToken[];
+  tls: { configured: boolean; sha256: string | null };
+}
+
+/** The limits of the store of an application and what it uses (`GET /apps/{app}/quota`). */
+export interface AppQuota {
+  app: string;
+  limits: { project_max_mb: number; project_max_file_mb: number; project_max_files: number; project_max_projects: number };
+  usage: { projects_in_app: number; projects_left: number; visible_projects: number; bytes: number; files: number };
+  projects: { id: string; name: string; bytes: number; files: number; bytes_left: number; files_left: number }[];
 }
 
 export interface AuthApps {

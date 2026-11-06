@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ACTIONS, RULES, allowedActions, can, canHide, canUnlock } from "./permissions";
-import { AuthClient, closesCurrent, filterAudit, orderSessions, policyRows, policyScore, secondsLeft, spanText, switchValue } from "./authsvc";
+import { AuthClient, auditDetail, closesCurrent, editableKind, filterAudit, orderSessions, policyRows, policyScore, secondsLeft, spanText, switchValue, wholeNumber } from "./authsvc";
 import { ServiceHttp } from "./http";
 import { fakeServer } from "./testkit";
 import type { AuthPolicy, AuthSession } from "./types";
@@ -76,6 +76,46 @@ describe("the client of the single login", () => {
     expect((await a.apps()).apps).toEqual(["studio"]);
     expect(s.calls[1].query.get("all")).toBeNull();
     expect(s.calls[2].query.get("all")).toBe("true");
+  });
+});
+
+describe("the audit, the keys and the changes of the policy", () => {
+  it("asks the audit with the filters, lists the keys, and sends a change with the confirmation only when it was given", async () => {
+    const s = fakeServer({
+      "GET /audit": () => ({ enabled: true, lines: [{ at: 5, event: "login", who: "ana", ip: "10.0.0.2" }] }),
+      "GET /auth/keys": () => ({ tokens: [], tls: { configured: false, sha256: null } }),
+      "PUT /auth/policy": () => ({ switches: [], attention: [], extra_apps: [], editable: [] }),
+    });
+    const a = new AuthClient(new ServiceHttp(() => "t", s.fetcher));
+    const r = await a.audit({ who: " ana ", event: "login", from: 3, limit: 20 });
+    expect(r.lines[0].event).toBe("login");
+    expect(s.calls[0].query.get("who")).toBe("ana");
+    expect(s.calls[0].query.get("event")).toBe("login");
+    expect(s.calls[0].query.get("since")).toBe("3");
+    expect(s.calls[0].query.get("until")).toBeNull();
+    expect(s.calls[0].query.get("limit")).toBe("20");
+    expect((await a.keys()).tls.configured).toBe(false);
+    await a.changePolicy("password_min_len", 12);
+    await a.changePolicy("url_token", true, true);
+    expect(s.calls[2].body).toEqual({ key: "password_min_len", value: 12 });
+    expect(s.calls[3].body).toEqual({ key: "url_token", value: true, confirm_weak: true });
+  });
+
+  it("writes the fields of a line besides the ones the table has a column for", () => {
+    expect(auditDetail({ at: 1, event: "policy_change", who: "ana", role: "admin", key: "url_token", from: "false", to: "true" })).toBe("role=admin key=url_token from=false to=true");
+    expect(auditDetail({ at: 1, event: "logout", who: "ana", ip: "" })).toBe("");
+  });
+
+  it("knows which switches have a button, and reads a whole number typed by hand", () => {
+    const policy: AuthPolicy = { switches: [], attention: [], extra_apps: [], editable: ["url_token", "password_min_len", "design_run"] };
+    expect(editableKind(policy, { key: "url_token", value: false, safe: true })).toBe("flag");
+    expect(editableKind(policy, { key: "password_min_len", value: 8, safe: true })).toBe("number");
+    expect(editableKind(policy, { key: "session_hours", value: 12, safe: true })).toBeNull();
+    expect(editableKind(policy, { key: "design_run", value: "yes", safe: true })).toBeNull();
+    expect(editableKind({ switches: [], attention: [], extra_apps: [] }, { key: "url_token", value: false, safe: true })).toBeNull();
+    expect(wholeNumber("12")).toBe(12);
+    expect(wholeNumber(" 7 ")).toBe(7);
+    for (const bad of ["", "1.5", "abc", "-3", "1234567890"]) expect(wholeNumber(bad), bad).toBeNull();
   });
 });
 

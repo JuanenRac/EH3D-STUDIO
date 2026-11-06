@@ -2,8 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   DESIGN_KINDS,
   DESIGN_RUN_AVAILABLE,
+  RUN_POLL_MAX,
+  RUN_POLL_S,
   SEVERITIES,
   SEVERITY_MARK,
+  boardCandidates,
   classifyReport,
   coordinates,
   countBySeverity,
@@ -13,6 +16,7 @@ import {
   nmToMm,
   parseReportText,
   reportCandidates,
+  unwrapRun,
 } from "./design";
 import type { Finding } from "./design";
 
@@ -146,11 +150,34 @@ describe("the findings on the page", () => {
 });
 
 describe("running the checks on the server", () => {
-  it("is not available yet, and the request that would run them is built only when it is complete", () => {
-    expect(DESIGN_RUN_AVAILABLE).toBe(false);
+  it("is offered, and the request that runs them is built only when it is complete", () => {
+    expect(DESIGN_RUN_AVAILABLE).toBe(true);
     expect(DESIGN_KINDS).toEqual(["check", "bom", "fabpack", "panel"]);
     expect(designRequest("check", "p-1", "board.brd")).toEqual({ kind: "check", project: "p-1", file: "board.brd", options: {} });
     expect(designRequest("bom", "", "board.brd")).toBeNull();
     expect(designRequest("panel", "p-1", "")).toBeNull();
+  });
+
+  it("reads the report a run of the server kept: the JSON of the program is taken out of the envelope", () => {
+    const envelope = { kind: "check", file: "board.json", ok: false, exit_code: 1, timed_out: false, truncated: false, report: CHECK, text: null, stderr: "" };
+    expect(unwrapRun(envelope)).toBe(CHECK);
+    expect(parseReportText(JSON.stringify(envelope))?.kind).toBe("check");
+    // a dry run of fabpack has only text, which is not a report; a JSON that is not an envelope is left as it is
+    expect(parseReportText(JSON.stringify({ ...envelope, kind: "fabpack", report: null, text: "dry run" }))).toBeNull();
+    expect(unwrapRun(CHECK)).toBe(CHECK);
+    expect(unwrapRun(null)).toBeNull();
+  });
+
+  it("offers the files of a project that can be worked on, the boards first, and never the reports a run left", () => {
+    const files = [{ name: "reports/check.json" }, { name: "notes.txt" }, { name: "main.kicad_pcb" }, { name: "panel/readme.md" }, { name: "a.json" }];
+    expect(boardCandidates(files)).toEqual(["a.json", "main.kicad_pcb", "notes.txt", "panel/readme.md"]);
+    expect(boardCandidates([{ name: "reports/bom.json" }])).toEqual([]);
+    expect(boardCandidates([])).toEqual([]);
+  });
+
+  it("waits a second between two reads of the job and gives up after a few minutes", () => {
+    expect(RUN_POLL_S).toBe(1);
+    expect(RUN_POLL_MAX * RUN_POLL_S).toBeGreaterThanOrEqual(120);
+    expect(RUN_POLL_MAX * RUN_POLL_S).toBeLessThanOrEqual(600);
   });
 });

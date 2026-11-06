@@ -11,7 +11,7 @@ import { SecurityPage } from "../pages/SecurityPage";
 import { WorkPage } from "../pages/WorkPage";
 import type { Role } from "../types";
 import { Providers, fakeServer, makeApp, makeServices, refusal } from "./testkit";
-import type { Handler } from "./testkit";
+import type { Call, Handler } from "./testkit";
 import type { AuthClaims } from "./types";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -246,10 +246,16 @@ describe("the security", () => {
       ],
       attention: ["token_default_days"],
       extra_apps: [],
+      editable: ["password_min_len"],
+    }),
+    "GET /audit": () => ({ enabled: true, lines: [{ at: 1700000200, event: "policy_change", who: "ana", key: "url_token" }] }),
+    "GET /auth/keys": () => ({
+      tokens: [{ id: "tk-1", name: "drillpro-bench", role: "operator", created: 1700000000, age_s: 100, last_used: null, expires: null }],
+      tls: { configured: true, sha256: "ab".repeat(32) },
     }),
   };
 
-  it("shows an administrator the sessions, the policy with what deserves a look, and what the server does not give yet", async () => {
+  it("shows an administrator the sessions, the policy with what deserves a look, the audit and the keys", async () => {
     const p = await show(<SecurityPage />, "admin", SESSIONS);
     expect(p.text()).toContain("android");
     expect(p.text()).toContain("this one");
@@ -258,16 +264,45 @@ describe("the security", () => {
     expect(p.text()).toContain("1 switches to look at");
     expect(p.text()).toContain("server.cfg");
     expect(p.text()).toContain("Audit log");
-    expect(p.text()).toContain("Not available on this server");
-    expect(p.$("fieldset[disabled]")).toBeTruthy();
+    expect(p.text()).toContain("policy_change");
+    expect(p.text()).toContain("key=url_token");
+    expect(p.text()).toContain("Keys and TLS fingerprint");
+    expect(p.text()).toContain("drillpro-bench");
+    expect(p.text()).toContain("ab".repeat(32));
+    expect(p.text()).not.toContain("Not available on this server");
     expect(button("Sign out everywhere")).toBeTruthy();
     // no secret anywhere: the policy has none
     expect(p.text()).not.toMatch(/token_hash|private_key/);
   });
 
-  it("does not ask for the policy or the sessions of everybody for a viewer, and shows the table of the roles", async () => {
+  it("changes a switch the server lets change, and asks again when the server says the value is looser than recommended", async () => {
+    const puts: Call[] = [];
+    const POLICY = { switches: [{ key: "password_min_len", value: 8, safe: true }], attention: [], extra_apps: [], editable: ["password_min_len"] };
+    const p = await show(<SecurityPage />, "admin", {
+      ...SESSIONS,
+      "GET /auth/policy": () => POLICY,
+      "PUT /auth/policy": (c) => {
+        puts.push(c);
+        return (c.body as { confirm_weak?: boolean }).confirm_weak ? POLICY : refusal(409, "weak_confirm_required");
+      },
+    });
+    const input = p.$("input[aria-label=password_min_len]") as HTMLInputElement;
+    expect(input).toBeTruthy();
+    expect(button("Save")?.disabled).toBe(true);
+    await typeInto(input, "6");
+    await click(button("Save"));
+    expect(puts).toHaveLength(1);
+    expect(puts[0].body).toEqual({ key: "password_min_len", value: 6 });
+    expect(p.text()).toContain("This makes the server less strict than recommended. Apply it anyway?");
+    await click(button("Confirm"));
+    expect(puts).toHaveLength(2);
+    expect(puts[1].body).toEqual({ key: "password_min_len", value: 6, confirm_weak: true });
+    expect(p.text()).not.toContain("Apply it anyway?");
+  });
+
+  it("does not ask for the policy, the audit, the keys or the sessions of everybody for a viewer, and shows the table of the roles", async () => {
     const p = await show(<SecurityPage />, "viewer", SESSIONS);
-    expect(p.server.calls.some((c) => c.path === "/auth/policy")).toBe(false);
+    for (const path of ["/auth/policy", "/audit", "/auth/keys"]) expect(p.server.calls.some((c) => c.path === path)).toBe(false);
     expect(p.text()).not.toContain("Policy of the server");
     expect(p.text()).not.toContain("All users");
     expect(p.text()).toContain("What each role may do");
@@ -305,9 +340,9 @@ describe("design and factory", () => {
       c.query.get("name") === "reports/check.json" ? new Response(JSON.stringify(CHECK)) : new Response(JSON.stringify({ not: "a report" })),
   };
 
-  it("keeps the buttons that run the checks off and says so, and shows the report left in a project as a table", async () => {
+  it("keeps the buttons that run the checks off for a viewer and says so, and shows the report left in a project as a table", async () => {
     const p = await show(<FactoryPage />, "viewer", FACTORY);
-    expect(p.text()).toContain("Not available on this server");
+    expect(p.text()).toContain("Your role does not allow this.");
     const run = p.$$("button").filter((b) => ["Design rule check", "Bill of materials", "Fabrication package", "Panel"].includes(b.textContent ?? ""));
     expect(run).toHaveLength(4);
     for (const b of run) expect((b as HTMLButtonElement).disabled).toBe(true);
@@ -321,6 +356,26 @@ describe("design and factory", () => {
     expect(p.text()).toContain("✖ Error");
     expect(p.text()).toContain("Fails");
     expect(p.$$("button").some((b) => b.textContent === "Design rule check" && !(b as HTMLButtonElement).disabled)).toBe(false);
+  });
+
+  it("asks the server to run a check on the board of the project, and reads the project again when the job is done", async () => {
+    const posts: Call[] = [];
+    const p = await show(<FactoryPage />, "operator", {
+      ...FACTORY,
+      "POST /apps/pcb/jobs": (c) => {
+        posts.push(c);
+        return { id: "w-1", machine: "", plugin: "phoenix", app: "pcb", state: "done", message: "reports/check.json written" };
+      },
+    });
+    const select = p.$$("select").find((s) => [...(s as HTMLSelectElement).options].some((o) => o.textContent === "Demo board")) as HTMLSelectElement;
+    expect(button("Design rule check")?.disabled).toBe(true);
+    await pick(select, "p-9");
+    expect(button("Design rule check")?.disabled).toBe(false);
+    const filesBefore = p.server.calls.filter((c) => c.path === "/apps/pcb/projects/p-9/files").length;
+    await click(button("Design rule check"));
+    expect(posts).toHaveLength(1);
+    expect(posts[0].body).toEqual({ kind: "check", project: "p-9", file: "board.brd", options: {} });
+    expect(p.server.calls.filter((c) => c.path === "/apps/pcb/projects/p-9/files").length).toBe(filesBefore + 1);
   });
 
   it("says when a project has no report", async () => {

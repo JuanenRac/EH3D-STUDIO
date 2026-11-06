@@ -3,6 +3,7 @@
  * the client, and the rules the panel decides with — which buttons a job has in its state, the filters and the order of the queue, and the request typed by hand.
  * GPL-3.0-or-later.
  */
+import type { DesignRequest } from "./design";
 import type { ServiceHttp } from "./http";
 import { can } from "./permissions";
 import type { Who } from "./permissions";
@@ -18,6 +19,8 @@ export class WorkClient {
 
   jobs = (f: { machine?: string; state?: string; app?: string; mine?: boolean; limit?: number; offset?: number } = {}) =>
     this.http.json<WorkJobPage>("GET", "/work/jobs", { query: { machine: f.machine, state: f.state, app: f.app, mine: f.mine ? "true" : undefined, limit: f.limit ?? 100, offset: f.offset } });
+  /** Runs the design program on a board of a project of the `pcb` application; the report becomes a file of the project (`reports/<kind>.json`). */
+  design = (req: DesignRequest) => this.http.json<WorkJob>("POST", "/apps/pcb/jobs", { json: req, transfer: true });
   job = (id: string) => this.http.json<WorkJob>("GET", `/work/jobs/${encodeURIComponent(id)}`);
   create = (job: NewWorkJob) => this.http.json<WorkJob>("POST", "/work/jobs", { json: job, transfer: true });
   start = (id: string) => this.http.json<WorkJob>("POST", `/work/jobs/${encodeURIComponent(id)}/start`, { json: {}, transfer: true });

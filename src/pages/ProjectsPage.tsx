@@ -30,7 +30,7 @@ import {
   writeProblem,
 } from "../services/store";
 import type { ProjectOrder, WriteProblem } from "../services/store";
-import type { StoreProject, StoreProjectSummary } from "../services/types";
+import type { AppQuota, StoreProject, StoreProjectSummary } from "../services/types";
 import { FilePreview } from "../components/FilePreview";
 import type { TextKey } from "../i18n";
 
@@ -326,6 +326,18 @@ function ProjectDetail({
   const [rename, setRename] = useState(project.name);
   const [busy, setBusy] = useState(false);
   const pending = useRef<Pending | null>(null);
+  // the limits of the store of this application, to show next to what the project uses (a server without the route shows the use alone)
+  const [quota, setQuota] = useState<AppQuota | null>(null);
+  useEffect(() => {
+    let alive = true;
+    store.quota().then(
+      (q) => alive && setQuota(q),
+      () => alive && setQuota(null),
+    );
+    return () => {
+      alive = false;
+    };
+  }, [store, project.etag]);
 
   const finalName = joinPath(upFolder, upName || upFile?.name || "");
   const nameOk = validFileName(finalName);
@@ -479,7 +491,9 @@ function ProjectDetail({
           <dd>{whenText(project.updated)}</dd>
           <dt>{t("pj_quota")}</dt>
           <dd>
-            {bytesText(bytes)} · {t("pj_files_n", { n: project.files.length })}
+            {bytesText(bytes)}
+            {quota && ` / ${bytesText(quota.limits.project_max_mb * 1024 * 1024)}`} · {t("pj_files_n", { n: project.files.length })}
+            {quota && ` / ${quota.limits.project_max_files}`}
           </dd>
         </dl>
         {canWrite && (

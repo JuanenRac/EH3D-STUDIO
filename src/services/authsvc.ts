@@ -4,7 +4,7 @@
  * the policy has no token, hash or key, and the id of a session is not the token. GPL-3.0-or-later.
  */
 import type { ServiceHttp } from "./http";
-import type { AuthApps, AuthClaims, AuthPolicy, AuthPolicySwitch, AuthSession } from "./types";
+import type { AuthApps, AuthClaims, AuthKeys, AuthPolicy, AuthPolicySwitch, AuthSession } from "./types";
 
 export class AuthClient {
   constructor(private http: ServiceHttp) {}
@@ -15,6 +15,13 @@ export class AuthClient {
   logoutAll = () => this.http.json<{ closed: number }>("POST", "/auth/logout-all", { json: {} });
   refresh = () => this.http.json<{ expires_s: number }>("POST", "/auth/refresh", { json: {} });
   policy = () => this.http.json<AuthPolicy>("GET", "/auth/policy");
+  /** Changes one switch while the server runs; a looser value than recommended is applied only with `confirmWeak`. The answer is the new policy. */
+  changePolicy = (key: string, value: boolean | number, confirmWeak = false) =>
+    this.http.json<AuthPolicy>("PUT", "/auth/policy", { json: confirmWeak ? { key, value, confirm_weak: true } : { key, value } });
+  keys = () => this.http.json<AuthKeys>("GET", "/auth/keys");
+  /** The lines of the audit, the newest first (an administrator). */
+  audit = async (f: Partial<AuditFilter> & { limit?: number } = {}): Promise<AuditResult> =>
+    this.http.json<AuditResult>("GET", "/audit", { query: { who: f.who?.trim() || undefined, event: f.event?.trim() || undefined, since: f.from ?? undefined, until: f.to ?? undefined, limit: f.limit ?? 100 } });
   apps = () => this.http.json<AuthApps>("GET", "/auth/apps");
 }
 
@@ -67,7 +74,7 @@ export function policyScore(p: AuthPolicy): { safe: number; total: number; atten
   return { safe: p.switches.filter((s) => s.safe).length, total: p.switches.length, attention };
 }
 
-// ---- the audit (this server has no route to read it yet)
+// ---- the audit (`GET /api/v1/audit`)
 
 export interface AuditEntry {
   at: number;
@@ -76,6 +83,34 @@ export interface AuditEntry {
   app?: string;
   detail?: string;
   ip?: string;
+  /** The other fields the event was written with (`role`, `key`, `project`...). */
+  [field: string]: unknown;
+}
+
+export interface AuditResult {
+  enabled: boolean;
+  lines: AuditEntry[];
+}
+
+/** The fields of a line of the audit besides the ones the table has a column for, as `key=value` words (a value that is not text is written as JSON; none is cut here). */
+export function auditDetail(e: AuditEntry): string {
+  const own = new Set(["at", "event", "who"]);
+  return Object.entries(e)
+    .filter(([k, v]) => !own.has(k) && v !== undefined && v !== null && v !== "")
+    .map(([k, v]) => `${k}=${typeof v === "string" ? v : JSON.stringify(v)}`)
+    .join(" ");
+}
+
+/** Whether a switch of the policy can be changed while the server runs, and the value a click on it would set (a flag is turned over; a number is typed). */
+export function editableKind(p: AuthPolicy, sw: AuthPolicySwitch): "flag" | "number" | null {
+  if (!(p.editable ?? []).includes(sw.key)) return null;
+  if (typeof sw.value === "boolean") return "flag";
+  return typeof sw.value === "number" ? "number" : null;
+}
+
+/** Whether the value a person typed for a number switch is a whole number (the server checks the range of each key). */
+export function wholeNumber(text: string): number | null {
+  return /^\d{1,9}$/.test(text.trim()) ? Number(text.trim()) : null;
 }
 
 export interface AuditFilter {

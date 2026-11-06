@@ -6,7 +6,7 @@
 import { ApiError } from "../api";
 import { quoteTag, unquoteTag } from "./http";
 import type { ServiceHttp } from "./http";
-import type { StoreFile, StoreImportResult, StoreLock, StoreLockState, StoreProject, StoreProjectPage, StoreProjectSummary, StoreVersion, StoreVersionList, StoreWriteResult } from "./types";
+import type { AppQuota, StoreFile, StoreImportResult, StoreLock, StoreLockState, StoreProject, StoreProjectPage, StoreProjectSummary, StoreVersion, StoreVersionList, StoreWriteResult } from "./types";
 
 /** The most bytes of a text that a preview downloads and shows. */
 export const PREVIEW_MAX_BYTES = 2 * 1024 * 1024;
@@ -39,6 +39,8 @@ export class StoreClient {
     return id === undefined ? root : `${root}/${encodeURIComponent(id)}`;
   }
 
+  /** The limits of the store of this application and what it uses. */
+  quota = () => this.http.json<AppQuota>("GET", `/apps/${encodeURIComponent(this.app)}/quota`);
   list = (q = "", limit = 200, offset = 0) => this.http.json<StoreProjectPage>("GET", this.base(), { query: { q, limit, offset } });
   get = (id: string) => this.http.json<StoreProject>("GET", this.base(id));
   create = (name: string) => this.http.json<StoreProject>("POST", this.base(), { json: { name } });

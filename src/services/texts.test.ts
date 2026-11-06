@@ -71,6 +71,10 @@ describe("the texts of the pages of the common services", () => {
       [429, "too_many_clients"],
       [404, "unknown_session"],
       [501, "not_supported"],
+      [501, "design_run_unavailable"],
+      [422, "bad_design_request"],
+      [422, "bad_policy"],
+      [409, "weak_confirm_required"],
       [0, "download_too_big"],
       [0, "upload_too_big"],
     ];

@@ -187,10 +187,19 @@ export function classifyReport(json: unknown): Report | null {
   return null;
 }
 
+/**
+ * The JSON the design program wrote, taken out of the envelope the server keeps it in (`reports/<kind>.json` of a run: `{kind, file, ok, exit_code, report, text, stderr}`); a JSON
+ * that is not an envelope is returned as it is. The text of a dry run (`fabpack`) has no JSON inside, so it comes back as null.
+ */
+export function unwrapRun(json: unknown): unknown {
+  if (!isObj(json) || !("exit_code" in json) || !("report" in json) || typeof json.kind !== "string") return json;
+  return json.report ?? null;
+}
+
 /** The report in a text, or null when the text is not JSON or is not a report. */
 export function parseReportText(text: string): Report | null {
   try {
-    return classifyReport(JSON.parse(text));
+    return classifyReport(unwrapRun(JSON.parse(text)));
   } catch {
     return null;
   }
@@ -241,13 +250,29 @@ export function coordinates(f: Finding): string | null {
   return f.atMm ? `${f.atMm[0]}, ${f.atMm[1]}` : null;
 }
 
-// ---- the request that would run a check on the server (not available on this server yet)
+// ---- the request that runs a check on the server (`POST /api/v1/apps/pcb/jobs`)
 
 export type DesignKind = "check" | "bom" | "fabpack" | "panel";
 export const DESIGN_KINDS: DesignKind[] = ["check", "bom", "fabpack", "panel"];
 
-/** The server does not run PHOENIX-PCB or CAM yet (docs/DESIGN_FACTORY_CONTRACT_NEEDS.md names the routes it would need), so the page keeps its buttons off. */
-export const DESIGN_RUN_AVAILABLE = false;
+/**
+ * The server has the route that runs the design program (docs/DESIGN_FACTORY_CONTRACT_NEEDS.md). A server that is not set up for it answers `501 design_run_unavailable` (the run is off
+ * by default and needs the program named in server.cfg), and the page says so with the sentence of that refusal, so the buttons are offered and the server decides.
+ */
+export const DESIGN_RUN_AVAILABLE = true;
+
+/** The files of a project a run can work on: everything but the reports the runs left (`reports/...`), the board files first. */
+export function boardCandidates(files: readonly { name: string }[]): string[] {
+  const board = (n: string) => /\.(json|brd|kicad_pcb|sch|gbr|zip)$/i.test(n);
+  return files
+    .map((f) => f.name)
+    .filter((n) => !n.startsWith("reports/"))
+    .sort((a, b) => Number(board(b)) - Number(board(a)) || a.localeCompare(b));
+}
+
+/** The seconds between two reads of a job that runs, and how many reads the page makes before it stops waiting. */
+export const RUN_POLL_S = 1;
+export const RUN_POLL_MAX = 180;
 
 export interface DesignRequest {
   kind: DesignKind;

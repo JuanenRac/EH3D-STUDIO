@@ -1,6 +1,7 @@
 /* Design and factory: the reports that the design tools (EH3D-PHOENIX-PCB: check, connectivity, bill of materials, fabrication package and panel) left as JSON files in a project of the
- * store, read as tables with the severity said in words and in a mark as well as in a colour. Running the checks on the server is not possible yet: the buttons are there, off,
- * and the page says which routes the server would need (docs/DESIGN_FACTORY_CONTRACT_NEEDS.md). */
+ * store, read as tables with the severity said in words and in a mark as well as in a colour. The buttons ask the server to run the design program on a board of the project
+ * (`POST /api/v1/apps/pcb/jobs`); the report appears as a file of the project when the job ends. A server that is not set up for it refuses with `design_run_unavailable` and the
+ * page says so with the sentence of the refusal (docs/DESIGN_FACTORY_CONTRACT_NEEDS.md). */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../context";
 import { Badge, Card, Empty } from "../components/ui";
@@ -9,16 +10,21 @@ import { useServices } from "../services/context";
 import {
   DESIGN_KINDS,
   DESIGN_RUN_AVAILABLE,
+  RUN_POLL_MAX,
+  RUN_POLL_S,
   SEVERITIES,
   SEVERITY_MARK,
+  boardCandidates,
   coordinates,
   countBySeverity,
+  designRequest,
   filterFindings,
   locations,
   parseReportText,
   reportCandidates,
 } from "../services/design";
-import type { Finding, Report, Severity } from "../services/design";
+import type { DesignKind, Finding, Report, Severity } from "../services/design";
+import { isFinished } from "../services/work";
 import { bytesText } from "../services/store";
 import type { StoreProjectSummary } from "../services/types";
 import type { TextKey } from "../i18n";
@@ -31,7 +37,7 @@ interface Found {
 }
 
 export function FactoryPage() {
-  const { t, err } = useApp();
+  const { t, err, say } = useApp();
   const sv = useServices();
   const [app, setApp] = useState(DESIGN_APPS[0]);
   const store = useMemo(() => sv.store(app), [sv, app]);
@@ -41,7 +47,11 @@ export function FactoryPage() {
   const [reports, setReports] = useState<Found[] | null>(null);
   const [scanError, setScanError] = useState<unknown>(null);
   const [file, setFile] = useState("");
+  const [boards, setBoards] = useState<string[]>([]);
+  const [board, setBoard] = useState("");
+  const [running, setRunning] = useState<DesignKind | null>(null);
   const canRead = sv.allowed("projects.read");
+  const canRun = sv.allowed("jobs.prepare") && sv.allowed("projects.write");
 
   useEffect(() => {
     setProject("");
@@ -62,9 +72,14 @@ export function FactoryPage() {
     setReports(null);
     setScanError(null);
     setFile("");
+    setBoards([]);
+    setBoard("");
     if (!project) return;
     try {
       const files = await store.files(project);
+      const candidates = boardCandidates(files);
+      setBoards(candidates);
+      setBoard(candidates[0] ?? "");
       const names = reportCandidates(files);
       const found: Found[] = [];
       for (const name of names) {
@@ -84,6 +99,27 @@ export function FactoryPage() {
     void scan();
   }, [scan]);
 
+  /** Asks the server to run the design program, waits for the job to end and reads the report it left in the project. */
+  const run = async (kind: DesignKind) => {
+    const request = designRequest(kind, project, board);
+    if (!request || app !== "pcb") return;
+    setRunning(kind);
+    try {
+      let job = await sv.work.design(request);
+      for (let i = 0; i < RUN_POLL_MAX && !isFinished(job.state); i++) {
+        await new Promise((r) => setTimeout(r, RUN_POLL_S * 1000));
+        job = await sv.work.job(job.id);
+      }
+      if (job.state === "done") say(t("up_state_done"), "ok");
+      else say(job.message || job.state, "error");
+      await scan();
+    } catch (e) {
+      say(err(e), "error");
+    } finally {
+      setRunning(null);
+    }
+  };
+
   if (!canRead) return <Card title={t("nav_factory")}>{<Empty>{t("svc_not_allowed")}</Empty>}</Card>;
   const shown = reports?.find((r) => r.file === file) ?? null;
 
@@ -91,13 +127,27 @@ export function FactoryPage() {
     <div className="stack">
       <Card title={t("fx_run")} wide>
         <p className="hint">{t("fx_run_hint")}</p>
+        <div className="filters">
+          <label>
+            {t("fx_board_file")}
+            <select value={board} onChange={(e) => setBoard(e.target.value)} disabled={boards.length === 0}>
+              <option value="">-</option>
+              {boards.map((b) => (
+                <option key={b} value={b}>
+                  {b}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
         <div className="form-actions">
           {DESIGN_KINDS.map((k) => (
-            <button key={k} disabled={!DESIGN_RUN_AVAILABLE || !project} title={t("svc_unavailable")}>
+            <button key={k} disabled={!DESIGN_RUN_AVAILABLE || !canRun || app !== "pcb" || !project || !board || running !== null} onClick={() => void run(k)}>
               {t(`fx_rk_${k}` as TextKey)}
             </button>
           ))}
-          <Badge tone="dim">{t("svc_unavailable")}</Badge>
+          {running && <Badge tone="run">{t(`fx_rk_${running}` as TextKey)} ...</Badge>}
+          {!canRun && <Badge tone="dim">{t("err_forbidden")}</Badge>}
         </div>
       </Card>
 
