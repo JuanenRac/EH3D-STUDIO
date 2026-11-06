@@ -2,7 +2,7 @@
   "repo": "EH3D-STUDIO",
   "ecosystem": "eh3d",
   "tagline": "The configuration panel of the EH3D server, in the look of BUNGARD-GUI.",
-  "description": "EH3D-STUDIO is a web application in React and TypeScript. It signs in to EH3D-SERVER and shows and changes what the server holds, in three groups of pages: Monitor (the overview, the machines by station, the jobs and the live events), Configure (the machines with their node and their configuration files, the users and the tokens, the settings of the server) and Account. Each person sees the pages their role allows. The client of the API, the rules of the forms and the eight languages are tested; the pages have been looked at in a browser against a local server with simulated machines.",
+  "description": "EH3D-STUDIO is a web application in React and TypeScript. It signs in to EH3D-SERVER and shows and changes what the server holds, in four groups of pages: Monitor (the overview, the machines by station, the jobs and the live events), Services (the projects and files of the store, the machines and jobs of the plugins, the design reports), Configure (the machines with their node and their configuration files, the users and the tokens, the settings of the server) and Account. Each person sees the pages their role allows. The client of the API, the rules of the forms and the eight languages are tested; the pages have been looked at in a browser against a local server with simulated machines, and the pages of the services only against a stand-in of the server.",
   "columns": [
     "WHO USES IT",
     "THIS REPOSITORY",
@@ -23,10 +23,10 @@
       "id": "pages",
       "column": 1,
       "level": "tested",
-      "title": "Pages in three groups",
+      "title": "Pages in four groups",
       "lines": [
-        "Monitor, Configure, Account;",
-        "each role sees its own"
+        "Monitor, Services, Configure,",
+        "Account; each role sees its own"
       ],
       "code": [
         "src/App.tsx",
@@ -71,6 +71,19 @@
       ],
       "code": [
         "src/model.ts"
+      ]
+    },
+    {
+      "id": "services",
+      "column": 1,
+      "level": "untested",
+      "title": "Services of the server",
+      "lines": [
+        "projects, jobs, security,",
+        "reports; stand-in server only"
+      ],
+      "code": [
+        "src/services/"
       ]
     },
     {
@@ -121,6 +134,12 @@
       "from": "pages",
       "to": "client",
       "level": "tested"
+    },
+    {
+      "from": "services",
+      "to": "server",
+      "label": "API",
+      "level": "contract"
     },
     {
       "from": "client",

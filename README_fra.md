@@ -18,7 +18,7 @@
 
 ---
 
-**Vérification d'honnêteté - ce qui tourne aujourd'hui :** une application web en React et TypeScript qui se connecte à EH3D-SERVER et montre et modifie ce qu'il contient : les machines avec leur station, leur nœud et leurs fichiers de configuration, les travaux, les utilisateurs et les jetons, les événements en direct. Le client de l'API, les règles des formulaires, le menu par rôle et les 37 langues sont couverts par 173 tests, et les pages ont été vues dans un navigateur contre un serveur local avec des machines simulées. **Elle n'a pas été utilisée avec des machines sur un banc**, et le serveur ne termine pas encore TLS.
+**Vérification d'honnêteté - ce qui tourne aujourd'hui :** une application web en React et TypeScript qui se connecte à EH3D-SERVER et montre et modifie ce qu'il contient : les machines avec leur station, leur nœud et leurs fichiers de configuration, les travaux, les utilisateurs et les jetons, les événements en direct. Le client de l'API, les règles des formulaires, le menu par rôle et les 37 langues sont couverts par 303 tests, et les pages ont été vues dans un navigateur contre un serveur local avec des machines simulées. **Elle n'a pas été utilisée avec des machines sur un banc**, et le serveur ne termine pas encore TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.1.0` |
 | Maturité | Fonctionnel |
-| Tests | 173 tests (`npm test`) |
+| Tests | 303 tests (`npm test`) |
 | Pile technique | React 19, TypeScript, Vite |
 | Sur du matériel réel | Pas avec des machines sur un banc : vue dans un navigateur contre un serveur local avec des machines simulées |
 
@@ -45,8 +45,9 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Logiciel | 🟡 | L'application se construit sans avertissement (types, lint, build) et est servie par le serveur à la racine de son adresse ; elle a tourné dans un navigateur contre un serveur local. |
-| Tests | 🟡 | 173 tests réussissent (`npm test`) : le client de l'API avec ses erreurs, les règles des noms, mots de passe et adresses, le menu par rôle, la flotte par station, les actions d'un travail et les 37 langues. |
+| Tests | 🟡 | 303 tests réussissent (`npm test`) : le client de l'API avec ses erreurs, les règles des noms, mots de passe et adresses, le menu par rôle, la flotte par station, les actions d'un travail et les 37 langues. |
 | Pages | 🟡 | Aperçu, machines par station, travaux, événements en direct, machines, utilisateurs et jetons, serveur, compte, préférences et à propos sont écrits ; travaux et machines se gèrent avec la vraie API du serveur. Aucune page n'a été essayée par quelqu'un d'autre que l'auteur. |
+| Services communs | 🟠 | Projets, machines et travaux, sécurité et rapports de conception sont écrits et testés contre un serveur de substitution ; pas contre EH3D-SERVER en marche ni sur le CM5. |
 | Langues | 🟡 | 37 langues dans chaque texte, refus du serveur compris ; les textes sont lus par un test, mais seuls l'anglais et quelques phrases des autres ont été lus par une personne ; les 29 langues après les huit premières sont des traductions du modèle qui attendent une relecture par des locuteurs natifs. |
 | Machines réelles | 🔴 | Rien n'a été fait avec elle sur un banc : aucune machine ajoutée, aucun nœud atteint et aucun travail exécuté par elle sur une vraie machine. |
 | Documentation | 🟡 | README en huit langues, les réglages du serveur et comment mettre Studio sur la CM5. |
@@ -159,6 +160,7 @@ Comment s'assemblent les parties de ce dépôt : qui lui parle, ce qu'il contien
 * **Travaux G-code libres et machines GRBL :** une machine peut être un contrôleur GRBL sur un port série du serveur (port et débit en bauds ; le serveur doit être compilé avec `--features serial`), et un administrateur l'ajoute ou la modifie dans Configuration. Dans Préparer, un programme G-code (collé ou chargé depuis un fichier) est prévisualisé et gardé prêt comme tout travail, avec un interrupteur de sécurité pour redémarrer la broche et le liquide de refroidissement à la reprise, désactivé par défaut. Un travail G-code en cours est mis en pause et repris depuis la liste, depuis sa page et depuis l'aperçu, qui disent la ligne atteinte et ce qu'il attend (une pause, ou l'attente avant le premier mouvement d'un travail qui reprend) ; un travail arrêté propose de reprendre là où il s'est arrêté : le serveur a gardé la demande, il n'est donc pas nécessaire de choisir le fichier à nouveau. Les travaux de perçage et de défonçage acceptent les outils désactivés et les trous ou trajets déjà faits, et la référence des réglages du serveur liste `gcode_finish_wait_s` et `updates_dir`. Essayé sur le simulateur et avec un substitut, jamais avec un vrai contrôleur GRBL. Un administrateur peut autoriser par machine les lignes `$` de GRBL (comme `$H`) avec un interrupteur de sécurité dans Configuration, désactivé par défaut et avec un avertissement.
 * **L'anneau de LED et le dernier contrôle de qualité sur la page d'une machine :** un opérateur allume ou éteint l'anneau et règle son niveau et sa teinte, et chacun lit le verdict du dernier contrôle du travail. Testé avec un substitut, jamais avec un vrai nœud.
 * **Une limite de temps pour chaque requête et des jetons que l'on peut auditer :** une requête sans réponse se termine en erreur après 5 à 60 secondes, une page qui redemande attend la dernière requête, la liste des jetons des programmes dit quand chacun a été utilisé pour la dernière fois et quand il expire (et marque ceux inutilisés depuis 90 jours, et permet d'indiquer les jours de validité d'un nouveau jeton), un travail dit qui l'a démarré et qui l'a arrêté, la page Serveur montre les interrupteurs que signale le serveur en marche, et chaque refus du serveur a une phrase dans les 37 langues, vérifiée contre la liste de codes que publie le serveur.
+* **Les services communs du serveur (non essayés avec le vrai serveur) :** l'explorateur du stockage de projets (arbre, versions avec SHA-256, envoi, `.eh3dproj`, verrou d'édition, conflits de `If-Match` signalés), les machines et travaux des plugins avec le flux d'événements, les emplacements d'outils du changeur, les sessions et la politique de connexion, et les rapports de conception d'un projet. Chaque rôle ne voit et ne fait que le sien ; le serveur décide au final.
 
 ## 🔒 Sécurité et protection
 
@@ -177,6 +179,7 @@ Comment s'assemblent les parties de ce dépôt : qui lui parle, ce qu'il contien
 |---|---|---|
 | API REST | tout ce que les pages montrent et modifient passe par `/api/v1/` d'EH3D-SERVER, avec le jeton de connexion comme jeton porteur | `src/api.ts` |
 | Websocket | `/api/v1/events?token=...` pour la page en direct, avec une reconnexion qui attend plus longtemps à chaque fois | `src/pages/Monitor.tsx` |
+| Événements du serveur | `/api/v1/events/stream` avec ticket, `Last-Event-ID` et une reconnexion qui attend plus à chaque fois | `src/services/events.ts` |
 | Stockage du navigateur | le jeton de connexion, la langue, le thème et l'actualisation, sous `eh3d-studio.*` | `src/App.tsx` |
 
 ## ⚙️ Configuration
@@ -205,7 +208,7 @@ Copiez `dist/` sur la CM5 (par exemple dans `/opt/eh3d-studio`), mettez `studio_
 
 ## 🧪 Tests
 
-`npm test` lance 173 tests et tous réussissent : le client de l'API (le jeton, le corps, la requête, les erreurs, un réseau qui tombe, les chemins avec des noms à échapper), les règles des noms, mots de passe et adresses de nœud, ce qui ne va pas dans une machine, le menu de chaque rôle, les machines groupées par station, les comptes et les actions d'un travail, et les 37 langues (chaque langue a chaque texte, les mêmes marqueurs partout, les deux variantes seulement avec des clés de la source, chinois et japonais dans leur écriture, aucune écrite de droite à gauche). `npm run typecheck` et `npm run lint` réussissent aussi. Il lit aussi les exemples de réponses que produisent les tests du serveur : une réponse qui change sans que Studio suive échoue ici. Il teste aussi la limite de temps de chaque requête (avec une horloge avancée à la main), l'interrogation qui attend la dernière requête, les textes face au catalogue des codes d'erreur du serveur et les règles des jetons des programmes.
+`npm test` lance 303 tests et tous réussissent : le client de l'API (le jeton, le corps, la requête, les erreurs, un réseau qui tombe, les chemins avec des noms à échapper), les règles des noms, mots de passe et adresses de nœud, ce qui ne va pas dans une machine, le menu de chaque rôle, les machines groupées par station, les comptes et les actions d'un travail, et les 37 langues (chaque langue a chaque texte, les mêmes marqueurs partout, les deux variantes seulement avec des clés de la source, chinois et japonais dans leur écriture, aucune écrite de droite à gauche). `npm run typecheck` et `npm run lint` réussissent aussi. Il lit aussi les exemples de réponses que produisent les tests du serveur : une réponse qui change sans que Studio suive échoue ici. Il teste aussi la limite de temps de chaque requête (avec une horloge avancée à la main), l'interrogation qui attend la dernière requête, les textes face au catalogue des codes d'erreur du serveur et les règles des jetons des programmes.
 
 ## 🏗️ Compilation et publication
 
@@ -232,12 +235,13 @@ La version vit dans `package.json` et dans `eh3d.project.json`, et chaque versio
 ```text
 EH3D-STUDIO/
 ├── src/
-│   ├── App.tsx context.tsx                      l'ossature, le menu en trois groupes, ce que les pages partagent
+│   ├── App.tsx context.tsx                      l'ossature, le menu en quatre groupes, ce que les pages partagent
 │   ├── api.ts types.ts                          le client de l'API du serveur
+│   ├── services/                                clients, règles et événements des quatre services
 │   ├── model.ts                                 rôles, règles des formulaires, flotte et travaux
 │   ├── jobtools.ts attention.ts                 les outils des travaux : trous, requêtes, plan, recherche, CSV
 │   ├── i18n.ts texts.ts locales/                les 37 langues
-│   ├── pages/                                   Supervision, Configuration, Compte et connexion
+│   ├── pages/                                   Supervision, Services, Configuration, Compte et connexion
 │   └── styles.css                               le thème Forge et trois autres
 ├── tools/
 │   ├── demo_seed.mjs shots.mjs                  données de démonstration et les images du README
@@ -271,6 +275,7 @@ EH3D-STUDIO/
 * Les réglages du serveur sont montrés comme référence, pas modifiés : l'API ne les donne pas, et ils se changent dans `server.cfg` sur la machine qui exécute le serveur.
 * Seul le propriétaire a regardé les pages ; les textes des langues autres que l'anglais n'ont pas été lus par des locuteurs natifs.
 * Il n'y a pas encore de page de visualisation d'un travail (le plan des trous).
+* Les pages des services communs n'ont tourné que contre un serveur de substitution ; l'audit, les clés, l'empreinte TLS et l'exécution des outils de conception ne sont pas encore disponibles sur le serveur.
 
 **La suite**
 
@@ -314,6 +319,7 @@ La langue se choisit dans cet ordre : celle enregistrée dans le navigateur (le 
 
 * L'API du serveur avec lequel Studio parle : `docs/API.md` d'EH3D-SERVER.
 * Comment mettre le serveur et Studio sur la CM5 : `docs/DEPLOY.md` d'EH3D-SERVER.
+* Pages des services communs : [projets](docs/PROJECTS_AND_FILES.md), [machines et travaux](docs/MACHINES_AND_JOBS.md), [sécurité](docs/USERS_AND_SECURITY.md), [conception et fabrication](docs/DESIGN_AND_FACTORY.md) et [ce qu'il faudrait au serveur](docs/DESIGN_FACTORY_CONTRACT_NEEDS.md).
 * [Journal des modifications](CHANGELOG.md)
 
 ## 🤝 Contribuer et communauté

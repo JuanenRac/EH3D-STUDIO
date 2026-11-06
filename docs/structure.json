@@ -27,14 +27,14 @@
       "rows": [
         {
           "desc": {
-            "en": "the shell, the menu in three groups, what the pages share",
-            "es": "el armazón, el menú en tres grupos, lo que comparten las páginas",
-            "it": "la struttura, il menu in tre gruppi, ciò che condividono le pagine",
-            "de": "das Gerüst, das Menü in drei Gruppen, was die Seiten teilen",
-            "fr": "l'ossature, le menu en trois groupes, ce que les pages partagent",
-            "pt": "a estrutura, o menu em três grupos, o que as páginas partilham",
-            "zh": "框架、分三组的菜单、页面共享的内容",
-            "ja": "枠組み、3 グループのメニュー、ページ共通の部分"
+            "en": "the shell, the menu in four groups, what the pages share",
+            "es": "el armazón, el menú en cuatro grupos, lo que comparten las páginas",
+            "it": "la struttura, il menu in quattro gruppi, ciò che condividono le pagine",
+            "de": "das Gerüst, das Menü in vier Gruppen, was die Seiten teilen",
+            "fr": "l'ossature, le menu en quatre groupes, ce que les pages partagent",
+            "pt": "a estrutura, o menu em quatro grupos, o que as páginas partilham",
+            "zh": "框架、分四组的菜单、页面共享的内容",
+            "ja": "枠組み、4 グループのメニュー、ページ共通の部分"
           },
           "name": "App.tsx  context.tsx",
           "tree_name": "App.tsx context.tsx"
@@ -52,6 +52,20 @@
           },
           "name": "api.ts  types.ts",
           "tree_name": "api.ts types.ts"
+        },
+        {
+          "desc": {
+            "en": "clients, rules and events of the four services",
+            "es": "clientes, reglas y eventos de los cuatro servicios",
+            "it": "client, regole ed eventi dei quattro servizi",
+            "de": "Clients, Regeln und Ereignisse der vier Dienste",
+            "fr": "clients, règles et événements des quatre services",
+            "pt": "clientes, regras e eventos dos quatro serviços",
+            "zh": "四个服务的客户端、规则和事件",
+            "ja": "4 サービスのクライアント・ルール・イベント"
+          },
+          "name": "services/",
+          "tree_name": "services/"
         },
         {
           "desc": {
@@ -96,14 +110,14 @@
         },
         {
           "desc": {
-            "en": "Monitor, Configure, Account and the sign-in",
-            "es": "Supervisión, Configuración, Cuenta y el acceso",
-            "it": "Monitoraggio, Configurazione, Account e accesso",
-            "de": "Überwachung, Konfiguration, Konto und Anmeldung",
-            "fr": "Supervision, Configuration, Compte et connexion",
-            "pt": "Monitorização, Configuração, Conta e entrada",
-            "zh": "监控、配置、账户和登录",
-            "ja": "モニター、設定、アカウント、サインイン"
+            "en": "Monitor, Services, Configure, Account and the sign-in",
+            "es": "Supervisión, Servicios, Configuración, Cuenta y el acceso",
+            "it": "Monitoraggio, Servizi, Configurazione, Account e accesso",
+            "de": "Überwachung, Dienste, Konfiguration, Konto und Anmeldung",
+            "fr": "Supervision, Services, Configuration, Compte et connexion",
+            "pt": "Monitorização, Serviços, Configuração, Conta e entrada",
+            "zh": "监控、服务、配置、账户和登录",
+            "ja": "モニター、サービス、設定、アカウント、サインイン"
           },
           "name": "pages/"
         },

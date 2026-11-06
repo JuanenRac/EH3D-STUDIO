@@ -18,7 +18,7 @@
 
 ---
 
-**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the 37 languages are covered by 173 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
+**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the 37 languages are covered by 303 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.1.0` |
 | Maturity | Functional |
-| Tests | 173 tests (`npm test`) |
+| Tests | 303 tests (`npm test`) |
 | Stack | React 19, TypeScript, Vite |
 | On real hardware | Not against machines on a bench: looked at in a browser against a local server with simulated machines |
 
@@ -45,8 +45,9 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟡 | The application builds without warnings (typecheck, lint, build) and is served by the server at the root of its address; it has been run in a browser against a local server. |
-| Tests | 🟡 | 173 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the 37 languages. |
+| Tests | 🟡 | 303 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the 37 languages. |
 | Pages | 🟡 | Overview, machines by station, jobs, live events, machines, users and tokens, server, account, preferences and about are written; the jobs and the machines are managed against the real API of the server. No page has been tried by someone who is not the author. |
+| Common services | 🟠 | Projects, machines and jobs, security and design reports are written and tested against a stand-in of the server; not against EH3D-SERVER running or on the CM5. |
 | Languages | 🟡 | 37 languages in every text, the refusals of the server included; the texts are read by a test, but only English and a few phrases of the others have been read by a person; the 29 languages beyond the first eight are translations by the model that wait for a review by native speakers. |
 | Real machines | 🔴 | Nothing has been done with it on a bench: no machine has been added, no node reached and no job run through it on a real machine. |
 | Documentation | 🟡 | README in eight languages, the settings of the server and how to put Studio on the CM5. |
@@ -159,6 +160,7 @@ How the parts of this repository fit together: who talks to it, what it holds an
 * **Free G-code jobs and GRBL machines:** a machine can be a GRBL controller on a serial port of the server (port and baud rate; the server must be built with `--features serial`), and an administrator adds or changes it in Configure. In Prepare, a G-code program (pasted or loaded from a file) is previewed and kept ready like any job, with a safety switch to start the spindle and the coolant again when it goes on, off by default. A running G-code job is held and resumed from the list, from its own page and from the overview, which say the line it has got to and what it waits for (a hold, or the wait before the first move of a job that goes on); a job that stopped offers to go on from where it stopped: the server kept what was asked, so the file is not picked again. Drilling and routing jobs take the tools that are switched off and the holes or paths already done, and the reference of the settings of the server lists `gcode_finish_wait_s` and `updates_dir`. Tried on the simulator and against a stand-in only, never against a real GRBL controller. An administrator can allow the `$` lines of GRBL (such as `$H`) per machine with a safety switch in Configure, off by default and with a warning.
 * **The ring of LEDs and the last quality check on the page of a machine:** an operator turns the ring on or off and sets its level and tone, and everybody reads the verdict of the last check of the work. Tested against a stand-in, never against a real node.
 * **A time limit on every request, and tokens you can audit:** a request that gets no answer ends as an error after 5 to 60 seconds, a page that asks again waits for the last request, the list of tokens of the programs says when each was last used and when it expires (and marks the ones not used for 90 days, and lets you give the days a new token lasts), a job says who started and who stopped it, the Server page shows the switches the running server reports, and every refusal of the server has a sentence in the 37 languages, checked against the list of codes the server publishes.
+* **The common services of the server (not tried against the real server):** the explorer of the project store (tree, versions with SHA-256, upload, `.eh3dproj`, edit lock, conflicts of `If-Match` told as a warning), the machines and jobs of the plugins with the stream of events, the places of the tools in the changer, the sessions and the policy of the login, and the design reports of a project. Each role sees and can do only its own; the server decides in the end.
 
 ## 🔒 Security & Safety
 
@@ -177,6 +179,7 @@ How the parts of this repository fit together: who talks to it, what it holds an
 |---|---|---|
 | REST API | everything the pages show and change goes through `/api/v1/` of EH3D-SERVER, with the login token as a bearer token | `src/api.ts` |
 | Websocket | `/api/v1/events?token=...` for the live page, with a reconnection that waits longer each time | `src/pages/Monitor.tsx` |
+| Server-sent events | `/api/v1/events/stream` with a ticket, `Last-Event-ID` and a reconnection that waits longer each time | `src/services/events.ts` |
 | Browser storage | the login token, the language, the theme and the refresh, under `eh3d-studio.*` | `src/App.tsx` |
 
 ## ⚙️ Configuration
@@ -205,7 +208,7 @@ Copy `dist/` to the CM5 (for example to `/opt/eh3d-studio`), put `studio_dir = /
 
 ## 🧪 Testing
 
-`npm test` runs 173 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the 37 languages (every language has every text, the same placeholders everywhere, the two variants only with keys of the source, Chinese and Japanese in their own scripts, none written right to left). `npm run typecheck` and `npm run lint` pass as well. It also reads the examples of the answers that the tests of the server make, so an answer that changes without Studio following fails here. It also tests the time limit of every request (with a clock that is moved by hand), the polling that waits for the last request, the texts against the catalog of the error codes of the server, and the rules for the tokens of the programs.
+`npm test` runs 303 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the 37 languages (every language has every text, the same placeholders everywhere, the two variants only with keys of the source, Chinese and Japanese in their own scripts, none written right to left). `npm run typecheck` and `npm run lint` pass as well. It also reads the examples of the answers that the tests of the server make, so an answer that changes without Studio following fails here. It also tests the time limit of every request (with a clock that is moved by hand), the polling that waits for the last request, the texts against the catalog of the error codes of the server, and the rules for the tokens of the programs.
 
 ## 🏗️ Build & Release
 
@@ -232,12 +235,13 @@ The version lives in `package.json` and in `eh3d.project.json`, and each version
 ```text
 EH3D-STUDIO/
 ├── src/
-│   ├── App.tsx context.tsx                      the shell, the menu in three groups, what the pages share
+│   ├── App.tsx context.tsx                      the shell, the menu in four groups, what the pages share
 │   ├── api.ts types.ts                          the client of the API of the server
+│   ├── services/                                clients, rules and events of the four services
 │   ├── model.ts                                 roles, rules of the forms, fleet and jobs
 │   ├── jobtools.ts attention.ts                 the job tools: holes, requests, plan, search, CSV
 │   ├── i18n.ts texts.ts locales/                the 37 languages
-│   ├── pages/                                   Monitor, Configure, Account and the sign-in
+│   ├── pages/                                   Monitor, Services, Configure, Account and the sign-in
 │   └── styles.css                               the Forge theme and three more
 ├── tools/
 │   ├── demo_seed.mjs shots.mjs                  demo data and the pictures of the README
@@ -271,6 +275,7 @@ EH3D-STUDIO/
 * The settings of the server are shown as a reference, not edited: the API does not give them out, and they are changed in `server.cfg` on the machine that runs the server.
 * Only the owner has looked at the pages; the texts of the languages other than English have not been read by native speakers.
 * There is no page of the viewer of a job (the plan of the holes) yet.
+* The pages of the common services have only run against a stand-in of the server; the audit, the keys, the fingerprint of the TLS and the running of the design tools are not available on the server yet.
 
 **Next**
 
@@ -314,6 +319,7 @@ The language is chosen in this order: the one saved in the browser (the selector
 
 * The API of the server that Studio talks to: `docs/API.md` of EH3D-SERVER.
 * How to put the server and Studio on the CM5: `docs/DEPLOY.md` of EH3D-SERVER.
+* Pages of the common services: [projects](docs/PROJECTS_AND_FILES.md), [machines and jobs](docs/MACHINES_AND_JOBS.md), [security](docs/USERS_AND_SECURITY.md), [design and factory](docs/DESIGN_AND_FACTORY.md) and [what the server would need](docs/DESIGN_FACTORY_CONTRACT_NEEDS.md).
 * [Changelog](CHANGELOG.md)
 
 ## 🤝 Contributing & Community
