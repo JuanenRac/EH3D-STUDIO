@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The workflow that builds the pages no longer lists its own sums file in the sums:** the check of the hashes after the build failed because of it.
+
 ## [0.1.1] - New pages over the services of the server: projects and files, machines and jobs, security, and design and factory
 
 - **Projects and files:** a page that explores the project store of the server: projects by application with search and tags, the tree of the files with their versions and SHA-256, a preview of texts (drilling, G-code, Gerber), JSON and images, upload, download, import and export of `.eh3dproj`, the editing lock with its time left, and the conflicts of `If-Match` (412, 428, 423) told as a warning with a way out.
