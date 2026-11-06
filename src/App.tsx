@@ -1,5 +1,5 @@
 /* The shell: the sidebar with the pages in their three groups (Monitor, Configure, Account), the top bar with who is signed in, the page, and the line of news. */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { Api, ApiError } from "./api";
 import { AppContext, THEMES, Toast, makeErr, makeText } from "./context";
 import type { AppState, ThemeId } from "./context";
@@ -16,6 +16,13 @@ import { PreparePage } from "./pages/Prepare";
 import { MachinePage } from "./pages/MachinePage";
 import { AccessPage, MachinesPage, ServerPage, UpdatesPage } from "./pages/Configure";
 import { AboutPage, AccountPage, PreferencesPage } from "./pages/Account";
+import { ServicesProvider } from "./services/context";
+
+// the pages of the common services load when they are first opened
+const ProjectsPage = lazy(() => import("./pages/ProjectsPage").then((m) => ({ default: m.ProjectsPage })));
+const WorkPage = lazy(() => import("./pages/WorkPage").then((m) => ({ default: m.WorkPage })));
+const FactoryPage = lazy(() => import("./pages/FactoryPage").then((m) => ({ default: m.FactoryPage })));
+const SecurityPage = lazy(() => import("./pages/SecurityPage").then((m) => ({ default: m.SecurityPage })));
 
 // set at the build from package.json (vite.config.ts)
 declare const __STUDIO_VERSION__: string;
@@ -42,7 +49,7 @@ function routeFromHash() {
   return parseRoute(window.location.hash);
 }
 
-const GROUPS = ["monitor", "configure", "account"] as const;
+const GROUPS = ["monitor", "services", "configure", "account"] as const;
 
 export default function App() {
   const [lang, setLang] = useState<Lang>(() => {
@@ -161,6 +168,18 @@ export default function App() {
     case "live":
       body = <LivePage />;
       break;
+    case "projects":
+      body = <ProjectsPage route={route.param} />;
+      break;
+    case "work":
+      body = <WorkPage route={route.param} />;
+      break;
+    case "factory":
+      body = <FactoryPage />;
+      break;
+    case "security":
+      body = <SecurityPage />;
+      break;
     case "machines":
       body = <MachinesPage />;
       break;
@@ -201,6 +220,7 @@ export default function App() {
 
   return (
     <AppContext.Provider value={state}>
+      <ServicesProvider>
       <div className="shell">
         <aside className="sidebar">
           <div className="brand">
@@ -249,7 +269,7 @@ export default function App() {
             </div>
           )}
           <div className="page" key={current + route.param}>
-            {body}
+            <Suspense fallback={<p className="muted">{t("svc_loading")}</p>}>{body}</Suspense>
           </div>
           <footer className="statusbar">
             <span>EH3D Studio {VERSION}</span>
@@ -258,6 +278,7 @@ export default function App() {
         </div>
         {news && <Toast message={news.message} kind={news.kind} onDone={() => setNews(null)} />}
       </div>
+      </ServicesProvider>
     </AppContext.Provider>
   );
 }

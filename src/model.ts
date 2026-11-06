@@ -103,11 +103,11 @@ export function spindleNameKey(id: SpindleId | ""): "spindle_unset" | "spindle_o
 
 // ---- the navigation: every page belongs to a group and needs a role
 
-export type PageId = "overview" | "fleet" | "machine" | "prepare" | "jobs" | "job" | "live" | "machines" | "access" | "server" | "updates" | "account" | "preferences" | "about";
+export type PageId = "overview" | "fleet" | "machine" | "prepare" | "jobs" | "job" | "live" | "projects" | "work" | "factory" | "machines" | "access" | "server" | "updates" | "security" | "account" | "preferences" | "about";
 
 export interface PageDef {
   id: PageId;
-  group: "monitor" | "configure" | "account";
+  group: "monitor" | "services" | "configure" | "account";
   needs: Role;
   /** Reached from a link, not from the menu. */
   hidden?: boolean;
@@ -121,10 +121,14 @@ export const PAGES: PageDef[] = [
   { id: "jobs", group: "monitor", needs: "viewer" },
   { id: "job", group: "monitor", needs: "viewer", hidden: true },
   { id: "live", group: "monitor", needs: "viewer" },
+  { id: "projects", group: "services", needs: "viewer" },
+  { id: "work", group: "services", needs: "viewer" },
+  { id: "factory", group: "services", needs: "viewer" },
   { id: "machines", group: "configure", needs: "admin" },
   { id: "access", group: "configure", needs: "admin" },
   { id: "server", group: "configure", needs: "viewer" },
   { id: "updates", group: "configure", needs: "admin" },
+  { id: "security", group: "account", needs: "viewer" },
   { id: "account", group: "account", needs: "viewer" },
   { id: "preferences", group: "account", needs: "viewer" },
   { id: "about", group: "account", needs: "viewer" },

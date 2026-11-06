@@ -148,11 +148,11 @@ describe("the rules checked before a request goes out", () => {
 });
 
 describe("the navigation", () => {
-  it("shows each role the pages it may use, in three groups", () => {
-    expect(pagesFor("viewer").map((p) => p.id)).toEqual(["overview", "fleet", "machine", "jobs", "job", "live", "server", "account", "preferences", "about"]);
+  it("shows each role the pages it may use, in four groups", () => {
+    expect(pagesFor("viewer").map((p) => p.id)).toEqual(["overview", "fleet", "machine", "jobs", "job", "live", "projects", "work", "factory", "server", "security", "account", "preferences", "about"]);
     expect(pagesFor("operator").length).toBe(pagesFor("viewer").length + 1);
     expect(pagesFor("admin").length).toBe(PAGES.length);
-    expect(new Set(PAGES.map((p) => p.group))).toEqual(new Set(["monitor", "configure", "account"]));
+    expect(new Set(PAGES.map((p) => p.group))).toEqual(new Set(["monitor", "services", "configure", "account"]));
     expect(atLeast("operator", "viewer") && !atLeast("viewer", "operator") && atLeast("admin", "admin")).toBe(true);
   });
 });
@@ -241,7 +241,7 @@ describe("the eight languages", () => {
 
   it("has a text for every page, state, role, theme, refusal and setting the pages name", () => {
     for (const p of PAGES) expect(ROWS, p.id).toHaveProperty(`nav_${p.id}`);
-    for (const g of ["monitor", "configure", "account"]) expect(ROWS).toHaveProperty(`group_${g}`);
+    for (const g of ["monitor", "services", "configure", "account"]) expect(ROWS).toHaveProperty(`group_${g}`);
     for (const s of ["ready", "connecting", "running", "waiting_operator", "done", "cancelled", "failed"] as const) expect(ROWS).toHaveProperty(stateKey(s));
     for (const r of ["viewer", "operator", "admin"]) expect(ROWS).toHaveProperty(`role_${r}`);
     for (const s of SERVER_SETTINGS) expect(ROWS).toHaveProperty(s.text);

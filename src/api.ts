@@ -31,6 +31,11 @@ export class Api {
     this.timeouts = { ...DEFAULT_TIMEOUTS, ...timeouts };
   }
 
+  /** What the clients of the common services (src/services) need to talk to the same server: the token as it is at each request, the transport and the time limits. */
+  transport(): { token: () => string | null; fetcher: Fetcher; timeouts: Timeouts } {
+    return { token: () => this.token, fetcher: this.fetcher, timeouts: this.timeouts };
+  }
+
   /** A request that gets no answer in time ends as the error `timeout`, and the request in flight is cancelled; a server that accepts the connection and then says nothing must not hold the page. */
   private async request<T>(method: string, path: string, body?: unknown, long = false): Promise<T> {
     const headers: Record<string, string> = {};

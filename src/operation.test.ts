@@ -12,21 +12,35 @@ import { describeEvent } from "./pages/Monitor";
 /** The codes of the server that the Studio shows with the text given by the server (the detail it sends says what is wrong with the work or the file). Every other code of
  * the catalog has a row `err_<code>` in the eight languages. */
 const GENERIC_ACCEPTED = [
+  "bad_app",
   "bad_board",
+  "bad_catalog",
+  "bad_container",
   "bad_dcf",
+  "bad_filename",
   "bad_hole",
   "bad_ncd",
   "bad_path",
   "bad_picture",
+  "bad_plugin_request",
   "bad_profile",
+  "bad_rack",
   "bad_samples",
   "bad_sorting",
   "bad_tool",
   "both_sources",
+  "catalog_readonly",
   "no_hole",
+  "not_locked",
+  "plugin_failed",
   "store",
   "too_many_holes",
+  "unknown_catalog",
+  "unknown_file",
+  "unknown_item",
+  "unknown_plugin",
   "unknown_tool",
+  "unknown_version",
 ];
 
 type Entry = { code: string; status: number; description: string };
