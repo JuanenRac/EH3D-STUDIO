@@ -3,6 +3,9 @@
 All notable changes to this project are documented here.
 
 ## [Unreleased]
+
+## [0.1.1] - New pages over the services of the server: projects and files, machines and jobs, security, and design and factory
+
 - **Projects and files:** a page that explores the project store of the server: projects by application with search and tags, the tree of the files with their versions and SHA-256, a preview of texts (drilling, G-code, Gerber), JSON and images, upload, download, import and export of `.eh3dproj`, the editing lock with its time left, and the conflicts of `If-Match` (412, 428, 423) told as a warning with a way out.
 - **Machines and jobs of the plugins:** the queue and history of the generic jobs with progress and confirmations, the plugins and machines, the live events (server-sent events with a ticket, `Last-Event-ID` and a reconnection that waits longer each time), notifications, and the table of the places of the tools in the changer with the checks of BUNGARD-GUI.
 - **Security:** the session and the open sessions (listed and closed), what each role may do, and the policy of the server with the switches that deserve a look; the audit, the keys and the fingerprint of the TLS are marked as not available on this server.
