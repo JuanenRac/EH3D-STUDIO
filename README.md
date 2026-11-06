@@ -18,7 +18,7 @@
 
 ---
 
-**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the 37 languages are covered by 303 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
+**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the 37 languages are covered by 311 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.1.1` |
 | Maturity | Functional |
-| Tests | 303 tests (`npm test`) |
+| Tests | 311 tests (`npm test`) |
 | Stack | React 19, TypeScript, Vite |
 | On real hardware | Not against machines on a bench: looked at in a browser against a local server with simulated machines |
 
@@ -45,7 +45,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟡 | The application builds without warnings (typecheck, lint, build) and is served by the server at the root of its address; it has been run in a browser against a local server. |
-| Tests | 🟡 | 303 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the 37 languages. |
+| Tests | 🟡 | 311 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the 37 languages. |
 | Pages | 🟡 | Overview, machines by station, jobs, live events, machines, users and tokens, server, account, preferences and about are written; the jobs and the machines are managed against the real API of the server. No page has been tried by someone who is not the author. |
 | Common services | 🟠 | Projects, machines and jobs, security and design reports are written and tested against a stand-in of the server; not against EH3D-SERVER running or on the CM5. |
 | Languages | 🟡 | 37 languages in every text, the refusals of the server included; the texts are read by a test, but only English and a few phrases of the others have been read by a person; the 29 languages beyond the first eight are translations by the model that wait for a review by native speakers. |
@@ -208,7 +208,7 @@ Copy `dist/` to the CM5 (for example to `/opt/eh3d-studio`), put `studio_dir = /
 
 ## 🧪 Testing
 
-`npm test` runs 303 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the 37 languages (every language has every text, the same placeholders everywhere, the two variants only with keys of the source, Chinese and Japanese in their own scripts, none written right to left). `npm run typecheck` and `npm run lint` pass as well. It also reads the examples of the answers that the tests of the server make, so an answer that changes without Studio following fails here. It also tests the time limit of every request (with a clock that is moved by hand), the polling that waits for the last request, the texts against the catalog of the error codes of the server, and the rules for the tokens of the programs.
+`npm test` runs 311 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the 37 languages (every language has every text, the same placeholders everywhere, the two variants only with keys of the source, Chinese and Japanese in their own scripts, none written right to left). `npm run typecheck` and `npm run lint` pass as well. It also reads the examples of the answers that the tests of the server make, so an answer that changes without Studio following fails here. It also tests the time limit of every request (with a clock that is moved by hand), the polling that waits for the last request, the texts against the catalog of the error codes of the server, and the rules for the tokens of the programs.
 
 ## 🏗️ Build & Release
 
@@ -275,7 +275,7 @@ EH3D-STUDIO/
 * The settings of the server are shown as a reference, not edited: the API does not give them out, and they are changed in `server.cfg` on the machine that runs the server.
 * Only the owner has looked at the pages; the texts of the languages other than English have not been read by native speakers.
 * There is no page of the viewer of a job (the plan of the holes) yet.
-* The pages of the common services have only run against a stand-in of the server; the audit, the keys, the fingerprint of the TLS and the running of the design tools are not available on the server yet.
+* The pages of the common services have only run against a stand-in of the server; the routes they now use for the design run, the audit, the keys, the changes of the policy and the quota are written from the contract of EH3D-SERVER and have not been tried against a running server. The design run needs the server set up for it (it answers 501 otherwise) and has not been tried with the real design program.
 
 **Next**
 

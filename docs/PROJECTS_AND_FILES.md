@@ -21,7 +21,7 @@ A viewer reads, previews and downloads; an operator also writes, locks, imports 
 
 ## Limits of the client
 
-Downloads and uploads are bounded (32 MB by default, 128 MB for an export, 2 MB for a preview), every request has a time limit, and only reads are tried again (twice, with a longer wait). The quota limits are the server's (`project_max_mb` and others): Studio shows the space used and the refusal `507`, not the limit, because no route tells it.
+Downloads and uploads are bounded (32 MB by default, 128 MB for an export, 2 MB for a preview), every request has a time limit, and only reads are tried again (twice, with a longer wait). The quota limits are the server's (`project_max_mb` and others): Studio shows the space used next to the limit and the number of files next to their limit, read from `GET /api/v1/apps/{app}/quota` (a server without that route shows the use alone), and the refusal `507` when a write would pass it.
 
 ## What has been tried
 

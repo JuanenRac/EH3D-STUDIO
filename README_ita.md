@@ -18,7 +18,7 @@
 
 ---
 
-**Verifica di onestà - cosa gira oggi:** un'applicazione web in React e TypeScript che accede a EH3D-SERVER e mostra e modifica ciò che contiene: le macchine con la loro stazione, il loro nodo e i file di configurazione, i lavori, gli utenti e i token, gli eventi in tempo reale. Il client dell'API, le regole dei moduli, il menu per ruolo e le 37 lingue sono coperti da 303 test, e le pagine sono state viste in un browser contro un server locale con macchine simulate. **Non è stata usata con macchine su un banco di prova**, e il server non termina ancora TLS.
+**Verifica di onestà - cosa gira oggi:** un'applicazione web in React e TypeScript che accede a EH3D-SERVER e mostra e modifica ciò che contiene: le macchine con la loro stazione, il loro nodo e i file di configurazione, i lavori, gli utenti e i token, gli eventi in tempo reale. Il client dell'API, le regole dei moduli, il menu per ruolo e le 37 lingue sono coperti da 311 test, e le pagine sono state viste in un browser contro un server locale con macchine simulate. **Non è stata usata con macchine su un banco di prova**, e il server non termina ancora TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Versione | `0.1.1` |
 | Maturità | Funzionale |
-| Test | 303 test (`npm test`) |
+| Test | 311 test (`npm test`) |
 | Stack tecnologico | React 19, TypeScript, Vite |
 | Su hardware reale | Non con macchine su un banco: vista in un browser contro un server locale con macchine simulate |
 
@@ -45,7 +45,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Area | Stato | Cosa significa qui |
 |---|---|---|
 | Software | 🟡 | L'applicazione compila senza avvisi (tipi, lint, build) ed è servita dal server alla radice del suo indirizzo; è stata eseguita in un browser contro un server locale. |
-| Test | 🟡 | 303 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le 37 lingue. |
+| Test | 🟡 | 311 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le 37 lingue. |
 | Pagine | 🟡 | Panoramica, macchine per stazione, lavori, eventi in tempo reale, macchine, utenti e token, server, account, preferenze e informazioni sono scritti; lavori e macchine si gestiscono con l'API reale del server. Nessuna pagina è stata provata da qualcuno che non sia l'autore. |
 | Servizi comuni | 🟠 | Progetti, macchine e lavori, sicurezza e rapporti di progetto sono scritti e provati contro un sostituto del server; non contro EH3D-SERVER in funzione né sulla CM5. |
 | Lingue | 🟡 | 37 lingue in ogni testo, compresi i rifiuti del server; i testi sono letti da un test, ma solo l'inglese e poche frasi delle altre sono state lette da una persona; le 29 lingue dopo le prime otto sono traduzioni del modello in attesa della revisione di madrelingua. |
@@ -208,7 +208,7 @@ Copia `dist/` sulla CM5 (ad esempio in `/opt/eh3d-studio`), metti `studio_dir = 
 
 ## 🧪 Test
 
-`npm test` esegue 303 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le 37 lingue (ogni lingua ha ogni testo, gli stessi segnaposto ovunque, le due varianti solo con chiavi della sorgente, cinese e giapponese nella loro scrittura, nessuna scritta da destra a sinistra). Passano anche `npm run typecheck` e `npm run lint`. Legge anche gli esempi di risposte prodotti dai test del server, così una risposta che cambia senza che Studio la segua fa fallire i test. Verifica anche il limite di tempo di ogni richiesta (con un orologio mosso a mano), il polling che attende l'ultima richiesta, i testi rispetto al catalogo dei codici di errore del server e le regole dei token dei programmi.
+`npm test` esegue 311 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le 37 lingue (ogni lingua ha ogni testo, gli stessi segnaposto ovunque, le due varianti solo con chiavi della sorgente, cinese e giapponese nella loro scrittura, nessuna scritta da destra a sinistra). Passano anche `npm run typecheck` e `npm run lint`. Legge anche gli esempi di risposte prodotti dai test del server, così una risposta che cambia senza che Studio la segua fa fallire i test. Verifica anche il limite di tempo di ogni richiesta (con un orologio mosso a mano), il polling che attende l'ultima richiesta, i testi rispetto al catalogo dei codici di errore del server e le regole dei token dei programmi.
 
 ## 🏗️ Compilazione e rilascio
 
@@ -275,7 +275,7 @@ EH3D-STUDIO/
 * Le impostazioni del server sono mostrate come riferimento, non modificate: l'API non le fornisce, e si cambiano in `server.cfg` sulla macchina che esegue il server.
 * Solo il proprietario ha guardato le pagine; i testi delle lingue diverse dall'inglese non sono stati letti da madrelingua.
 * Non c'è ancora una pagina del visore di un lavoro (la pianta dei fori).
-* Le pagine dei servizi comuni hanno girato solo contro un sostituto del server; audit, chiavi, impronta TLS ed esecuzione degli strumenti di progetto non sono ancora disponibili sul server.
+* Le pagine dei servizi comuni hanno girato solo contro un sostituto del server; le rotte che ora usano per l'esecuzione del progetto, l'audit, le chiavi, le modifiche della policy e la quota sono scritte dal contratto di EH3D-SERVER e non sono state provate contro un server in funzione. L'esecuzione del progetto richiede un server predisposto (altrimenti risponde 501) e non è stata provata con il vero programma di progettazione.
 
 **Prossimi passi**
 

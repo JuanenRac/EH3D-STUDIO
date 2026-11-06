@@ -18,7 +18,7 @@
 
 ---
 
-**Ehrlichkeitscheck - was heute läuft:** eine Webanwendung in React und TypeScript, die sich bei EH3D-SERVER anmeldet und zeigt und ändert, was dieser enthält: die Maschinen mit Station, Knoten und Konfigurationsdateien, die Aufträge, die Benutzer und die Tokens, die Live-Ereignisse. Der Client der API, die Regeln der Formulare, das Menü je Rolle und die 37 Sprachen sind durch 303 Tests abgedeckt, und die Seiten wurden in einem Browser gegen einen lokalen Server mit simulierten Maschinen angesehen. **Sie wurde nicht mit Maschinen auf einem Prüfstand benutzt**, und der Server beendet TLS noch nicht.
+**Ehrlichkeitscheck - was heute läuft:** eine Webanwendung in React und TypeScript, die sich bei EH3D-SERVER anmeldet und zeigt und ändert, was dieser enthält: die Maschinen mit Station, Knoten und Konfigurationsdateien, die Aufträge, die Benutzer und die Tokens, die Live-Ereignisse. Der Client der API, die Regeln der Formulare, das Menü je Rolle und die 37 Sprachen sind durch 311 Tests abgedeckt, und die Seiten wurden in einem Browser gegen einen lokalen Server mit simulierten Maschinen angesehen. **Sie wurde nicht mit Maschinen auf einem Prüfstand benutzt**, und der Server beendet TLS noch nicht.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.1.1` |
 | Reifegrad | Funktionsfähig |
-| Tests | 303 Tests (`npm test`) |
+| Tests | 311 Tests (`npm test`) |
 | Technologie-Stack | React 19, TypeScript, Vite |
 | Auf echter Hardware | Nicht mit Maschinen auf einem Prüfstand: im Browser gegen einen lokalen Server mit simulierten Maschinen angesehen |
 
@@ -45,7 +45,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Software | 🟡 | Die Anwendung baut ohne Warnungen (Typen, Lint, Build) und wird vom Server an der Wurzel seiner Adresse ausgeliefert; sie lief in einem Browser gegen einen lokalen Server. |
-| Tests | 🟡 | 303 Tests bestehen (`npm test`): der Client der API mit seinen Fehlern, die Regeln für Namen, Passwörter und Adressen, das Menü je Rolle, die Flotte je Station, die Aktionen eines Auftrags und die 37 Sprachen. |
+| Tests | 🟡 | 311 Tests bestehen (`npm test`): der Client der API mit seinen Fehlern, die Regeln für Namen, Passwörter und Adressen, das Menü je Rolle, die Flotte je Station, die Aktionen eines Auftrags und die 37 Sprachen. |
 | Seiten | 🟡 | Übersicht, Maschinen je Station, Aufträge, Live-Ereignisse, Maschinen, Benutzer und Tokens, Server, Konto, Einstellungen und Info sind geschrieben; Aufträge und Maschinen werden gegen die echte API des Servers verwaltet. Keine Seite wurde von jemand anderem als dem Autor erprobt. |
 | Gemeinsame Dienste | 🟠 | Projekte, Maschinen und Aufträge, Sicherheit und Entwurfsberichte sind geschrieben und gegen einen Server-Ersatz getestet; nicht gegen einen laufenden EH3D-SERVER oder auf dem CM5. |
 | Sprachen | 🟡 | 37 Sprachen in jedem Text, auch in den Ablehnungen des Servers; die Texte liest ein Test, aber nur Englisch und wenige Sätze der anderen hat ein Mensch gelesen; die 29 Sprachen nach den ersten acht sind Übersetzungen des Modells, die auf die Prüfung durch Muttersprachler warten. |
@@ -208,7 +208,7 @@ Kopieren Sie `dist/` auf die CM5 (zum Beispiel nach `/opt/eh3d-studio`), tragen 
 
 ## 🧪 Tests
 
-`npm test` führt 303 Tests aus und alle bestehen: der Client der API (das Token, der Rumpf, die Abfrage, die Fehler, ein ausfallendes Netz, die Pfade mit zu maskierenden Namen), die Regeln für Namen, Passwörter und Knotenadressen, was an einer Maschine falsch ist, das Menü jeder Rolle, die nach Station gruppierten Maschinen, die Zählungen und Aktionen eines Auftrags und die 37 Sprachen (jede Sprache hat jeden Text, überall dieselben Platzhalter, die beiden Varianten nur mit Schlüsseln der Quelle, Chinesisch und Japanisch in ihrer Schrift, keine von rechts nach links geschrieben). `npm run typecheck` und `npm run lint` bestehen ebenfalls. Es liest auch die Beispiele der Antworten, die die Tests des Servers erzeugen; eine Antwort, die sich ändert, ohne dass Studio folgt, schlägt hier fehl. Außerdem werden die Zeitgrenze jeder Anfrage (mit einer von Hand gestellten Uhr), die Abfrage, die auf die letzte Anfrage wartet, die Texte gegen den Katalog der Fehlercodes des Servers und die Regeln für die Programm-Tokens getestet.
+`npm test` führt 311 Tests aus und alle bestehen: der Client der API (das Token, der Rumpf, die Abfrage, die Fehler, ein ausfallendes Netz, die Pfade mit zu maskierenden Namen), die Regeln für Namen, Passwörter und Knotenadressen, was an einer Maschine falsch ist, das Menü jeder Rolle, die nach Station gruppierten Maschinen, die Zählungen und Aktionen eines Auftrags und die 37 Sprachen (jede Sprache hat jeden Text, überall dieselben Platzhalter, die beiden Varianten nur mit Schlüsseln der Quelle, Chinesisch und Japanisch in ihrer Schrift, keine von rechts nach links geschrieben). `npm run typecheck` und `npm run lint` bestehen ebenfalls. Es liest auch die Beispiele der Antworten, die die Tests des Servers erzeugen; eine Antwort, die sich ändert, ohne dass Studio folgt, schlägt hier fehl. Außerdem werden die Zeitgrenze jeder Anfrage (mit einer von Hand gestellten Uhr), die Abfrage, die auf die letzte Anfrage wartet, die Texte gegen den Katalog der Fehlercodes des Servers und die Regeln für die Programm-Tokens getestet.
 
 ## 🏗️ Build und Veröffentlichung
 
@@ -275,7 +275,7 @@ EH3D-STUDIO/
 * Die Einstellungen des Servers werden als Referenz gezeigt, nicht bearbeitet: die API gibt sie nicht heraus, und sie werden in `server.cfg` auf dem Rechner geändert, der den Server betreibt.
 * Nur der Besitzer hat die Seiten angesehen; die Texte der Sprachen außer Englisch wurden nicht von Muttersprachlern gelesen.
 * Es gibt noch keine Seite für die Ansicht eines Auftrags (den Plan der Löcher).
-* Die Seiten der gemeinsamen Dienste liefen nur gegen einen Server-Ersatz; Audit, Schlüssel, TLS-Fingerabdruck und das Ausführen der Entwurfswerkzeuge gibt es auf dem Server noch nicht.
+* Die Seiten der gemeinsamen Dienste liefen nur gegen einen Server-Ersatz; die Routen, die sie jetzt für den Entwurfslauf, das Audit, die Schlüssel, die Änderungen der Richtlinie und das Kontingent nutzen, sind nach dem Vertrag von EH3D-SERVER geschrieben und wurden nicht gegen einen laufenden Server erprobt. Der Entwurfslauf braucht einen dafür eingerichteten Server (sonst antwortet er 501) und wurde nicht mit dem echten Entwurfsprogramm erprobt.
 
 **Als Nächstes**
 
