@@ -668,5 +668,10 @@
 "perm_jobs_start": "Përgatitni dhe nisni punë",
 "perm_jobs_cancel": "Ndaloni dhe fshini punë",
 "perm_machines_manage": "Menaxhoni makina dhe katalogë",
-"perm_policy_read": "Shikoni të gjitha sesionet dhe politikën"
+"perm_policy_read": "Shikoni të gjitha sesionet dhe politikën",
+"login_remember": "Më kujto në këtë kompjuter",
+"login_remember_hint": "Çaktivizuar: hyrja mbaron kur mbyll skedën. Aktivizuar: ky shfletues e ruan deri sa të dalësh. Mos e zgjidh në një kompjuter të përbashkët.",
+"srv_network_open": "E hap serverin ndaj rrjetit: dëgjon në të gjitha adresat e kompjuterit dhe jo vetëm në këtë kompjuter (si parazgjedhje i çaktivizuar). Lexohet kur nis serveri.",
+"srv_update_allow_unsigned": "I lejon ndihmësit të përditësimeve të instalojë një botim pa nënshkrim kur hashi i tij është i saktë (si parazgjedhje i çaktivizuar: kërkohet nënshkrimi i një nënshkruesi të lejuar).",
+"sec_restart_needed": "Hyn në fuqi kur serveri rinis."
 }

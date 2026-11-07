@@ -668,5 +668,10 @@
 "perm_jobs_start": "Taken voorbereiden en starten",
 "perm_jobs_cancel": "Taken stoppen en verwijderen",
 "perm_machines_manage": "Machines en catalogi beheren",
-"perm_policy_read": "Alle sessies en het beleid bekijken"
+"perm_policy_read": "Alle sessies en het beleid bekijken",
+"login_remember": "Onthoud mij op deze computer",
+"login_remember_hint": "Uit: de aanmelding eindigt als je het tabblad sluit. Aan: deze browser houdt hem vast tot je afmeldt. Zet dit niet aan op een gedeelde computer.",
+"srv_network_open": "Opent de server voor het netwerk: hij luistert op alle adressen van de computer en niet alleen op deze computer (standaard uit). Wordt gelezen als de server start.",
+"srv_update_allow_unsigned": "Laat de updatehulp een release zonder handtekening installeren als de hash klopt (standaard uit: de handtekening van een toegestane ondertekenaar is vereist).",
+"sec_restart_needed": "Werkt zodra de server opnieuw start."
 }

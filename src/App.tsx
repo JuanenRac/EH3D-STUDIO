@@ -7,6 +7,7 @@ import { useAttention, useReachable } from "./attention";
 import { browserLang, isLang, text } from "./i18n";
 import type { Lang, TextKey } from "./i18n";
 import { forgetPrograms } from "./jobtools";
+import { browserStores, clearToken, readToken, saveToken } from "./tokenstore";
 import { parseRoute, pagesFor } from "./model";
 import type { PageId } from "./model";
 import type { Session } from "./types";
@@ -66,7 +67,9 @@ export default function App() {
     return [0, 2, 5, 10, 30].includes(n) ? n : 5;
   });
   const [alerts, setAlerts] = useState<boolean>(() => read("alerts") === "1");
-  const api = useMemo(() => new Api(read("token")), []);
+  // the token of the login is kept by this tab only (sessionStorage), or by the browser when the person ticked "remember me" (localStorage): see tokenstore.ts
+  const stores = useMemo(() => browserStores(), []);
+  const api = useMemo(() => new Api(readToken(stores)), [stores]);
   const [session, setSession] = useState<Session | null>(null);
   const [checked, setChecked] = useState(false);
   const [route, setRoute] = useState(routeFromHash);
@@ -85,10 +88,10 @@ export default function App() {
 
   const signOutLocally = useCallback(() => {
     api.token = null;
-    write("token", null);
+    clearToken(stores);
     forgetPrograms();
     setSession(null);
-  }, [api]);
+  }, [api, stores]);
 
   // a saved token is checked once; a refusal means it has expired
   useEffect(() => {
@@ -108,8 +111,8 @@ export default function App() {
     );
   }, [api, signOutLocally]);
 
-  const signedIn = async () => {
-    write("token", api.token);
+  const signedIn = async (remember: boolean) => {
+    if (api.token) saveToken(stores, api.token, remember);
     setSession(await api.session());
   };
 
@@ -123,7 +126,7 @@ export default function App() {
   useAttention(api, session != null, refreshS, alerts, text(lang, "alert_waiting"));
   const reachable = useReachable(api, session != null);
   if (!checked) return null;
-  if (!session) return <Login api={api} lang={lang} onLang={changeLang} onSignedIn={() => void signedIn()} />;
+  if (!session) return <Login api={api} lang={lang} onLang={changeLang} onSignedIn={(remember) => void signedIn(remember)} />;
 
   const state: AppState = {
     api,

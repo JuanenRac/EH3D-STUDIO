@@ -668,5 +668,10 @@
 "perm_jobs_start": "Undirbúa og ræsa verk",
 "perm_jobs_cancel": "Stöðva og eyða verkum",
 "perm_machines_manage": "Stjórna vélum og vörulistum",
-"perm_policy_read": "Sjá allar setur og stefnuna"
+"perm_policy_read": "Sjá allar setur og stefnuna",
+"login_remember": "Muna mig á þessari tölvu",
+"login_remember_hint": "Slökkt: innskráningin endar þegar flipanum er lokað. Kveikt: þessi vafri geymir hana þar til þú skráir þig út. Ekki velja þetta á sameiginlegri tölvu.",
+"srv_network_open": "Opnar netþjóninn fyrir netinu: hann hlustar á öllum vistföngum tölvunnar en ekki aðeins á þessari tölvu (sjálfgefið slökkt). Les þegar netþjónninn ræsist.",
+"srv_update_allow_unsigned": "Leyfir uppfærsluhjálparanum að setja upp útgáfu án undirskriftar þegar tætigildi hennar er rétt (sjálfgefið slökkt: krafist er undirskriftar leyfðs undirritara).",
+"sec_restart_needed": "Tekur gildi þegar netþjónninn er endurræstur."
 }

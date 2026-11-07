@@ -102,6 +102,8 @@ export function SecurityPage() {
   };
 
   const score = policy.data ? policyScore(policy.data) : null;
+  // the keys whose change is read when the server starts
+  const restartKeys = policy.data?.restart_required ?? [];
   return (
     <div className="stack">
       <Card title={t("sec_session")}>
@@ -251,7 +253,10 @@ export function SecurityPage() {
                           <code>{switchValue(sw.value)}</code>
                         </td>
                         <td>{attention ? <Badge tone="wait">▲ {t("sec_look")}</Badge> : <Badge tone="ok">✔ {t("sec_strict")}</Badge>}</td>
-                        <td>{known ? t(known.text) : ""}</td>
+                        <td>
+                          {known ? t(known.text) : ""}
+                          {restartKeys.includes(sw.key) && <span className="hint"> {t("sec_restart_needed")}</span>}
+                        </td>
                         <td>{editor(sw)}</td>
                       </tr>
                     );

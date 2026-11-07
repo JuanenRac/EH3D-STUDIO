@@ -18,7 +18,7 @@
 
 ---
 
-**Verifica di onestà - cosa gira oggi:** un'applicazione web in React e TypeScript che accede a EH3D-SERVER e mostra e modifica ciò che contiene: le macchine con la loro stazione, il loro nodo e i file di configurazione, i lavori, gli utenti e i token, gli eventi in tempo reale. Il client dell'API, le regole dei moduli, il menu per ruolo e le 37 lingue sono coperti da 314 test, e le pagine sono state viste in un browser contro un server locale con macchine simulate. **Non è stata usata con macchine su un banco di prova**, e il server non termina ancora TLS.
+**Verifica di onestà - cosa gira oggi:** un'applicazione web in React e TypeScript che accede a EH3D-SERVER e mostra e modifica ciò che contiene: le macchine con la loro stazione, il loro nodo e i file di configurazione, i lavori, gli utenti e i token, gli eventi in tempo reale. Il client dell'API, le regole dei moduli, il menu per ruolo e le 37 lingue sono coperti da 323 test, e le pagine sono state viste in un browser contro un server locale con macchine simulate. **Non è stata usata con macchine su un banco di prova**, e il server non termina ancora TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Versione | `0.1.2` |
 | Maturità | Funzionale |
-| Test | 314 test (`npm test`) |
+| Test | 323 test (`npm test`) |
 | Stack tecnologico | React 19, TypeScript, Vite |
 | Su hardware reale | Non con macchine su un banco: vista in un browser contro un server locale con macchine simulate |
 
@@ -45,7 +45,7 @@ Ogni riga è una parte di questo repository e il semaforo dice a che punto è og
 | Area | Stato | Cosa significa qui |
 |---|---|---|
 | Software | 🟡 | L'applicazione compila senza avvisi (tipi, lint, build) ed è servita dal server alla radice del suo indirizzo; è stata eseguita in un browser contro un server locale. |
-| Test | 🟡 | 314 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le 37 lingue. |
+| Test | 🟡 | 323 test passano (`npm test`): il client dell'API con i suoi errori, le regole di nomi, password e indirizzi, il menu per ruolo, la flotta per stazione, le azioni di un lavoro e le 37 lingue. |
 | Pagine | 🟡 | Panoramica, macchine per stazione, lavori, eventi in tempo reale, macchine, utenti e token, server, account, preferenze e informazioni sono scritti; lavori e macchine si gestiscono con l'API reale del server. Nessuna pagina è stata provata da qualcuno che non sia l'autore. |
 | Servizi comuni | 🟠 | Progetti, macchine e lavori, sicurezza e rapporti di progetto sono scritti e provati contro un sostituto del server; non contro EH3D-SERVER in funzione né sulla CM5. |
 | Lingue | 🟡 | 37 lingue in ogni testo, compresi i rifiuti del server; i testi sono letti da un test, ma solo l'inglese e poche frasi delle altre sono state lette da una persona; le 29 lingue dopo le prime otto sono traduzioni del modello in attesa della revisione di madrelingua. |
@@ -168,10 +168,10 @@ Come si incastrano le parti di questo repository: chi parla con esso, cosa conti
 |---|---|
 | Qualcuno che non ha effettuato l'accesso | ogni pagina richiede un accesso; il server rifiuta ogni richiesta senza un token valido (`401`), e cinque password errate bloccano il nome per un po' |
 | Una persona che fa più di quanto il suo ruolo consente | il menu e i pulsanti seguono il ruolo, e il server ricontrolla il ruolo a ogni richiesta |
-| Un token letto da altri | il token di un programma si mostra una volta, quello di un nodo mai più; il token di accesso vive solo nel browser della persona e va solo al server da cui è venuta la pagina |
+| Un token letto da altri | il token di un programma si mostra una volta, quello di un nodo mai più; il token di accesso vive solo nel browser della persona (in `sessionStorage`, quindi sparisce alla chiusura della scheda; in `localStorage` solo se la persona spunta «Ricordami» all'accesso) e va solo al server da cui è venuta la pagina |
 | Un valore errato inviato al server | nomi, password e indirizzi sono controllati prima dell'invio, e il server li ricontrolla e rifiuta una configurazione con una chiave inesistente |
 
-**Ciò che non è difeso:** il server non termina ancora TLS, quindi su una rete non cifrata token e password viaggiano in chiaro; un browser che un'altra persona può usare resta con l'accesso aperto finché la persona non esce o l'accesso scade (12 ore di default). Studio non ha avuto una revisione indipendente, e i controlli di un modulo sono una comodità: ci si fida solo del server.
+**Ciò che non è difeso:** il server non termina ancora TLS, quindi su una rete non cifrata token e password viaggiano in chiaro; un browser che un'altra persona può usare resta con l'accesso aperto finché la persona non chiude la scheda (finché non esce, se «Ricordami» era spuntato) o l'accesso scade (12 ore di default). Studio non ha avuto una revisione indipendente, e i controlli di un modulo sono una comodità: ci si fida solo del server.
 
 ## 🔌 Interfacce
 
@@ -180,7 +180,7 @@ Come si incastrano le parti di questo repository: chi parla con esso, cosa conti
 | API REST | tutto ciò che le pagine mostrano e modificano passa per `/api/v1/` di EH3D-SERVER, con il token di accesso come bearer token | `src/api.ts` |
 | Websocket | `/api/v1/events?token=...` per la pagina in tempo reale, con una riconnessione che attende più a lungo ogni volta | `src/pages/Monitor.tsx` |
 | Eventi del server | `/api/v1/events/stream` con ticket, `Last-Event-ID` e una riconnessione che attende di più ogni volta | `src/services/events.ts` |
-| Archivio del browser | il token di accesso, la lingua, il tema e l'aggiornamento, sotto `eh3d-studio.*` | `src/App.tsx` |
+| Archivio del browser | il token di accesso (`sessionStorage`, o `localStorage` con «Ricordami»), la lingua, il tema e l'aggiornamento, sotto `eh3d-studio.*` | `src/App.tsx`, `src/tokenstore.ts` |
 
 ## ⚙️ Configurazione
 
@@ -208,7 +208,7 @@ Copia `dist/` sulla CM5 (ad esempio in `/opt/eh3d-studio`), metti `studio_dir = 
 
 ## 🧪 Test
 
-`npm test` esegue 314 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le 37 lingue (ogni lingua ha ogni testo, gli stessi segnaposto ovunque, le due varianti solo con chiavi della sorgente, cinese e giapponese nella loro scrittura, nessuna scritta da destra a sinistra). Passano anche `npm run typecheck` e `npm run lint`. Legge anche gli esempi di risposte prodotti dai test del server, così una risposta che cambia senza che Studio la segua fa fallire i test. Verifica anche il limite di tempo di ogni richiesta (con un orologio mosso a mano), il polling che attende l'ultima richiesta, i testi rispetto al catalogo dei codici di errore del server e le regole dei token dei programmi.
+`npm test` esegue 323 test e passano tutti: il client dell'API (il token, il corpo, la query, gli errori, una rete che fallisce, i percorsi con nomi da proteggere), le regole di nomi, password e indirizzi dei nodi, cosa non va in una macchina, il menu di ogni ruolo, le macchine raggruppate per stazione, i conteggi e le azioni di un lavoro, e le 37 lingue (ogni lingua ha ogni testo, gli stessi segnaposto ovunque, le due varianti solo con chiavi della sorgente, cinese e giapponese nella loro scrittura, nessuna scritta da destra a sinistra). Passano anche `npm run typecheck` e `npm run lint`. Legge anche gli esempi di risposte prodotti dai test del server, così una risposta che cambia senza che Studio la segua fa fallire i test. Verifica anche il limite di tempo di ogni richiesta (con un orologio mosso a mano), il polling che attende l'ultima richiesta, i testi rispetto al catalogo dei codici di errore del server e le regole dei token dei programmi.
 
 ## 🏗️ Compilazione e rilascio
 
@@ -240,6 +240,7 @@ EH3D-STUDIO/
 │   ├── services/                                client, regole ed eventi dei quattro servizi
 │   ├── model.ts                                 ruoli, regole dei moduli, flotta e lavori
 │   ├── jobtools.ts attention.ts                 gli strumenti dei lavori: fori, richieste, disegno, ricerca, CSV
+│   ├── tokenstore.ts                            dove si conserva il token di accesso: questa scheda, o il browser se ricordato
 │   ├── i18n.ts texts.ts locales/                le 37 lingue
 │   ├── pages/                                   Monitoraggio, Servizi, Configurazione, Account e accesso
 │   └── styles.css                               il tema Forge e altri tre

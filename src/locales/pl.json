@@ -668,5 +668,10 @@
 "perm_jobs_start": "Przygotowywać i uruchamiać zadania",
 "perm_jobs_cancel": "Zatrzymywać i usuwać zadania",
 "perm_machines_manage": "Zarządzać maszynami i katalogami",
-"perm_policy_read": "Widzieć wszystkie sesje i politykę"
+"perm_policy_read": "Widzieć wszystkie sesje i politykę",
+"login_remember": "Zapamiętaj mnie na tym komputerze",
+"login_remember_hint": "Wyłączone: logowanie kończy się po zamknięciu karty. Włączone: ta przeglądarka zachowuje je do wylogowania. Nie zaznaczaj na współdzielonym komputerze.",
+"srv_network_open": "Otwiera serwer na sieć: nasłuchuje na wszystkich adresach komputera, a nie tylko na tym komputerze (domyślnie wyłączone). Odczytywane przy uruchomieniu serwera.",
+"srv_update_allow_unsigned": "Pozwala pomocnikowi aktualizacji zainstalować wydanie bez podpisu, gdy jego skrót jest poprawny (domyślnie wyłączone: wymagany jest podpis dozwolonego podpisującego).",
+"sec_restart_needed": "Działa po ponownym uruchomieniu serwera."
 }

@@ -668,5 +668,10 @@
 "perm_jobs_start": "Priprava in zagon opravil",
 "perm_jobs_cancel": "Ustavljanje in brisanje opravil",
 "perm_machines_manage": "Upravljanje strojev in katalogov",
-"perm_policy_read": "Ogled vseh sej in pravilnika"
+"perm_policy_read": "Ogled vseh sej in pravilnika",
+"login_remember": "Zapomni si me v tem računalniku",
+"login_remember_hint": "Izklopljeno: prijava se konča z zaprtjem zavihka. Vklopljeno: ta brskalnik jo hrani, dokler se ne odjavite. Ne vklopite na skupnem računalniku.",
+"srv_network_open": "Odpre strežnik omrežju: posluša na vseh naslovih računalnika, ne le na tem računalniku (privzeto izklopljeno). Prebere se ob zagonu strežnika.",
+"srv_update_allow_unsigned": "Pomočniku za posodobitve dovoli namestiti izdajo brez podpisa, ko je njen zgoščenec pravilen (privzeto izklopljeno: zahtevan je podpis dovoljenega podpisnika).",
+"sec_restart_needed": "Začne veljati ob ponovnem zagonu strežnika."
 }

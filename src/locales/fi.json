@@ -668,5 +668,10 @@
 "perm_jobs_start": "Valmistella ja käynnistää töitä",
 "perm_jobs_cancel": "Pysäyttää ja poistaa töitä",
 "perm_machines_manage": "Hallita koneita ja luetteloita",
-"perm_policy_read": "Nähdä kaikki istunnot ja käytäntö"
+"perm_policy_read": "Nähdä kaikki istunnot ja käytäntö",
+"login_remember": "Muista minut tällä tietokoneella",
+"login_remember_hint": "Pois: kirjautuminen päättyy, kun suljet välilehden. Päällä: tämä selain säilyttää sen, kunnes kirjaudut ulos. Älä valitse tätä jaetulla tietokoneella.",
+"srv_network_open": "Avaa palvelimen verkkoon: se kuuntelee kaikissa tietokoneen osoitteissa eikä vain tällä tietokoneella (oletuksena pois). Luetaan, kun palvelin käynnistyy.",
+"srv_update_allow_unsigned": "Antaa päivitysapurin asentaa julkaisun ilman allekirjoitusta, kun sen tiiviste on oikea (oletuksena pois: sallitun allekirjoittajan allekirjoitus vaaditaan).",
+"sec_restart_needed": "Tulee voimaan, kun palvelin käynnistyy uudelleen."
 }

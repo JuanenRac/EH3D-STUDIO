@@ -668,5 +668,10 @@
 "perm_jobs_start": "Pripravovať a spúšťať úlohy",
 "perm_jobs_cancel": "Zastavovať a mazať úlohy",
 "perm_machines_manage": "Spravovať stroje a katalógy",
-"perm_policy_read": "Zobraziť všetky relácie a zásady"
+"perm_policy_read": "Zobraziť všetky relácie a zásady",
+"login_remember": "Zapamätať si ma na tomto počítači",
+"login_remember_hint": "Vypnuté: prihlásenie skončí zatvorením karty. Zapnuté: tento prehliadač si ho pamätá, kým sa neodhlásite. Nezapínajte na zdieľanom počítači.",
+"srv_network_open": "Otvorí server sieti: počúva na všetkých adresách počítača, nielen na tomto počítači (predvolene vypnuté). Číta sa pri spustení servera.",
+"srv_update_allow_unsigned": "Dovolí pomocníkovi aktualizácií nainštalovať vydanie bez podpisu, keď je jeho hash správny (predvolene vypnuté: vyžaduje sa podpis povoleného podpisovateľa).",
+"sec_restart_needed": "Prejaví sa po reštarte servera."
 }

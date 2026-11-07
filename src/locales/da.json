@@ -668,5 +668,10 @@
 "perm_jobs_start": "Forberede og starte job",
 "perm_jobs_cancel": "Stoppe og slette job",
 "perm_machines_manage": "Administrere maskiner og kataloger",
-"perm_policy_read": "Se alle sessioner og politikken"
+"perm_policy_read": "Se alle sessioner og politikken",
+"login_remember": "Husk mig på denne computer",
+"login_remember_hint": "Fra: login slutter, når du lukker fanen. Til: denne browser beholder det, indtil du logger ud. Slå det ikke til på en delt computer.",
+"srv_network_open": "Åbner serveren mod netværket: den lytter på alle computerens adresser og ikke kun på denne computer (som standard fra). Læses, når serveren starter.",
+"srv_update_allow_unsigned": "Lader opdateringshjælperen installere en udgivelse uden signatur, når dens hash er rigtig (som standard fra: en signatur fra en tilladt underskriver kræves).",
+"sec_restart_needed": "Træder i kraft, når serveren genstarter."
 }

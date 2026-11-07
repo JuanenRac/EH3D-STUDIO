@@ -95,6 +95,19 @@
           "tree_name": "jobtools.ts attention.ts"
         },
         {
+          "name": "tokenstore.ts",
+          "desc": {
+            "en": "where the login token is kept: this tab, or the browser if remembered",
+            "es": "dónde se guarda el token de acceso: esta pestaña, o el navegador si se recuerda",
+            "it": "dove si conserva il token di accesso: questa scheda, o il browser se ricordato",
+            "de": "wo das Anmelde-Token liegt: dieser Tab, oder der Browser bei Merken",
+            "fr": "où le jeton de connexion est gardé : cet onglet, ou le navigateur si mémorisé",
+            "pt": "onde o token de sessão é guardado: este separador, ou o navegador se lembrado",
+            "zh": "登录令牌的保存位置：本标签页，选择记住时为浏览器",
+            "ja": "ログイントークンの保存先：このタブ、記憶する場合はブラウザー"
+          }
+        },
+        {
           "desc": {
             "en": "the 37 languages",
             "es": "los 37 idiomas",

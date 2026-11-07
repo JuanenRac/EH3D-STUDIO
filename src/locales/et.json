@@ -668,5 +668,10 @@
 "perm_jobs_start": "Tööde ettevalmistamine ja käivitamine",
 "perm_jobs_cancel": "Tööde peatamine ja kustutamine",
 "perm_machines_manage": "Masinate ja kataloogide haldamine",
-"perm_policy_read": "Kõigi seansside ja poliitika vaatamine"
+"perm_policy_read": "Kõigi seansside ja poliitika vaatamine",
+"login_remember": "Jäta mind sellesse arvutisse meelde",
+"login_remember_hint": "Väljas: sisselogimine lõpeb, kui sulgete vahekaardi. Sees: see brauser hoiab seda, kuni välja logite. Ärge lülitage seda sisse jagatud arvutis.",
+"srv_network_open": "Avab serveri võrgule: see kuulab kõigil arvuti aadressidel, mitte ainult sellel arvutil (vaikimisi väljas). Loetakse serveri käivitamisel.",
+"srv_update_allow_unsigned": "Lubab värskendusabilisel paigaldada allkirjata väljalaske, kui selle räsi on õige (vaikimisi väljas: nõutakse lubatud allkirjastaja allkirja).",
+"sec_restart_needed": "Jõustub serveri taaskäivitamisel."
 }

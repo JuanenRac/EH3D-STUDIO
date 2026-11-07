@@ -221,6 +221,8 @@ export interface AuthPolicy {
   extra_apps: string[];
   /** The keys `PUT /auth/policy` can change while the server runs (absent on a server that cannot change any). */
   editable?: string[];
+  /** The `editable` keys whose change is kept at once but is read when the server starts (absent on a server that has none). */
+  restart_required?: string[];
 }
 
 /** One token of a program as `GET /auth/keys` lists it: the identifier and the age, never the secret. */

@@ -668,5 +668,10 @@
 "perm_jobs_start": "Jipprepara u jibda xogħlijiet",
 "perm_jobs_cancel": "Twaqqaf u tħassar xogħlijiet",
 "perm_machines_manage": "Timmaniġġja magni u katalgi",
-"perm_policy_read": "Araw is-sessjonijiet kollha u l-politika"
+"perm_policy_read": "Araw is-sessjonijiet kollha u l-politika",
+"login_remember": "Ftakarni fuq dan il-kompjuter",
+"login_remember_hint": "Mitfi: id-dħul jintemm meta tagħlaq it-tab. Mixgħul: dan il-browser iżommu sakemm toħroġ. Tagħżlux fuq kompjuter maqsum.",
+"srv_network_open": "Jiftaħ is-server għan-netwerk: jisma' fuq l-indirizzi kollha tal-kompjuter u mhux biss fuq dan il-kompjuter (b'mod awtomatiku mitfi). Jinqara meta jibda s-server.",
+"srv_update_allow_unsigned": "Jippermetti lill-għajnuna tal-aġġornamenti tinstalla ħruġ mingħajr firma meta l-hash tiegħu jkun tajjeb (b'mod awtomatiku mitfi: tinħtieġ firma ta' firmatarju permess).",
+"sec_restart_needed": "Jidħol fis-seħħ meta s-server jerġa' jibda."
 }

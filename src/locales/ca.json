@@ -668,5 +668,10 @@
 "perm_jobs_start": "Preparar i iniciar treballs",
 "perm_jobs_cancel": "Aturar i esborrar treballs",
 "perm_machines_manage": "Gestionar màquines i catàlegs",
-"perm_policy_read": "Veure totes les sessions i la política"
+"perm_policy_read": "Veure totes les sessions i la política",
+"login_remember": "Recorda'm en aquest ordinador",
+"login_remember_hint": "Desactivat: la sessió acaba en tancar la pestanya. Activat: aquest navegador la conserva fins que tanquis la sessió. No ho activis en un ordinador compartit.",
+"srv_network_open": "Obre el servidor a la xarxa: escolta en totes les adreces de l'ordinador i no només en aquest ordinador (per defecte desactivat). Es llegeix quan s'inicia el servidor.",
+"srv_update_allow_unsigned": "Permet que l'ajudant d'actualitzacions instal·li una versió sense signatura quan el seu hash és correcte (per defecte desactivat: cal la signatura d'un signant permès).",
+"sec_restart_needed": "Té efecte quan el servidor es reinicia."
 }

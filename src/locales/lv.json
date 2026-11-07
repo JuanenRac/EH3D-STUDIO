@@ -668,5 +668,10 @@
 "perm_jobs_start": "Sagatavot un sākt darbus",
 "perm_jobs_cancel": "Apturēt un dzēst darbus",
 "perm_machines_manage": "Pārvaldīt iekārtas un katalogus",
-"perm_policy_read": "Skatīt visas sesijas un politiku"
+"perm_policy_read": "Skatīt visas sesijas un politiku",
+"login_remember": "Atcerēties mani šajā datorā",
+"login_remember_hint": "Izslēgts: pieteikšanās beidzas, kad aizverat cilni. Ieslēgts: šī pārlūkprogramma to glabā, līdz izrakstāties. Neieslēdziet kopīgā datorā.",
+"srv_network_open": "Atver serveri tīklam: tas klausās visās datora adresēs, nevis tikai šajā datorā (pēc noklusējuma izslēgts). Tiek nolasīts, kad serveris startē.",
+"srv_update_allow_unsigned": "Ļauj atjauninājumu palīgam instalēt izlaidumu bez paraksta, ja tā jaucējkods ir pareizs (pēc noklusējuma izslēgts: nepieciešams atļauta parakstītāja paraksts).",
+"sec_restart_needed": "Stājas spēkā, kad serveris tiek restartēts."
 }

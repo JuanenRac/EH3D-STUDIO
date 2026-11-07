@@ -668,5 +668,10 @@
 "perm_jobs_start": "Preparar e iniciar traballos",
 "perm_jobs_cancel": "Parar e borrar traballos",
 "perm_machines_manage": "Xestionar máquinas e catálogos",
-"perm_policy_read": "Ver todas as sesións e a política"
+"perm_policy_read": "Ver todas as sesións e a política",
+"login_remember": "Lembrarme neste ordenador",
+"login_remember_hint": "Desactivado: a sesión remata ao pechar a lapela. Activado: este navegador consérvaa ata que peches a sesión. Non o actives nun ordenador compartido.",
+"srv_network_open": "Abre o servidor á rede: escoita en todos os enderezos do ordenador e non só neste ordenador (por defecto desactivado). Lese cando se inicia o servidor.",
+"srv_update_allow_unsigned": "Permite que o axudante de actualizacións instale unha versión sen sinatura cando o seu hash é correcto (por defecto desactivado: esíxese a sinatura dun asinante permitido).",
+"sec_restart_needed": "Aplícase cando o servidor se reinicia."
 }

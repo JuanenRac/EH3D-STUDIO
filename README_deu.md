@@ -18,7 +18,7 @@
 
 ---
 
-**Ehrlichkeitscheck - was heute läuft:** eine Webanwendung in React und TypeScript, die sich bei EH3D-SERVER anmeldet und zeigt und ändert, was dieser enthält: die Maschinen mit Station, Knoten und Konfigurationsdateien, die Aufträge, die Benutzer und die Tokens, die Live-Ereignisse. Der Client der API, die Regeln der Formulare, das Menü je Rolle und die 37 Sprachen sind durch 314 Tests abgedeckt, und die Seiten wurden in einem Browser gegen einen lokalen Server mit simulierten Maschinen angesehen. **Sie wurde nicht mit Maschinen auf einem Prüfstand benutzt**, und der Server beendet TLS noch nicht.
+**Ehrlichkeitscheck - was heute läuft:** eine Webanwendung in React und TypeScript, die sich bei EH3D-SERVER anmeldet und zeigt und ändert, was dieser enthält: die Maschinen mit Station, Knoten und Konfigurationsdateien, die Aufträge, die Benutzer und die Tokens, die Live-Ereignisse. Der Client der API, die Regeln der Formulare, das Menü je Rolle und die 37 Sprachen sind durch 323 Tests abgedeckt, und die Seiten wurden in einem Browser gegen einen lokalen Server mit simulierten Maschinen angesehen. **Sie wurde nicht mit Maschinen auf einem Prüfstand benutzt**, und der Server beendet TLS noch nicht.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.1.2` |
 | Reifegrad | Funktionsfähig |
-| Tests | 314 Tests (`npm test`) |
+| Tests | 323 Tests (`npm test`) |
 | Technologie-Stack | React 19, TypeScript, Vite |
 | Auf echter Hardware | Nicht mit Maschinen auf einem Prüfstand: im Browser gegen einen lokalen Server mit simulierten Maschinen angesehen |
 
@@ -45,7 +45,7 @@ Jede Zeile ist ein Teil dieses Repositorys, und die Ampel sagt, wie weit er heut
 | Bereich | Stand | Was das hier bedeutet |
 |---|---|---|
 | Software | 🟡 | Die Anwendung baut ohne Warnungen (Typen, Lint, Build) und wird vom Server an der Wurzel seiner Adresse ausgeliefert; sie lief in einem Browser gegen einen lokalen Server. |
-| Tests | 🟡 | 314 Tests bestehen (`npm test`): der Client der API mit seinen Fehlern, die Regeln für Namen, Passwörter und Adressen, das Menü je Rolle, die Flotte je Station, die Aktionen eines Auftrags und die 37 Sprachen. |
+| Tests | 🟡 | 323 Tests bestehen (`npm test`): der Client der API mit seinen Fehlern, die Regeln für Namen, Passwörter und Adressen, das Menü je Rolle, die Flotte je Station, die Aktionen eines Auftrags und die 37 Sprachen. |
 | Seiten | 🟡 | Übersicht, Maschinen je Station, Aufträge, Live-Ereignisse, Maschinen, Benutzer und Tokens, Server, Konto, Einstellungen und Info sind geschrieben; Aufträge und Maschinen werden gegen die echte API des Servers verwaltet. Keine Seite wurde von jemand anderem als dem Autor erprobt. |
 | Gemeinsame Dienste | 🟠 | Projekte, Maschinen und Aufträge, Sicherheit und Entwurfsberichte sind geschrieben und gegen einen Server-Ersatz getestet; nicht gegen einen laufenden EH3D-SERVER oder auf dem CM5. |
 | Sprachen | 🟡 | 37 Sprachen in jedem Text, auch in den Ablehnungen des Servers; die Texte liest ein Test, aber nur Englisch und wenige Sätze der anderen hat ein Mensch gelesen; die 29 Sprachen nach den ersten acht sind Übersetzungen des Modells, die auf die Prüfung durch Muttersprachler warten. |
@@ -168,10 +168,10 @@ Wie die Teile dieses Repositorys zusammenpassen: wer mit ihm spricht, was es ent
 |---|---|
 | Jemand, der nicht angemeldet ist | jede Seite braucht eine Anmeldung; der Server lehnt jede Anfrage ohne gültiges Token ab (`401`), und fünf falsche Passwörter sperren den Namen eine Weile |
 | Eine Person, die mehr tut, als ihre Rolle erlaubt | Menü und Knöpfe folgen der Rolle, und der Server prüft die Rolle bei jeder Anfrage erneut |
-| Ein von jemand anderem gelesenes Token | das Token eines Programms wird einmal gezeigt, das eines Knotens nie wieder; das Anmelde-Token lebt nur im Browser der Person und geht nur an den Server, von dem die Seite kam |
+| Ein von jemand anderem gelesenes Token | das Token eines Programms wird einmal gezeigt, das eines Knotens nie wieder; das Anmelde-Token lebt nur im Browser der Person (in `sessionStorage`, es verschwindet also beim Schließen des Tabs; in `localStorage` nur, wenn die Person bei der Anmeldung „Angemeldet bleiben“ ankreuzt) und geht nur an den Server, von dem die Seite kam |
 | Ein falscher Wert an den Server | Namen, Passwörter und Adressen werden vor dem Senden geprüft, und der Server prüft sie erneut und lehnt eine Konfiguration mit einem unbekannten Schlüssel ab |
 
-**Was nicht abgesichert ist:** der Server beendet TLS noch nicht, daher laufen in einem unverschlüsselten Netz Token und Passwörter im Klartext; ein Browser, den jemand anderes benutzen kann, bleibt angemeldet, bis die Person sich abmeldet oder die Anmeldung abläuft (standardmäßig 12 Stunden). Studio hatte keine unabhängige Prüfung, und die Prüfungen eines Formulars sind eine Bequemlichkeit: Vertrauen darf man nur dem Server.
+**Was nicht abgesichert ist:** der Server beendet TLS noch nicht, daher laufen in einem unverschlüsselten Netz Token und Passwörter im Klartext; ein Browser, den jemand anderes benutzen kann, bleibt angemeldet, bis die Person den Tab schließt (bei „Angemeldet bleiben“, bis sie sich abmeldet) oder die Anmeldung abläuft (standardmäßig 12 Stunden). Studio hatte keine unabhängige Prüfung, und die Prüfungen eines Formulars sind eine Bequemlichkeit: Vertrauen darf man nur dem Server.
 
 ## 🔌 Schnittstellen
 
@@ -180,7 +180,7 @@ Wie die Teile dieses Repositorys zusammenpassen: wer mit ihm spricht, was es ent
 | REST-API | alles, was die Seiten zeigen und ändern, läuft über `/api/v1/` von EH3D-SERVER, mit dem Anmelde-Token als Bearer-Token | `src/api.ts` |
 | Websocket | `/api/v1/events?token=...` für die Live-Seite, mit einer Wiederverbindung, die jedes Mal länger wartet | `src/pages/Monitor.tsx` |
 | Server-Ereignisse | `/api/v1/events/stream` mit Ticket, `Last-Event-ID` und einer Wiederverbindung, die jedes Mal länger wartet | `src/services/events.ts` |
-| Browser-Speicher | das Anmelde-Token, die Sprache, das Thema und die Aktualisierung unter `eh3d-studio.*` | `src/App.tsx` |
+| Browser-Speicher | das Anmelde-Token (`sessionStorage`, oder `localStorage` bei „Angemeldet bleiben“), die Sprache, das Thema und die Aktualisierung unter `eh3d-studio.*` | `src/App.tsx`, `src/tokenstore.ts` |
 
 ## ⚙️ Konfiguration
 
@@ -208,7 +208,7 @@ Kopieren Sie `dist/` auf die CM5 (zum Beispiel nach `/opt/eh3d-studio`), tragen 
 
 ## 🧪 Tests
 
-`npm test` führt 314 Tests aus und alle bestehen: der Client der API (das Token, der Rumpf, die Abfrage, die Fehler, ein ausfallendes Netz, die Pfade mit zu maskierenden Namen), die Regeln für Namen, Passwörter und Knotenadressen, was an einer Maschine falsch ist, das Menü jeder Rolle, die nach Station gruppierten Maschinen, die Zählungen und Aktionen eines Auftrags und die 37 Sprachen (jede Sprache hat jeden Text, überall dieselben Platzhalter, die beiden Varianten nur mit Schlüsseln der Quelle, Chinesisch und Japanisch in ihrer Schrift, keine von rechts nach links geschrieben). `npm run typecheck` und `npm run lint` bestehen ebenfalls. Es liest auch die Beispiele der Antworten, die die Tests des Servers erzeugen; eine Antwort, die sich ändert, ohne dass Studio folgt, schlägt hier fehl. Außerdem werden die Zeitgrenze jeder Anfrage (mit einer von Hand gestellten Uhr), die Abfrage, die auf die letzte Anfrage wartet, die Texte gegen den Katalog der Fehlercodes des Servers und die Regeln für die Programm-Tokens getestet.
+`npm test` führt 323 Tests aus und alle bestehen: der Client der API (das Token, der Rumpf, die Abfrage, die Fehler, ein ausfallendes Netz, die Pfade mit zu maskierenden Namen), die Regeln für Namen, Passwörter und Knotenadressen, was an einer Maschine falsch ist, das Menü jeder Rolle, die nach Station gruppierten Maschinen, die Zählungen und Aktionen eines Auftrags und die 37 Sprachen (jede Sprache hat jeden Text, überall dieselben Platzhalter, die beiden Varianten nur mit Schlüsseln der Quelle, Chinesisch und Japanisch in ihrer Schrift, keine von rechts nach links geschrieben). `npm run typecheck` und `npm run lint` bestehen ebenfalls. Es liest auch die Beispiele der Antworten, die die Tests des Servers erzeugen; eine Antwort, die sich ändert, ohne dass Studio folgt, schlägt hier fehl. Außerdem werden die Zeitgrenze jeder Anfrage (mit einer von Hand gestellten Uhr), die Abfrage, die auf die letzte Anfrage wartet, die Texte gegen den Katalog der Fehlercodes des Servers und die Regeln für die Programm-Tokens getestet.
 
 ## 🏗️ Build und Veröffentlichung
 
@@ -240,6 +240,7 @@ EH3D-STUDIO/
 │   ├── services/                                Clients, Regeln und Ereignisse der vier Dienste
 │   ├── model.ts                                 Rollen, Formularregeln, Flotte und Aufträge
 │   ├── jobtools.ts attention.ts                 die Auftragswerkzeuge: Löcher, Anfragen, Plan, Suche, CSV
+│   ├── tokenstore.ts                            wo das Anmelde-Token liegt: dieser Tab, oder der Browser bei Merken
 │   ├── i18n.ts texts.ts locales/                die 37 Sprachen
 │   ├── pages/                                   Überwachung, Dienste, Konfiguration, Konto und Anmeldung
 │   └── styles.css                               das Thema Forge und drei weitere

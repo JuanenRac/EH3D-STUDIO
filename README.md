@@ -18,7 +18,7 @@
 
 ---
 
-**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the 37 languages are covered by 314 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
+**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the 37 languages are covered by 323 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.1.2` |
 | Maturity | Functional |
-| Tests | 314 tests (`npm test`) |
+| Tests | 323 tests (`npm test`) |
 | Stack | React 19, TypeScript, Vite |
 | On real hardware | Not against machines on a bench: looked at in a browser against a local server with simulated machines |
 
@@ -45,7 +45,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟡 | The application builds without warnings (typecheck, lint, build) and is served by the server at the root of its address; it has been run in a browser against a local server. |
-| Tests | 🟡 | 314 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the 37 languages. |
+| Tests | 🟡 | 323 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job and the 37 languages. |
 | Pages | 🟡 | Overview, machines by station, jobs, live events, machines, users and tokens, server, account, preferences and about are written; the jobs and the machines are managed against the real API of the server. No page has been tried by someone who is not the author. |
 | Common services | 🟠 | Projects, machines and jobs, security and design reports are written and tested against a stand-in of the server; not against EH3D-SERVER running or on the CM5. |
 | Languages | 🟡 | 37 languages in every text, the refusals of the server included; the texts are read by a test, but only English and a few phrases of the others have been read by a person; the 29 languages beyond the first eight are translations by the model that wait for a review by native speakers. |
@@ -168,10 +168,10 @@ How the parts of this repository fit together: who talks to it, what it holds an
 |---|---|
 | Someone who has not signed in | every page needs a login; the server refuses every request without a valid token (`401`), and five wrong passwords block the name for a while |
 | A person doing more than their role allows | the menu and the buttons follow the role, and the server checks the role again on every request |
-| A token read by someone else | the token of a program is shown once, the token of a node never again; the login token lives only in the browser of the person and goes only to the server the page came from |
+| A token read by someone else | the token of a program is shown once, the token of a node never again; the login token lives only in the browser of the person (in `sessionStorage`, so it is gone when the tab is closed; in `localStorage` only when the person ticks "remember me" at the sign-in) and goes only to the server the page came from |
 | A wrong value sent to the server | names, passwords and addresses are checked before sending, and the server checks them again and refuses a configuration with a key that does not exist |
 
-**What is not defended:** the server does not terminate TLS yet, so on a plain network the token and the passwords travel in clear text; a browser that someone else can use stays signed in until the person signs out or the login ends (12 hours by default). Studio has had no independent review, and the checks of a form are a convenience: only the server is to be trusted.
+**What is not defended:** the server does not terminate TLS yet, so on a plain network the token and the passwords travel in clear text; a browser that someone else can use stays signed in until the person closes the tab (until the person signs out, if "remember me" was ticked) or the login ends (12 hours by default). Studio has had no independent review, and the checks of a form are a convenience: only the server is to be trusted.
 
 ## 🔌 Interfaces
 
@@ -180,7 +180,7 @@ How the parts of this repository fit together: who talks to it, what it holds an
 | REST API | everything the pages show and change goes through `/api/v1/` of EH3D-SERVER, with the login token as a bearer token | `src/api.ts` |
 | Websocket | `/api/v1/events?token=...` for the live page, with a reconnection that waits longer each time | `src/pages/Monitor.tsx` |
 | Server-sent events | `/api/v1/events/stream` with a ticket, `Last-Event-ID` and a reconnection that waits longer each time | `src/services/events.ts` |
-| Browser storage | the login token, the language, the theme and the refresh, under `eh3d-studio.*` | `src/App.tsx` |
+| Browser storage | the login token (`sessionStorage`, or `localStorage` with "remember me"), the language, the theme and the refresh, under `eh3d-studio.*` | `src/App.tsx`, `src/tokenstore.ts` |
 
 ## ⚙️ Configuration
 
@@ -208,7 +208,7 @@ Copy `dist/` to the CM5 (for example to `/opt/eh3d-studio`), put `studio_dir = /
 
 ## 🧪 Testing
 
-`npm test` runs 314 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the 37 languages (every language has every text, the same placeholders everywhere, the two variants only with keys of the source, Chinese and Japanese in their own scripts, none written right to left). `npm run typecheck` and `npm run lint` pass as well. It also reads the examples of the answers that the tests of the server make, so an answer that changes without Studio following fails here. It also tests the time limit of every request (with a clock that is moved by hand), the polling that waits for the last request, the texts against the catalog of the error codes of the server, and the rules for the tokens of the programs.
+`npm test` runs 323 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the 37 languages (every language has every text, the same placeholders everywhere, the two variants only with keys of the source, Chinese and Japanese in their own scripts, none written right to left). `npm run typecheck` and `npm run lint` pass as well. It also reads the examples of the answers that the tests of the server make, so an answer that changes without Studio following fails here. It also tests the time limit of every request (with a clock that is moved by hand), the polling that waits for the last request, the texts against the catalog of the error codes of the server, and the rules for the tokens of the programs.
 
 ## 🏗️ Build & Release
 
@@ -240,6 +240,7 @@ EH3D-STUDIO/
 │   ├── services/                                clients, rules and events of the four services
 │   ├── model.ts                                 roles, rules of the forms, fleet and jobs
 │   ├── jobtools.ts attention.ts                 the job tools: holes, requests, plan, search, CSV
+│   ├── tokenstore.ts                            where the login token is kept: this tab, or the browser if remembered
 │   ├── i18n.ts texts.ts locales/                the 37 languages
 │   ├── pages/                                   Monitor, Services, Configure, Account and the sign-in
 │   └── styles.css                               the Forge theme and three more

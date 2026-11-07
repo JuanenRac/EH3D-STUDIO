@@ -668,5 +668,10 @@
 "perm_jobs_start": "Priprema i pokretanje poslova",
 "perm_jobs_cancel": "Zaustavljanje i brisanje poslova",
 "perm_machines_manage": "Upravljanje strojevima i katalozima",
-"perm_policy_read": "Pregled svih sesija i pravila"
+"perm_policy_read": "Pregled svih sesija i pravila",
+"login_remember": "Zapamti me na ovom računalu",
+"login_remember_hint": "Isključeno: prijava završava kad zatvorite karticu. Uključeno: ovaj preglednik je čuva dok se ne odjavite. Ne uključujte na zajedničkom računalu.",
+"srv_network_open": "Otvara poslužitelj prema mreži: sluša na svim adresama računala, a ne samo na ovom računalu (zadano isključeno). Čita se pri pokretanju poslužitelja.",
+"srv_update_allow_unsigned": "Dopušta pomoćniku za ažuriranje da instalira izdanje bez potpisa kada je njegov hash ispravan (zadano isključeno: traži se potpis dopuštenog potpisnika).",
+"sec_restart_needed": "Stupa na snagu nakon ponovnog pokretanja poslužitelja."
 }

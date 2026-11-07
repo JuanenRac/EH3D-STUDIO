@@ -668,5 +668,10 @@
 "perm_jobs_start": "Pregătește și pornește lucrări",
 "perm_jobs_cancel": "Oprește și șterge lucrări",
 "perm_machines_manage": "Gestionează mașini și cataloage",
-"perm_policy_read": "Vezi toate sesiunile și politica"
+"perm_policy_read": "Vezi toate sesiunile și politica",
+"login_remember": "Ține-mă minte pe acest calculator",
+"login_remember_hint": "Oprit: autentificarea se termină când închizi fila. Pornit: acest browser o păstrează până te deconectezi. Nu o bifa pe un calculator partajat.",
+"srv_network_open": "Deschide serverul către rețea: ascultă pe toate adresele calculatorului, nu doar pe acest calculator (implicit oprit). Se citește la pornirea serverului.",
+"srv_update_allow_unsigned": "Permite asistentului de actualizări să instaleze o versiune fără semnătură când hash-ul ei este corect (implicit oprit: se cere semnătura unui semnatar permis).",
+"sec_restart_needed": "Intră în vigoare la repornirea serverului."
 }

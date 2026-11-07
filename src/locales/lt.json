@@ -668,5 +668,10 @@
 "perm_jobs_start": "Paruošti ir paleisti darbus",
 "perm_jobs_cancel": "Stabdyti ir trinti darbus",
 "perm_machines_manage": "Valdyti mašinas ir katalogus",
-"perm_policy_read": "Peržiūrėti visas sesijas ir politiką"
+"perm_policy_read": "Peržiūrėti visas sesijas ir politiką",
+"login_remember": "Prisiminti mane šiame kompiuteryje",
+"login_remember_hint": "Išjungta: prisijungimas baigiasi uždarius skirtuką. Įjungta: ši naršyklė jį išsaugo, kol atsijungsite. Nejunkite bendrame kompiuteryje.",
+"srv_network_open": "Atveria serverį tinklui: jis klausosi visų kompiuterio adresų, o ne tik šio kompiuterio (pagal numatytuosius nustatymus išjungta). Nuskaitoma paleidžiant serverį.",
+"srv_update_allow_unsigned": "Leidžia naujinimų padėjėjui įdiegti leidimą be parašo, kai jo maiša teisinga (pagal numatytuosius nustatymus išjungta: reikalingas leidžiamo pasirašytojo parašas).",
+"sec_restart_needed": "Įsigalioja iš naujo paleidus serverį."
 }

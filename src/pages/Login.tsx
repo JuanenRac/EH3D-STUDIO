@@ -6,12 +6,14 @@ import { validName, validPassword } from "../model";
 import { LANGS, LANG_NAMES, errorText, text } from "../i18n";
 import type { Lang } from "../i18n";
 
-export function Login({ api, lang, onLang, onSignedIn }: { api: Api; lang: Lang; onLang: (l: Lang) => void; onSignedIn: () => void }) {
+export function Login({ api, lang, onLang, onSignedIn }: { api: Api; lang: Lang; onLang: (l: Lang) => void; onSignedIn: (remember: boolean) => void }) {
   const t = (k: Parameters<typeof text>[1], v?: Record<string, string | number>) => text(lang, k, v);
   const [needed, setNeeded] = useState<boolean | null>(null);
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
+  // off by default: the login lasts until the tab is closed; ticked, the browser keeps it for the next visit
+  const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -28,7 +30,7 @@ export function Login({ api, lang, onLang, onSignedIn }: { api: Api; lang: Lang;
     try {
       if (needed) await api.setup(code.trim(), name.trim(), password);
       await api.login(name.trim(), password);
-      onSignedIn();
+      onSignedIn(remember);
     } catch (e) {
       setError(errorText(lang, e));
     } finally {
@@ -61,6 +63,11 @@ export function Login({ api, lang, onLang, onSignedIn }: { api: Api; lang: Lang;
         <Field label={t("acc_password")} hint={needed ? t("password_rule") : undefined}>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={needed ? "new-password" : "current-password"} />
         </Field>
+        <label className="check">
+          <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+          {t("login_remember")}
+        </label>
+        <p className="hint">{t("login_remember_hint")}</p>
         {error && <p className="error">{error}</p>}
         <button className="primary" type="submit" disabled={!ok || busy || needed === null}>
           {needed ? t("login_create") : t("login_signin")}
