@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The release links of the page Updates are web addresses only:** the link to a release is shown only when the address the server gives is `https://` or `http://`, so an address such as `javascript:` or `data:` is never turned into a link; one more test (314).
 - **Signing out leaves no G-code in the browser:** the programs kept for a job that may go on are removed from the browser when the person signs out (or the session expires), and only the newest eight are kept while working, so the store no longer fills with the programs of old jobs; two more tests (313).
 
 ## [0.1.2] - Design runs from the pages, the audit, the keys and the security policy, the quotas and the single sign-in

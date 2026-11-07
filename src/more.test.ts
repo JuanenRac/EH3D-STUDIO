@@ -9,6 +9,7 @@ import {
   holeRadius,
   holesDone,
   forgetPrograms,
+  isWebLink,
   jobsCsv,
   KEPT_COUNT,
   keepProgram,
@@ -249,6 +250,16 @@ describe("a program kept in the browser", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it("makes a link only of an address on the web, never of a script or a data address", () => {
+    expect(isWebLink("https://github.com/JuanenRac/EH3D-SERVER/releases/tag/v0.1.4")).toBe(true);
+    expect(isWebLink("http://192.168.0.5/notes")).toBe(true);
+    for (const bad of ["javascript:alert(1)", " javascript:alert(1)", "JaVaScRiPt:alert(1)", "data:text/html,<b>x</b>", "vbscript:x", "//evil.example/x", "/relative", "", "not a url"]) {
+      expect(isWebLink(bad), bad).toBe(false);
+    }
+    expect(isWebLink(null)).toBe(false);
+    expect(isWebLink(undefined)).toBe(false);
   });
 
   it("forgets every kept program and nothing else when the person signs out", () => {

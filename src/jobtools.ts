@@ -130,6 +130,17 @@ export function keepProgram(jobId: string, name: string, text: string): void {
   }
 }
 
+/** Whether an address that came from the server may be a link of the page: only `https://` (or `http://`) ones, never `javascript:` or `data:`. */
+export function isWebLink(address: string | null | undefined): address is string {
+  if (typeof address !== "string") return false;
+  try {
+    const u = new URL(address);
+    return u.protocol === "https:" || u.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
 /** Forget every program kept in the browser (signing out leaves no G-code of the jobs behind). */
 export function forgetPrograms(): void {
   try {

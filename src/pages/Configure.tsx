@@ -5,7 +5,7 @@ import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Field } from "../components/ui";
 import { cfgKeys, tokenDays, tokenState, connectionBody, dollarSwitchShown, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, parseReleaseNotes, splitStep, studioReplaced, toInput, updatable, updatesBusy, validName, validPassword } from "../model";
 import type { MachineProblem } from "../model";
-import { copyId, machineExport, machineImport } from "../jobtools";
+import { copyId, isWebLink, machineExport, machineImport } from "../jobtools";
 import { copyText } from "../clipboard";
 import type { ConnectionKind, MachineInput, Role } from "../types";
 import { CONNECTION_KINDS, ROLES } from "../types";
@@ -582,7 +582,7 @@ export function UpdatesPage() {
                   <code>{c.installed ?? "-"}</code>
                 </td>
                 <td>
-                  {c.url ? (
+                  {isWebLink(c.url) ? (
                     <a href={c.url} target="_blank" rel="noreferrer">
                       <code>{c.latest ?? "-"}</code>
                     </a>
