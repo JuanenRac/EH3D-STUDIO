@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.1.2] - Design runs from the pages, the audit, the keys and the security policy, the quotas and the single sign-in
+
 - **Running the checks on the server:** the four buttons of the page Design and factory ask the server to run the design program on a board file of a project of the `pcb` application (`POST /api/v1/apps/pcb/jobs`), wait for the job and read the project again; the report a run keeps (an envelope with the JSON of the program) is shown like any other report. A server that is not set up for it answers `501 design_run_unavailable` and the page says so. A viewer sees the buttons off.
 - **The audit, the keys and the TLS fingerprint in the page Security:** the audit with its filters by person and event, the tokens of the programs by identifier and age, and the fingerprint of the certificate the server names, in place of the card that said they were not available.
 - **Switches of security that can be changed while the server runs:** the switches the server lists as `editable` have a button or a number to type; a value the server says is looser than recommended is asked a second time before it is applied.
