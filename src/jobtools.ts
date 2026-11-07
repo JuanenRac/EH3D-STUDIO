@@ -96,14 +96,47 @@ export function gcodeLineCount(text: string): number {
 
 const KEPT = "eh3d.gcode.";
 const KEPT_MAX = 1_500_000;
+/** How many programs the browser keeps: the newest ones, so that old jobs do not fill the store. */
+export const KEPT_COUNT = 8;
 
-/** Keep the text of a program under the id of its job (best effort: a full or blocked store is not an error). */
+function keptKeys(store: Storage): string[] {
+  const keys: string[] = [];
+  for (let i = 0; i < store.length; i++) {
+    const k = store.key(i);
+    if (k !== null && k.startsWith(KEPT)) keys.push(k);
+  }
+  return keys;
+}
+
+/** Keep the text of a program under the id of its job (best effort: a full or blocked store is not an error). Only the newest KEPT_COUNT programs stay. */
 export function keepProgram(jobId: string, name: string, text: string): void {
   if (text.length > KEPT_MAX) return;
   try {
-    window.localStorage.setItem(KEPT + jobId, JSON.stringify({ name, text }));
+    const store = window.localStorage;
+    store.setItem(KEPT + jobId, JSON.stringify({ name, text, at: Date.now() }));
+    const rows = keptKeys(store).map((k) => {
+      let at = 0;
+      try {
+        at = Number((JSON.parse(store.getItem(k) ?? "{}") as { at?: unknown }).at) || 0;
+      } catch {
+        /* a damaged entry counts as the oldest */
+      }
+      return { k, at };
+    });
+    rows.sort((a, b) => b.at - a.at);
+    for (const old of rows.slice(KEPT_COUNT)) if (old.k !== KEPT + jobId) store.removeItem(old.k);
   } catch {
     /* no store: the person picks the file again */
+  }
+}
+
+/** Forget every program kept in the browser (signing out leaves no G-code of the jobs behind). */
+export function forgetPrograms(): void {
+  try {
+    const store = window.localStorage;
+    for (const k of keptKeys(store)) store.removeItem(k);
+  } catch {
+    /* no store: nothing was kept */
   }
 }
 

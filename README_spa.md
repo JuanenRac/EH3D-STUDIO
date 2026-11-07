@@ -18,7 +18,7 @@
 
 ---
 
-**Comprobación de honestidad - lo que se ejecuta hoy:** una aplicación web en React y TypeScript que entra en EH3D-SERVER y muestra y cambia lo que este guarda: las máquinas con su estación, su nodo y sus ficheros de configuración, los trabajos, los usuarios y los tokens, los eventos en vivo. El cliente de la API, las reglas de los formularios, el menú por rol y los 37 idiomas están cubiertos por 311 pruebas, y las páginas se han visto en un navegador contra un servidor local con máquinas simuladas. **No se ha usado con máquinas en un banco de pruebas**, y el servidor aún no termina TLS.
+**Comprobación de honestidad - lo que se ejecuta hoy:** una aplicación web en React y TypeScript que entra en EH3D-SERVER y muestra y cambia lo que este guarda: las máquinas con su estación, su nodo y sus ficheros de configuración, los trabajos, los usuarios y los tokens, los eventos en vivo. El cliente de la API, las reglas de los formularios, el menú por rol y los 37 idiomas están cubiertos por 313 pruebas, y las páginas se han visto en un navegador contra un servidor local con máquinas simuladas. **No se ha usado con máquinas en un banco de pruebas**, y el servidor aún no termina TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Versión | `0.1.2` |
 | Madurez | Funcional |
-| Pruebas | 311 pruebas (`npm test`) |
+| Pruebas | 313 pruebas (`npm test`) |
 | Pila tecnológica | React 19, TypeScript, Vite |
 | En hardware real | No con máquinas en un banco: vista en un navegador contra un servidor local con máquinas simuladas |
 
@@ -45,7 +45,7 @@ Cada línea es una parte de este repositorio y la luz dice hasta dónde llega ho
 | Área | Estado | Qué significa aquí |
 |---|---|---|
 | Software | 🟡 | La aplicación compila sin avisos (tipos, lint, compilación) y el servidor la sirve en la raíz de su dirección; se ha ejecutado en un navegador contra un servidor local. |
-| Pruebas | 🟡 | Pasan 311 pruebas (`npm test`): el cliente de la API con sus errores, las reglas de nombres, contraseñas y direcciones, el menú por rol, la flota por estación, las acciones de un trabajo y los 37 idiomas. |
+| Pruebas | 🟡 | Pasan 313 pruebas (`npm test`): el cliente de la API con sus errores, las reglas de nombres, contraseñas y direcciones, el menú por rol, la flota por estación, las acciones de un trabajo y los 37 idiomas. |
 | Páginas | 🟡 | Resumen, máquinas por estación, trabajos, eventos en vivo, máquinas, usuarios y tokens, servidor, cuenta, preferencias y acerca de están escritos; los trabajos y las máquinas se gestionan con la API real del servidor. Ninguna página la ha probado alguien que no sea el autor. |
 | Servicios comunes | 🟠 | Proyectos, máquinas y trabajos, seguridad e informes de diseño están escritos y probados contra un sustituto del servidor; no contra EH3D-SERVER en marcha ni en la CM5. |
 | Idiomas | 🟡 | 37 idiomas en cada texto, incluidas las negativas del servidor; los textos los lee una prueba, pero solo el inglés y unas pocas frases de los demás las ha leído una persona; los 29 idiomas posteriores a los ocho primeros son traducciones del modelo pendientes de revisión por hablantes nativos. |
@@ -208,7 +208,7 @@ Copia `dist/` a la CM5 (por ejemplo a `/opt/eh3d-studio`), pon `studio_dir = /op
 
 ## 🧪 Pruebas
 
-`npm test` ejecuta 311 pruebas y pasan todas: el cliente de la API (el token, el cuerpo, la consulta, los errores, una red que falla, las rutas con nombres que necesitan escape), las reglas de nombres, contraseñas y direcciones de nodo, lo que está mal en una máquina, el menú de cada rol, las máquinas agrupadas por estación, los recuentos y las acciones de un trabajo, y los 37 idiomas (cada idioma tiene todos los textos, los mismos marcadores en todas partes, las dos variantes solo con claves de la fuente, chino y japonés en su escritura, ninguno escrito de derecha a izquierda). `npm run typecheck` y `npm run lint` también pasan. También lee los ejemplos de respuestas que hacen las pruebas del servidor, de modo que una respuesta que cambia sin que Studio la siga falla aquí. También prueba el tiempo máximo de cada petición (con un reloj que se mueve a mano), el sondeo que espera a la última petición, los textos frente al catálogo de códigos de error del servidor y las reglas de los tokens de los programas.
+`npm test` ejecuta 313 pruebas y pasan todas: el cliente de la API (el token, el cuerpo, la consulta, los errores, una red que falla, las rutas con nombres que necesitan escape), las reglas de nombres, contraseñas y direcciones de nodo, lo que está mal en una máquina, el menú de cada rol, las máquinas agrupadas por estación, los recuentos y las acciones de un trabajo, y los 37 idiomas (cada idioma tiene todos los textos, los mismos marcadores en todas partes, las dos variantes solo con claves de la fuente, chino y japonés en su escritura, ninguno escrito de derecha a izquierda). `npm run typecheck` y `npm run lint` también pasan. También lee los ejemplos de respuestas que hacen las pruebas del servidor, de modo que una respuesta que cambia sin que Studio la siga falla aquí. También prueba el tiempo máximo de cada petición (con un reloj que se mueve a mano), el sondeo que espera a la última petición, los textos frente al catálogo de códigos de error del servidor y las reglas de los tokens de los programas.
 
 ## 🏗️ Compilación y publicación
 

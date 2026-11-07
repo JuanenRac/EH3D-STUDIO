@@ -8,7 +8,9 @@ import {
   gcodeRequest,
   holeRadius,
   holesDone,
+  forgetPrograms,
   jobsCsv,
+  KEPT_COUNT,
   keepProgram,
   keptProgram,
   kindOfFiles,
@@ -204,6 +206,55 @@ describe("a program kept in the browser", () => {
     });
     expect(() => keepProgram("j", "n", "t")).not.toThrow();
     expect(keptProgram("j")).toBeNull();
+    expect(() => forgetPrograms()).not.toThrow();
+  });
+
+  function listed(initial: Record<string, string> = {}) {
+    const data = { ...initial };
+    vi.stubGlobal("window", {
+      localStorage: {
+        get length() {
+          return Object.keys(data).length;
+        },
+        key: (i: number) => Object.keys(data)[i] ?? null,
+        getItem: (k: string) => (k in data ? data[k] : null),
+        setItem: (k: string, v: string) => {
+          data[k] = v;
+        },
+        removeItem: (k: string) => {
+          delete data[k];
+        },
+      },
+    });
+    return data;
+  }
+
+  it("keeps only the newest programs, never the one just written, and leaves other entries of the store alone", () => {
+    vi.useFakeTimers();
+    try {
+      const data = listed({ "eh3d-studio.lang": "es" });
+      for (let i = 0; i < KEPT_COUNT + 3; i++) {
+        vi.setSystemTime(1_000 + i);
+        keepProgram(`j${i}`, "n", "t");
+      }
+      const kept = Object.keys(data).filter((k) => k.startsWith("eh3d.gcode."));
+      expect(kept).toHaveLength(KEPT_COUNT);
+      expect(kept).not.toContain("eh3d.gcode.j0");
+      expect(kept).toContain(`eh3d.gcode.j${KEPT_COUNT + 2}`);
+      expect(data["eh3d-studio.lang"]).toBe("es");
+      // a program written with an older clock than the rest is still the one that stays
+      vi.setSystemTime(1);
+      keepProgram("late", "n", "t");
+      expect(keptProgram("late")).toEqual({ name: "n", text: "t" });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("forgets every kept program and nothing else when the person signs out", () => {
+    const data = listed({ "eh3d-studio.theme": "dark", "eh3d.gcode.a": "{}", "eh3d.gcode.b": "x" });
+    forgetPrograms();
+    expect(data).toEqual({ "eh3d-studio.theme": "dark" });
   });
 });
 

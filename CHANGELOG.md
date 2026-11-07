@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Signing out leaves no G-code in the browser:** the programs kept for a job that may go on are removed from the browser when the person signs out (or the session expires), and only the newest eight are kept while working, so the store no longer fills with the programs of old jobs; two more tests (313).
+
 ## [0.1.2] - Design runs from the pages, the audit, the keys and the security policy, the quotas and the single sign-in
 
 - **Running the checks on the server:** the four buttons of the page Design and factory ask the server to run the design program on a board file of a project of the `pcb` application (`POST /api/v1/apps/pcb/jobs`), wait for the job and read the project again; the report a run keeps (an envelope with the JSON of the program) is shown like any other report. A server that is not set up for it answers `501 design_run_unavailable` and the page says so. A viewer sees the buttons off.

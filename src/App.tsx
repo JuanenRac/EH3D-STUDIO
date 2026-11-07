@@ -6,6 +6,7 @@ import type { AppState, ThemeId } from "./context";
 import { useAttention, useReachable } from "./attention";
 import { browserLang, isLang, text } from "./i18n";
 import type { Lang, TextKey } from "./i18n";
+import { forgetPrograms } from "./jobtools";
 import { parseRoute, pagesFor } from "./model";
 import type { PageId } from "./model";
 import type { Session } from "./types";
@@ -85,6 +86,7 @@ export default function App() {
   const signOutLocally = useCallback(() => {
     api.token = null;
     write("token", null);
+    forgetPrograms();
     setSession(null);
   }, [api]);
 
