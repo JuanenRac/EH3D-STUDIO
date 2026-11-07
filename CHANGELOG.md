@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.1.3] - Login token kept by the tab, switches of the server on the security page, a catalog of refusals and Portuguese of Portugal
+
 - **Portuguese of Portugal without "você":** the label "you" of the sessions is now "tu", and a test reads the whole Portuguese column of the texts for the forms of Brazil.
 - **The security page shows the new switches of the server:** `network_open` (open the server to the network; the server now listens on this computer only by default, so the table of the settings shows `127.0.0.1:18200`) and `update_allow_unsigned` (let the update helper install a release without a signature; a signature is required by default) can be turned over with the confirmation of a looser value, and the table says next to `network_open` that it takes effect when the server restarts (`restart_required` of the policy). Their descriptions are in the 37 languages.
 - **The login token is kept by the tab, and by the browser only if the person asks:** the token now lives in `sessionStorage`, so closing the tab or the browser ends the login and another tab does not see it; the sign-in has a box **Remember me on this computer** (off by default, with a warning not to tick it on a shared computer) that keeps it in `localStorage` instead. The token is in one store only, signing out (or a refusal because the login ended) removes it from both, a token an earlier version left in `localStorage` is still read, and a browser that keeps nothing is not an error (`src/tokenstore.ts`, with its tests). The text of the box is in the 37 languages.
