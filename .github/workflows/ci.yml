@@ -18,7 +18,7 @@ jobs:
   # The checks every repository of the suite runs, held once in EH3D-DOCS as a reusable workflow; the reference is a full
   # commit, so a change there reaches this repository only when this line is moved.
   validate:
-    uses: JuanenRac/EH3D-DOCS/.github/workflows/validate.yml@4610941ddec34b44f54073f0f0acf1ccd1b9ae48
+    uses: JuanenRac/EH3D-DOCS/.github/workflows/validate.yml@57c9da353c0ad0e59905e54ce8c44a31bf8b0ec6
     with:
       python-version: "3.12"
       check-pictures: true
@@ -45,10 +45,10 @@ jobs:
     name: Typecheck, lint, test and build the pages
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "22"
           cache: npm
