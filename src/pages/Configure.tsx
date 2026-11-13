@@ -1,12 +1,13 @@
 /* The group Configure: the machines of the server (each with how to reach it, its stations and its configuration files), the people and the tokens of the programs,
  * and the reference of the settings of the server itself. */
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Field } from "../components/ui";
-import { cfgKeys, tokenDays, tokenState, connectionBody, dollarSwitchShown, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, parseReleaseNotes, splitStep, studioReplaced, toInput, updatable, updatesBusy, validName, validPassword } from "../model";
-import type { MachineProblem } from "../model";
+import { cfgKeys, tokenDays, tokenState, connectionBody, dollarSwitchShown, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, parseReleaseNotes, reloadAfterUpdate, splitStep, studioReplaced, toInput, updatable, updatePhase, updatesBusy, UPDATE_LOST_AFTER_MS, validName, validPassword } from "../model";
+import type { MachineProblem, UpdatePhase } from "../model";
 import { copyId, isWebLink, machineExport, machineImport } from "../jobtools";
 import { copyText } from "../clipboard";
+import { ApiError } from "../api";
 import type { ConnectionKind, MachineInput, Role } from "../types";
 import { CONNECTION_KINDS, ROLES } from "../types";
 import type { TextKey } from "../i18n";
@@ -503,6 +504,17 @@ function Bar({ percent, tone }: { percent: number; tone: string }) {
   );
 }
 
+/** The text of each phase of an update (the ones of the helper and the refusals have texts of their own; a lost server says what the client says when nothing answers). */
+const PHASE_TEXT: Record<Exclude<UpdatePhase, "idle">, TextKey> = {
+  started: "up_asked",
+  applying: "up_state_updating",
+  restarting: "up_waiting",
+  done: "up_state_done",
+  failed: "up_state_error",
+  lost: "err_unreachable",
+  signed_out: "err_unauthorized",
+};
+
 /** The updates of the installed services from the releases of GitHub: what is installed and what is the latest (with what changes in it), a button for each service or for all,
  * and, while the helper works, the steps of the job with a bar each, the bar of the whole, the log, and the earlier jobs. */
 export function UpdatesPage() {
@@ -510,9 +522,39 @@ export function UpdatesPage() {
   const [fast, setFast] = useState(false);
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
   const { data, error, reload } = usePolled(() => api.updates(), fast ? 1 : 10);
-  const busy = data ? updatesBusy(data) : false;
+  // an update is being followed from the moment the helper is seen busy; the server restarting in the middle of it cuts the requests (and, unless the logins are kept
+  // across restarts, ends the login), so the answer that is held is old: what the page says comes from the last answer AND the last failure
+  const followingRef = useRef(false);
+  const failedSince = useRef<number | null>(null);
+  const [lost, setLost] = useState(false);
+  const stale = data ? updatesBusy(data) : false;
+  useEffect(() => {
+    if (stale) followingRef.current = true;
+  }, [stale]);
+  useEffect(() => {
+    if (error == null) {
+      failedSince.current = null;
+      setLost(false);
+      return;
+    }
+    if (failedSince.current === null) failedSince.current = Date.now();
+    if (Date.now() - failedSince.current >= UPDATE_LOST_AFTER_MS) setLost(true);
+  }, [error]);
+  const phase = updatePhase({
+    view: data,
+    failure: error != null && stale ? { status: error instanceof ApiError ? error.status : 0 } : null,
+    lost,
+  });
+  // the helper is not busy any more when the server stopped answering for good or the login ended: the buttons come back
+  const busy = stale && phase !== "lost" && phase !== "signed_out";
   // while the helper works the page asks every second; when the server itself restarts the requests fail for a while and then answer again
   if (busy !== fast) setFast(busy);
+  const reloadNow = reloadAfterUpdate(followingRef.current, data) && phase === "done";
+  useEffect(() => {
+    if (!reloadNow) return;
+    const id = setTimeout(() => window.location.reload(), 3000);
+    return () => clearTimeout(id);
+  }, [reloadNow]);
   const ask = async (what: () => Promise<unknown>) => {
     try {
       await what();
@@ -566,6 +608,32 @@ export function UpdatesPage() {
         }
       >
         <p className="hint">{t("up_help")}</p>
+        {phase !== "idle" && (
+          <p className={`up-phase ${phase}`} role="status" data-phase={phase}>
+            <Badge tone={phase === "failed" || phase === "lost" ? "bad" : phase === "done" ? "ok" : "run"}>{t(PHASE_TEXT[phase])}</Badge>
+            {phase === "lost" && (
+              <>
+                {" "}
+                <button onClick={() => window.location.reload()}>{t("up_reload")}</button>
+              </>
+            )}
+            {phase === "signed_out" && (
+              <>
+                {" "}
+                <span className="hint">{t("up_waiting")}</span>{" "}
+                <button className="primary" onClick={() => err(error)}>
+                  {t("login_signin")}
+                </button>
+              </>
+            )}
+            {reloadNow && (
+              <>
+                {" "}
+                <span className="hint">{t("up_reload_help")}</span>
+              </>
+            )}
+          </p>
+        )}
         <table className="table">
           <thead>
             <tr>

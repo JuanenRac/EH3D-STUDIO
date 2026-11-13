@@ -319,6 +319,42 @@ export function studioReplaced(view: { state: string; steps?: { id: string; stat
   return view.state === "done" && (view.steps ?? []).some((s) => s.id === "studio.install" && s.state === "done");
 }
 
+/** Where an update stands for the person who follows it. The helper writes `idle|checking|updating|done|error`; the rest comes from what the page itself sees. */
+export type UpdatePhase = "idle" | "started" | "applying" | "restarting" | "done" | "failed" | "lost" | "signed_out";
+
+/** How long the page keeps asking, after the server stopped answering in the middle of an update, before it says the server did not come back. */
+export const UPDATE_LOST_AFTER_MS = 180_000;
+
+/**
+ * The phase of an update from the last answer (`view`, null when none came yet) and the last failed request (`failure`, null when the last request worked).
+ * Only call it with a failure while an update is being followed: a failure with no update going is not the update's business.
+ * A refusal 401 means the server restarted and the login ended with it (the logins live in its memory unless `persist_sessions` is on): the update goes on without us.
+ * Any other failure is the restart of the server until `lost` (the page has been asking for UPDATE_LOST_AFTER_MS with no answer).
+ */
+export function updatePhase(input: {
+  view: { pending: boolean; state: string; steps?: { id: string; state: string }[] } | null;
+  failure: { status: number } | null;
+  lost?: boolean;
+}): UpdatePhase {
+  const { view, failure } = input;
+  if (failure) {
+    if (failure.status === 401) return "signed_out";
+    return input.lost ? "lost" : "restarting";
+  }
+  if (!view) return "idle";
+  if (view.state === "error") return "failed";
+  if (view.state === "done") return "done";
+  if (view.state === "updating" || view.state === "checking") {
+    return (view.steps ?? []).some((s) => s.id.endsWith(".restart") && s.state === "running") ? "restarting" : "applying";
+  }
+  return view.pending ? "started" : "idle";
+}
+
+/** The page loads itself again, once, when the update it was following replaced the pages of Studio. A page opened after the update finished does not, so it cannot loop. */
+export function reloadAfterUpdate(following: boolean, view: { state: string; steps?: { id: string; state: string }[] } | null): boolean {
+  return following && view != null && studioReplaced(view);
+}
+
 // ---- the fleet and the jobs
 
 export interface StationGroup {
