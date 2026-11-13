@@ -673,5 +673,6 @@
 "login_remember_hint": "Desactivat: la sessió acaba en tancar la pestanya. Activat: aquest navegador la conserva fins que tanquis la sessió. No ho activis en un ordinador compartit.",
 "srv_network_open": "Obre el servidor a la xarxa: escolta en totes les adreces de l'ordinador i no només en aquest ordinador (per defecte desactivat). Es llegeix quan s'inicia el servidor.",
 "srv_update_allow_unsigned": "Permet que l'ajudant d'actualitzacions instal·li una versió sense signatura quan el seu hash és correcte (per defecte desactivat: cal la signatura d'un signant permès).",
+"srv_update_keep_logins": "Manté les sessions durant el reinici que fa una actualització del servidor, només uns minuts (per defecte apagat: el reinici tanca totes les sessions).",
 "sec_restart_needed": "Té efecte quan el servidor es reinicia."
 }

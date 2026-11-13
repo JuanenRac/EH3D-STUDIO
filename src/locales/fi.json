@@ -673,5 +673,6 @@
 "login_remember_hint": "Pois: kirjautuminen päättyy, kun suljet välilehden. Päällä: tämä selain säilyttää sen, kunnes kirjaudut ulos. Älä valitse tätä jaetulla tietokoneella.",
 "srv_network_open": "Avaa palvelimen verkkoon: se kuuntelee kaikissa tietokoneen osoitteissa eikä vain tällä tietokoneella (oletuksena pois). Luetaan, kun palvelin käynnistyy.",
 "srv_update_allow_unsigned": "Antaa päivitysapurin asentaa julkaisun ilman allekirjoitusta, kun sen tiiviste on oikea (oletuksena pois: sallitun allekirjoittajan allekirjoitus vaaditaan).",
+"srv_update_keep_logins": "Säilyttää kirjautumiset palvelimen päivityksen aiheuttaman uudelleenkäynnistyksen yli vain muutaman minuutin ajan (oletuksena pois: uudelleenkäynnistys kirjaa kaikki ulos).",
 "sec_restart_needed": "Tulee voimaan, kun palvelin käynnistyy uudelleen."
 }

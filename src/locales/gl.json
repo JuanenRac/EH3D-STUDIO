@@ -673,5 +673,6 @@
 "login_remember_hint": "Desactivado: a sesión remata ao pechar a lapela. Activado: este navegador consérvaa ata que peches a sesión. Non o actives nun ordenador compartido.",
 "srv_network_open": "Abre o servidor á rede: escoita en todos os enderezos do ordenador e non só neste ordenador (por defecto desactivado). Lese cando se inicia o servidor.",
 "srv_update_allow_unsigned": "Permite que o axudante de actualizacións instale unha versión sen sinatura cando o seu hash é correcto (por defecto desactivado: esíxese a sinatura dun asinante permitido).",
+"srv_update_keep_logins": "Mantén as sesións durante o reinicio que fai unha actualización do servidor, só uns minutos (por defecto apagado: o reinicio pecha todas as sesións).",
 "sec_restart_needed": "Aplícase cando o servidor se reinicia."
 }

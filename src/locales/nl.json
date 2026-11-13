@@ -673,5 +673,6 @@
 "login_remember_hint": "Uit: de aanmelding eindigt als je het tabblad sluit. Aan: deze browser houdt hem vast tot je afmeldt. Zet dit niet aan op een gedeelde computer.",
 "srv_network_open": "Opent de server voor het netwerk: hij luistert op alle adressen van de computer en niet alleen op deze computer (standaard uit). Wordt gelezen als de server start.",
 "srv_update_allow_unsigned": "Laat de updatehulp een release zonder handtekening installeren als de hash klopt (standaard uit: de handtekening van een toegestane ondertekenaar is vereist).",
+"srv_update_keep_logins": "Bewaart de aanmeldingen tijdens de herstart die een update van de server veroorzaakt, slechts enkele minuten (standaard uit: de herstart meldt iedereen af).",
 "sec_restart_needed": "Werkt zodra de server opnieuw start."
 }

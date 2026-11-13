@@ -673,5 +673,6 @@
 "login_remember_hint": "Izklopljeno: prijava se konča z zaprtjem zavihka. Vklopljeno: ta brskalnik jo hrani, dokler se ne odjavite. Ne vklopite na skupnem računalniku.",
 "srv_network_open": "Odpre strežnik omrežju: posluša na vseh naslovih računalnika, ne le na tem računalniku (privzeto izklopljeno). Prebere se ob zagonu strežnika.",
 "srv_update_allow_unsigned": "Pomočniku za posodobitve dovoli namestiti izdajo brez podpisa, ko je njen zgoščenec pravilen (privzeto izklopljeno: zahtevan je podpis dovoljenega podpisnika).",
+"srv_update_keep_logins": "Ohrani prijave med ponovnim zagonom, ki ga sproži posodobitev strežnika, le nekaj minut (privzeto izklopljeno: ponovni zagon vse odjavi).",
 "sec_restart_needed": "Začne veljati ob ponovnem zagonu strežnika."
 }

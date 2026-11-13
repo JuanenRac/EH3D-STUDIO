@@ -673,5 +673,6 @@
 "login_remember_hint": "Oprit: autentificarea se termină când închizi fila. Pornit: acest browser o păstrează până te deconectezi. Nu o bifa pe un calculator partajat.",
 "srv_network_open": "Deschide serverul către rețea: ascultă pe toate adresele calculatorului, nu doar pe acest calculator (implicit oprit). Se citește la pornirea serverului.",
 "srv_update_allow_unsigned": "Permite asistentului de actualizări să instaleze o versiune fără semnătură când hash-ul ei este corect (implicit oprit: se cere semnătura unui semnatar permis).",
+"srv_update_keep_logins": "Păstrează autentificările în timpul repornirii provocate de o actualizare a serverului, doar câteva minute (implicit dezactivat: repornirea deconectează pe toată lumea).",
 "sec_restart_needed": "Intră în vigoare la repornirea serverului."
 }

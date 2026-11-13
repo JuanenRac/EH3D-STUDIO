@@ -673,5 +673,6 @@
 "login_remember_hint": "As: críochnaíonn an logáil isteach nuair a dhúnann tú an cluaisín. Air: coinníonn an brabhsálaí seo í go dtí go logálfaidh tú amach. Ná roghnaigh é ar ríomhaire comhroinnte.",
 "srv_network_open": "Osclaíonn sé an freastalaí don líonra: éisteann sé ar gach seoladh den ríomhaire seachas ar an ríomhaire seo amháin (as de réir réamhshocraithe). Léitear é nuair a thosaíonn an freastalaí.",
 "srv_update_allow_unsigned": "Ligeann sé don chúntóir nuashonruithe eisiúint gan síniú a shuiteáil nuair atá a hash ceart (as de réir réamhshocraithe: tá síniú ó shínitheoir ceadaithe riachtanach).",
+"srv_update_keep_logins": "Coimeádann sé na logálacha isteach le linn an athosclaithe a thagann ó nuashonrú an fhreastalaí, ar feadh cúpla nóiméad amháin (as de réir réamhshocraithe: logálann an t-athosclú gach duine amach).",
 "sec_restart_needed": "Tagann sé i bhfeidhm nuair a atosaíonn an freastalaí."
 }

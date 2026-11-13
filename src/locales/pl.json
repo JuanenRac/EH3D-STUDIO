@@ -673,5 +673,6 @@
 "login_remember_hint": "Wyłączone: logowanie kończy się po zamknięciu karty. Włączone: ta przeglądarka zachowuje je do wylogowania. Nie zaznaczaj na współdzielonym komputerze.",
 "srv_network_open": "Otwiera serwer na sieć: nasłuchuje na wszystkich adresach komputera, a nie tylko na tym komputerze (domyślnie wyłączone). Odczytywane przy uruchomieniu serwera.",
 "srv_update_allow_unsigned": "Pozwala pomocnikowi aktualizacji zainstalować wydanie bez podpisu, gdy jego skrót jest poprawny (domyślnie wyłączone: wymagany jest podpis dozwolonego podpisującego).",
+"srv_update_keep_logins": "Zachowuje logowania podczas restartu wywołanego aktualizacją serwera, tylko na kilka minut (domyślnie wyłączone: restart wylogowuje wszystkich).",
 "sec_restart_needed": "Działa po ponownym uruchomieniu serwera."
 }

@@ -419,6 +419,7 @@ export const SERVER_SETTINGS: { key: string; value: string; text: TextKey }[] = 
   { key: "studio_dir", value: "-", text: "srv_studio_dir" },
   { key: "updates_dir", value: "-", text: "srv_updates_dir" },
   { key: "update_allow_unsigned", value: "false", text: "srv_update_allow_unsigned" },
+  { key: "update_keep_logins", value: "false", text: "srv_update_keep_logins" },
   { key: "gcode_finish_wait_s", value: "900", text: "srv_gcode_finish_wait_s" },
   { key: "exit_on_panic", value: "true", text: "srv_exit_on_panic" },
   { key: "trust_forwarded_for", value: "false", text: "srv_trust_forwarded_for" },

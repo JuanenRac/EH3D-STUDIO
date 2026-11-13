@@ -673,5 +673,6 @@
 "login_remember_hint": "Av: inloggningen upphör när du stänger fliken. På: den här webbläsaren behåller den tills du loggar ut. Slå inte på det på en delad dator.",
 "srv_network_open": "Öppnar servern mot nätverket: den lyssnar på alla datorns adresser och inte bara på den här datorn (som standard av). Läses när servern startar.",
 "srv_update_allow_unsigned": "Låter uppdateringshjälpen installera en utgåva utan signatur när dess hash är rätt (som standard av: en signatur från en tillåten undertecknare krävs).",
+"srv_update_keep_logins": "Behåller inloggningarna genom den omstart som en uppdatering av servern utlöser, bara i några minuter (som standard av: omstarten loggar ut alla).",
 "sec_restart_needed": "Gäller när servern startas om."
 }
