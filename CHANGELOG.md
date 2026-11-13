@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A pull request must say what it changes:** the validation runs `tools/changelog_pr_check.py` on a pull request (it fails when the CHANGELOG has no new line under [Unreleased]; the label `no-changelog` skips it), the same check as the other repositories of the suite.
 - **The CI keeps its actions up to date and does not pile up runs:** a `dependabot.yml` groups the updates of the GitHub Actions in one monthly request, a new push to a branch cancels the run of the older one that is still going, and the Rust jobs have a time limit, so a stuck job cannot hold a runner for hours.
 ## [0.1.3] - Login token kept by the tab, switches of the server on the security page, a catalog of refusals and Portuguese of Portugal
 
