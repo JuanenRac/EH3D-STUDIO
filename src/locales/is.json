@@ -673,5 +673,6 @@
 "login_remember_hint": "Slökkt: innskráningin endar þegar flipanum er lokað. Kveikt: þessi vafri geymir hana þar til þú skráir þig út. Ekki velja þetta á sameiginlegri tölvu.",
 "srv_network_open": "Opnar netþjóninn fyrir netinu: hann hlustar á öllum vistföngum tölvunnar en ekki aðeins á þessari tölvu (sjálfgefið slökkt). Les þegar netþjónninn ræsist.",
 "srv_update_allow_unsigned": "Leyfir uppfærsluhjálparanum að setja upp útgáfu án undirskriftar þegar tætigildi hennar er rétt (sjálfgefið slökkt: krafist er undirskriftar leyfðs undirritara).",
+"srv_update_keep_logins": "Heldur innskráningum í gegnum endurræsinguna sem uppfærsla netþjónsins veldur, aðeins í nokkrar mínútur (sjálfgefið slökkt: endurræsingin skráir alla út).",
 "sec_restart_needed": "Tekur gildi þegar netþjónninn er endurræstur."
 }

@@ -673,5 +673,6 @@
 "login_remember_hint": "Fra: login slutter, når du lukker fanen. Til: denne browser beholder det, indtil du logger ud. Slå det ikke til på en delt computer.",
 "srv_network_open": "Åbner serveren mod netværket: den lytter på alle computerens adresser og ikke kun på denne computer (som standard fra). Læses, når serveren starter.",
 "srv_update_allow_unsigned": "Lader opdateringshjælperen installere en udgivelse uden signatur, når dens hash er rigtig (som standard fra: en signatur fra en tilladt underskriver kræves).",
+"srv_update_keep_logins": "Bevarer logins under den genstart, som en opdatering af serveren udløser, kun i nogle minutter (som standard slået fra: genstarten logger alle ud).",
 "sec_restart_needed": "Træder i kraft, når serveren genstarter."
 }

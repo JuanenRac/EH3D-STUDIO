@@ -673,5 +673,6 @@
 "login_remember_hint": "Isključeno: prijava završava kad zatvorite karticu. Uključeno: ovaj preglednik je čuva dok se ne odjavite. Ne uključujte na zajedničkom računalu.",
 "srv_network_open": "Otvara poslužitelj prema mreži: sluša na svim adresama računala, a ne samo na ovom računalu (zadano isključeno). Čita se pri pokretanju poslužitelja.",
 "srv_update_allow_unsigned": "Dopušta pomoćniku za ažuriranje da instalira izdanje bez potpisa kada je njegov hash ispravan (zadano isključeno: traži se potpis dopuštenog potpisnika).",
+"srv_update_keep_logins": "Zadržava prijave tijekom ponovnog pokretanja koje uzrokuje ažuriranje poslužitelja, samo nekoliko minuta (zadano isključeno: ponovno pokretanje odjavljuje sve).",
 "sec_restart_needed": "Stupa na snagu nakon ponovnog pokretanja poslužitelja."
 }

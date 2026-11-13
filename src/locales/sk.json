@@ -673,5 +673,6 @@
 "login_remember_hint": "Vypnuté: prihlásenie skončí zatvorením karty. Zapnuté: tento prehliadač si ho pamätá, kým sa neodhlásite. Nezapínajte na zdieľanom počítači.",
 "srv_network_open": "Otvorí server sieti: počúva na všetkých adresách počítača, nielen na tomto počítači (predvolene vypnuté). Číta sa pri spustení servera.",
 "srv_update_allow_unsigned": "Dovolí pomocníkovi aktualizácií nainštalovať vydanie bez podpisu, keď je jeho hash správny (predvolene vypnuté: vyžaduje sa podpis povoleného podpisovateľa).",
+"srv_update_keep_logins": "Zachová prihlásenia počas reštartu, ktorý spôsobí aktualizácia servera, iba na niekoľko minút (predvolene vypnuté: reštart všetkých odhlási).",
 "sec_restart_needed": "Prejaví sa po reštarte servera."
 }

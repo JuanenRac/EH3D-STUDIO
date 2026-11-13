@@ -673,5 +673,6 @@
 "login_remember_hint": "Desaktibatuta: saioa fitxa ixten duzunean amaitzen da. Aktibatuta: nabigatzaile honek gordetzen du saioa itxi arte. Ez aktibatu ordenagailu partekatu batean.",
 "srv_network_open": "Zerbitzaria sarera irekitzen du: ordenagailuaren helbide guztietan entzuten du, ez soilik ordenagailu honetan (lehenespenez desaktibatuta). Zerbitzaria abiatzean irakurtzen da.",
 "srv_update_allow_unsigned": "Eguneratze-laguntzaileari sinadurarik gabeko bertsio bat instalatzen uzten dio, haren hash-a zuzena denean (lehenespenez desaktibatuta: baimendutako sinatzaile baten sinadura behar da).",
+"srv_update_keep_logins": "Zerbitzariaren eguneratzeak eragindako berrabiaraztean saioak gordetzen ditu, minutu batzuetan bakarrik (lehenespenez itzalita: berrabiarazteak guztiak saiotik ateratzen ditu).",
 "sec_restart_needed": "Zerbitzaria berrabiaraztean izango du eragina."
 }

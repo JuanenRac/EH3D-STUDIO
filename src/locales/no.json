@@ -673,5 +673,6 @@
 "login_remember_hint": "Av: påloggingen avsluttes når du lukker fanen. På: denne nettleseren beholder den til du logger av. Ikke slå det på på en delt datamaskin.",
 "srv_network_open": "Åpner serveren mot nettverket: den lytter på alle adressene til datamaskinen og ikke bare på denne datamaskinen (som standard av). Leses når serveren starter.",
 "srv_update_allow_unsigned": "Lar oppdateringshjelperen installere en utgivelse uten signatur når hashen er riktig (som standard av: signaturen til en tillatt undertegner kreves).",
+"srv_update_keep_logins": "Beholder påloggingene gjennom omstarten som en oppdatering av serveren utløser, bare i noen minutter (som standard av: omstarten logger alle ut).",
 "sec_restart_needed": "Trer i kraft når serveren startes på nytt."
 }

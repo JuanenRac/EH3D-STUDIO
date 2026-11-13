@@ -108,7 +108,7 @@ describe("the token of the login", () => {
 });
 
 describe("the texts of the sign-in and of the new switches", () => {
-  const KEYS = ["login_remember", "login_remember_hint", "srv_network_open", "srv_update_allow_unsigned", "sec_restart_needed"] as const;
+  const KEYS = ["login_remember", "login_remember_hint", "srv_network_open", "srv_update_allow_unsigned", "srv_update_keep_logins", "sec_restart_needed"] as const;
 
   it("exist in the 37 languages and warn about a shared computer", () => {
     for (const k of KEYS) {
@@ -123,6 +123,7 @@ describe("the texts of the sign-in and of the new switches", () => {
     expect(by.listen.value).toBe("127.0.0.1:18200");
     expect(by.network_open).toMatchObject({ value: "false", text: "srv_network_open" });
     expect(by.update_allow_unsigned).toMatchObject({ value: "false", text: "srv_update_allow_unsigned" });
+    expect(by.update_keep_logins).toMatchObject({ value: "false", text: "srv_update_keep_logins" });
   });
 
   it("make the new flags editable from the security page only when the server says so", () => {

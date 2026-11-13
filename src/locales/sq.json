@@ -673,5 +673,6 @@
 "login_remember_hint": "Çaktivizuar: hyrja mbaron kur mbyll skedën. Aktivizuar: ky shfletues e ruan deri sa të dalësh. Mos e zgjidh në një kompjuter të përbashkët.",
 "srv_network_open": "E hap serverin ndaj rrjetit: dëgjon në të gjitha adresat e kompjuterit dhe jo vetëm në këtë kompjuter (si parazgjedhje i çaktivizuar). Lexohet kur nis serveri.",
 "srv_update_allow_unsigned": "I lejon ndihmësit të përditësimeve të instalojë një botim pa nënshkrim kur hashi i tij është i saktë (si parazgjedhje i çaktivizuar: kërkohet nënshkrimi i një nënshkruesi të lejuar).",
+"srv_update_keep_logins": "Ruan hyrjet gjatë rinisjes që shkakton përditësimi i serverit, vetëm për disa minuta (e çaktivizuar si parazgjedhje: rinisja i nxjerr të gjithë jashtë).",
 "sec_restart_needed": "Hyn në fuqi kur serveri rinis."
 }

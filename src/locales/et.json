@@ -673,5 +673,6 @@
 "login_remember_hint": "Väljas: sisselogimine lõpeb, kui sulgete vahekaardi. Sees: see brauser hoiab seda, kuni välja logite. Ärge lülitage seda sisse jagatud arvutis.",
 "srv_network_open": "Avab serveri võrgule: see kuulab kõigil arvuti aadressidel, mitte ainult sellel arvutil (vaikimisi väljas). Loetakse serveri käivitamisel.",
 "srv_update_allow_unsigned": "Lubab värskendusabilisel paigaldada allkirjata väljalaske, kui selle räsi on õige (vaikimisi väljas: nõutakse lubatud allkirjastaja allkirja).",
+"srv_update_keep_logins": "Säilitab sisselogimised serveri uuendamisega kaasneva taaskäivituse ajal vaid mõne minuti (vaikimisi väljas: taaskäivitus logib kõik välja).",
 "sec_restart_needed": "Jõustub serveri taaskäivitamisel."
 }

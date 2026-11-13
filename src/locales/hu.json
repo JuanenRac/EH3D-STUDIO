@@ -673,5 +673,6 @@
 "login_remember_hint": "Ki: a bejelentkezés a lap bezárásakor véget ér. Be: ez a böngésző addig megőrzi, amíg ki nem jelentkezik. Ne kapcsolja be megosztott számítógépen.",
 "srv_network_open": "Megnyitja a kiszolgálót a hálózat felé: a számítógép minden címén figyel, nem csak ezen a számítógépen (alapértelmezés szerint ki). A kiszolgáló indulásakor olvasódik be.",
 "srv_update_allow_unsigned": "Engedi, hogy a frissítési segéd aláírás nélküli kiadást telepítsen, ha a hash-e helyes (alapértelmezés szerint ki: engedélyezett aláíró aláírása szükséges).",
+"srv_update_keep_logins": "Megőrzi a bejelentkezéseket a kiszolgáló frissítése okozta újraindítás alatt, csak néhány percig (alapértelmezés szerint kikapcsolva: az újraindítás mindenkit kijelentkeztet).",
 "sec_restart_needed": "A kiszolgáló újraindításakor lép érvénybe."
 }

@@ -673,5 +673,6 @@
 "login_remember_hint": "Išjungta: prisijungimas baigiasi uždarius skirtuką. Įjungta: ši naršyklė jį išsaugo, kol atsijungsite. Nejunkite bendrame kompiuteryje.",
 "srv_network_open": "Atveria serverį tinklui: jis klausosi visų kompiuterio adresų, o ne tik šio kompiuterio (pagal numatytuosius nustatymus išjungta). Nuskaitoma paleidžiant serverį.",
 "srv_update_allow_unsigned": "Leidžia naujinimų padėjėjui įdiegti leidimą be parašo, kai jo maiša teisinga (pagal numatytuosius nustatymus išjungta: reikalingas leidžiamo pasirašytojo parašas).",
+"srv_update_keep_logins": "Išsaugo prisijungimus per perkrovimą, kurį sukelia serverio atnaujinimas, tik kelias minutes (pagal numatymą išjungta: perkrovimas visus atjungia).",
 "sec_restart_needed": "Įsigalioja iš naujo paleidus serverį."
 }
