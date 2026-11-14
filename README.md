@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
   <img src="https://img.shields.io/badge/Stack-React%20%2B%20TypeScript-00599C.svg" alt="React and TypeScript">
   <img src="https://img.shields.io/badge/Languages-37-00E5FF.svg" alt="Languages">
-  <img src="https://img.shields.io/badge/Version-0.1.3-0f6cbd.svg" alt="Version">
+  <img src="https://img.shields.io/badge/Version-0.1.4-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-4CAF50.svg" alt="Maturity">
 </p>
 
@@ -28,7 +28,7 @@
 
 | | |
 |---|---|
-| Version | `0.1.3` |
+| Version | `0.1.4` |
 | Maturity | Functional |
 | Tests | 323 tests (`npm test`) |
 | Stack | React 19, TypeScript, Vite |

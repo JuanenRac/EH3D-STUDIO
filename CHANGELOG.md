@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.1.4] - Security page for kept logins and an update page that no longer sticks
+
 - **The shared validation tools are updated:** the validator also runs the workflow and lessons checks of the suite with their latest rules, including a check to run before every push.
 - **The CI validation checks the workflows and the lessons of past CI failures against a baseline:** `tools/workflow_hygiene.py` and `tools/lessons_lint.py` (copies of the shared tools) run in the validation, and only findings that are not in `tools/workflow_hygiene_baseline.json` and `tools/lessons_lint_baseline.json` fail it, so what exists today stays as it is and a new one is caught. `python tools/workflow_hygiene.py --root . --detail` and `python tools/lessons_lint.py --repo .` list the findings.
 - **The security page describes the switch that keeps the logins through the restart of an update of the server:** `update_keep_logins` (off by default, edited like the other switches with the confirmation of a looser value) is listed in the settings of the server with its text in the 37 languages, so the page of the updates can follow an update of the server to its end without the person signing in again.
@@ -11,6 +13,7 @@ All notable changes to this project are documented here.
 - **The validation of the CI is the reusable one of the documentation hub:** the job `validate` calls `validate.yml` of EH3D-DOCS (pinned by commit) and the check of the CHANGELOG is a job of its own.
 - **A pull request must say what it changes:** the validation runs `tools/changelog_pr_check.py` on a pull request (it fails when the CHANGELOG has no new line under [Unreleased]; the label `no-changelog` skips it), the same check as the other repositories of the suite.
 - **The CI keeps its actions up to date and does not pile up runs:** a `dependabot.yml` groups the updates of the GitHub Actions in one monthly request, a new push to a branch cancels the run of the older one that is still going, and the Rust jobs have a time limit, so a stuck job cannot hold a runner for hours.
+
 ## [0.1.3] - Login token kept by the tab, switches of the server on the security page, a catalog of refusals and Portuguese of Portugal
 
 - **Portuguese of Portugal without "você":** the label "you" of the sessions is now "tu", and a test reads the whole Portuguese column of the texts for the forms of Brazil.
