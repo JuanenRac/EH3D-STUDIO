@@ -14,7 +14,7 @@
   ],
   "deployment_target": "cm5",
   "maturity": "functional",
-  "evidence": "host-test",
+  "evidence": "simulator",
   "family": "CNC Workflow Tools",
   "parent": null,
   "build": "npm ci && npm run typecheck && npm run lint && npm test && npm run build",
