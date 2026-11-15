@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **69 more tests and a measure of the coverage:** the parts every page is built from (cards, fields, progress bars, the buttons that ask once more), the drawing of a job, the summary before a job starts and the button that starts it, the sign-in screen (with the set-up of the first administrator), the preview of a file of a project with its versions, and the small helpers of the pages are tested in a small DOM; `npm run test:coverage` measures how much of the code the tests run and the CI runs it.
+
 ## [0.1.4] - Security page for kept logins and an update page that no longer sticks
 
 - **The shared validation tools are updated:** the validator also runs the workflow and lessons checks of the suite with their latest rules, including a check to run before every push.

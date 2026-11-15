@@ -26,5 +26,14 @@ export default defineConfig({
     strictPort: true,
     proxy: { "/api": { target: server, changeOrigin: true, ws: true } },
   },
-  test: { environment: "node" },
+  test: {
+    environment: "node",
+    // `npm run test:coverage` measures the code the pages and the services are made of; the tables of the languages, the entry point and the helpers of the tests are left out
+    coverage: {
+      provider: "v8",
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/**/*.test.{ts,tsx}", "src/services/testkit.tsx", "src/locales/**", "src/main.tsx", "src/examples/**"],
+      reporter: ["text", "json-summary"],
+    },
+  },
 });
