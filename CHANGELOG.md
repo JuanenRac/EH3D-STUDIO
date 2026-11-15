@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.1.5] - The pages archive is attached to the release again, a simulated server for the client and more tests
+
+- **The release file is attached again:** version 0.1.4 was published without `eh3d-studio-0.1.4.tar.gz` (and its `.sha256`), so the update of Studio from the server said that the release had no such file. This version is built and attached from its own commit by the release workflow, with the names the update helper of EH3D-SERVER looks for (`eh3d-studio-<version>.tar.gz` and its `.sha256`).
+
 - **A simulated server for the client (`src/simserver.ts`):** a transport that answers like EH3D-SERVER from the examples of its answers and fails on purpose when told to: the server down, a refusal (503), a page that is not JSON, a server that accepts the request and says nothing, a login that expired and a link that fails by chance from a seed. Nine new tests (441 in all) check that each failure reaches the page as its error, that a request that hangs ends as a timeout and the polling does not pile requests up, that a new login recovers an expired session and that the same seed fails the same requests. It has only run against this simulation: no real server or machine was used.
 
 - **33 more tests of the shell of the application and a floor of coverage:** the watch of the jobs that wait for the operator (the title, the bell, the notification, the clock of the looks), the check that the server answers, the copy to the clipboard and the places the login token is kept are tested with a clock that the test moves by hand; the CI stops when the tests cover less code than today (the `thresholds` of the coverage in `vite.config.ts`).
