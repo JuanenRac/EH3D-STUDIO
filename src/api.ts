@@ -23,11 +23,15 @@ export type Timeouts = { normal: number; health: number; long: number; stop: num
 /** `stop` is the time the stop button waits for an answer before it tries once more: a stop that hangs for the time of an ordinary request is a stop that did not happen. */
 export const DEFAULT_TIMEOUTS: Timeouts = { normal: 15000, health: 5000, long: 60000, stop: 3000 };
 
+/** How long a stop refused by an ended login stays valid to be sent again after the next login. */
+export const STOP_RESEND_WINDOW_MS = 120_000;
+
 export class Api {
   /** The login token of this person (kept by the application, never by this class). */
   token: string | null;
   private fetcher: Fetcher;
   private timeouts: Timeouts;
+  private refusedStop: { machine: string; at: number } | null = null;
 
   constructor(token: string | null = null, fetcher?: Fetcher, timeouts: Partial<Timeouts> = {}) {
     this.token = token;
@@ -90,6 +94,7 @@ export class Api {
   login = async (name: string, password: string) => {
     const r = await this.request<{ token: string; name: string; role: Role; expires_s: number; app?: string; session_id?: string }>("POST", "/auth/login", { name, password, app: LOGIN_APP });
     this.token = r.token;
+    await this.resendRefusedStop();
     return r;
   };
   logout = async () => {
@@ -176,7 +181,20 @@ export class Api {
     } catch (e) {
       // The stop is idempotent in the server (with no job to end it answers stopped: false), so a stop that got no answer or never reached the server is sent once more.
       if (e instanceof ApiError && e.status === 0 && (e.code === "timeout" || e.code === "unreachable")) return send();
+      // A stop refused because the login had ended is kept in memory only, for a short time, and sent again after the next login.
+      if (e instanceof ApiError && e.status === 401) this.refusedStop = { machine, at: Date.now() };
       throw e;
+    }
+  };
+  /** Sends again the stop that the ended login refused, once, and only if it was refused a moment ago (a later job is never stopped by an old order). */
+  private resendRefusedStop = async (): Promise<void> => {
+    const pending = this.refusedStop;
+    this.refusedStop = null;
+    if (!pending || Date.now() - pending.at > STOP_RESEND_WINDOW_MS) return;
+    try {
+      await this.stopMachine(pending.machine);
+    } catch {
+      // The person is already in; a stop that fails again is shown by the next action, not by the login.
     }
   };
 

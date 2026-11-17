@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Api, ApiError, DEFAULT_TIMEOUTS } from "./api";
+import { Api, ApiError, DEFAULT_TIMEOUTS, STOP_RESEND_WINDOW_MS } from "./api";
 import { CORE_LANGS, errorText, LANGS, text } from "./i18n";
 import { skipWhileBusy } from "./polling";
 
@@ -134,5 +134,52 @@ describe("the stop button", () => {
     });
     await expect(api.stopMachine("m1")).rejects.toMatchObject({ status: 404 });
     expect(calls).toBe(1);
+  });
+});
+
+describe("a stop refused by an ended login", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  const login = new Response(JSON.stringify({ token: "new", name: "n", role: "operator", expires_s: 60 }), { status: 200 });
+
+  function server(log: string[]) {
+    let ended = true;
+    return new Api("old", async (url, init) => {
+      const path = String(url);
+      log.push(`${init?.method} ${path}`);
+      if (path.endsWith("/auth/login")) { ended = false; return login.clone(); }
+      return ended ? new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 }) : new Response(JSON.stringify({ ok: true, stopped: true, job: null }), { status: 200 });
+    });
+  }
+
+  it("is sent again once after the next login", async () => {
+    const log: string[] = [];
+    const api = server(log);
+    await expect(api.stopMachine("m1")).rejects.toMatchObject({ status: 401 });
+    await api.login("n", "p");
+    expect(log.filter((l) => l.endsWith("/machines/m1/stop"))).toHaveLength(2);
+    await api.login("n", "p");
+    expect(log.filter((l) => l.endsWith("/machines/m1/stop"))).toHaveLength(2);
+  });
+
+  it("is not sent after the window, so an old order never stops a later job", async () => {
+    const log: string[] = [];
+    const api = server(log);
+    await expect(api.stopMachine("m1")).rejects.toMatchObject({ status: 401 });
+    await vi.advanceTimersByTimeAsync(STOP_RESEND_WINDOW_MS + 1);
+    await api.login("n", "p");
+    expect(log.filter((l) => l.endsWith("/machines/m1/stop"))).toHaveLength(1);
+  });
+
+  it("is not kept when the server refused it for another reason", async () => {
+    const log: string[] = [];
+    const api = new Api("t", async (url, init) => {
+      log.push(`${init?.method} ${String(url)}`);
+      return String(url).endsWith("/auth/login") ? login.clone() : new Response(JSON.stringify({ error: "not_found" }), { status: 404 });
+    });
+    await expect(api.stopMachine("m1")).rejects.toMatchObject({ status: 404 });
+    await api.login("n", "p");
+    expect(log.filter((l) => l.endsWith("/stop"))).toHaveLength(1);
   });
 });
