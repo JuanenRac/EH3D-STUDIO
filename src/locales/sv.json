@@ -455,6 +455,7 @@
 "warn_far": "Arbetet börjar {d} mm från bordets hörn: kontrollera förskjutningen och enheten",
 "warn_scale": "Maskinfilen sträcker arbetet (skala {x} x {y}, inte 1)",
 "warn_out_of_course": "Planen tar axel {axis} {mm} mm förbi dess slag",
+"warn_units_supposed": "Filen anger ingen enhet; talen läses som tusendels tum",
 "err_outside_course": "Planens exakta steg tar en axel förbi dess slag. Flytta arbetet på bordet, eller ange dry_run = warn i maskinens finjustering om du vet vad du gör.",
 "err_artifact_in_use": "En uppgift arbetar fortfarande med den här artefakten eller skapade den: ta bort uppgiften först.",
 "err_bad_artifact": "Artefaktens beskrivning är ogiltig (namn, format, resultattyp, indata eller parametrar).",

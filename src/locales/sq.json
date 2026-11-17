@@ -455,6 +455,7 @@
 "warn_far": "Puna fillon {d} mm nga këndi i tavolinës: kontrolloni zhvendosjen dhe njësinë",
 "warn_scale": "Skedari i makinës e shtrin punën (shkalla {x} x {y}, jo 1)",
 "warn_out_of_course": "Plani e çon boshtin {axis} {mm} mm përtej kursit të tij",
+"warn_units_supposed": "Skedari nuk tregon njësinë; numrat lexohen si të mijtat e inçit",
 "err_outside_course": "Hapat e saktë të planit e çojnë një bosht përtej kursit të tij. Lëvizeni punën në tavolinë, ose vendosni dry_run = warn në akordimin e makinës nëse e dini çfarë po bëni.",
 "err_artifact_in_use": "Një detyrë ende punon mbi këtë artefakt ose e ka krijuar: hiqeni detyrën së pari.",
 "err_bad_artifact": "Përshkrimi i artefaktit nuk është i vlefshëm (emri, formati, lloji i rezultatit, hyrjet ose parametrat).",

@@ -32,7 +32,7 @@ export function spindleFindingKey(code: SpindleFinding["code"]): "spindle_rpm_ab
 }
 
 /** The text that says one thing that looks wrong in the work of a job. */
-export function warningKey(code: WorkWarning["code"]): "warn_tiny" | "warn_too_big" | "warn_far" | "warn_scale" | "warn_out_of_course" {
+export function warningKey(code: WorkWarning["code"]): "warn_tiny" | "warn_too_big" | "warn_far" | "warn_scale" | "warn_out_of_course" | "warn_units_supposed" {
   return `warn_${code}` as const;
 }
 
@@ -50,6 +50,8 @@ export function warningVars(w: WorkWarning): Record<string, string | number> {
       return { x: w.values[0], y: w.values[1] };
     case "out_of_course":
       return { axis: w.axis ?? "", mm: v[0] };
+    case "units_supposed":
+      return {};
   }
 }
 

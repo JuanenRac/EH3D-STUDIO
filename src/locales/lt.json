@@ -455,6 +455,7 @@
 "warn_far": "Darbas prasideda {d} mm nuo stalo kampo: patikrinkite poslinkį ir vienetą",
 "warn_scale": "Staklių failas ištempia darbą (mastelis {x} x {y}, ne 1)",
 "warn_out_of_course": "Planas nuveda ašį {axis} {mm} mm už jos eigos",
+"warn_units_supposed": "Faile nenurodytas vienetas; skaičiai skaitomi kaip tūkstantosios colio dalys",
 "err_outside_course": "Tikslūs plano žingsniai nuveda ašį už jos eigos. Perkelkite darbą ant stalo arba nustatykite dry_run = warn staklių derinime, jei žinote, ką darote.",
 "err_artifact_in_use": "Užduotis dar dirba su šiuo artefaktu arba jį sukūrė: pirmiausia pašalinkite užduotį.",
 "err_bad_artifact": "Artefakto aprašas netinkamas (pavadinimas, formatas, rezultato tipas, įvestys ar parametrai).",

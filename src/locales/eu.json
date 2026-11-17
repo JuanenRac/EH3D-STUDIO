@@ -455,6 +455,7 @@
 "warn_far": "Lana mahaiaren izkinatik {d} mm-ra hasten da: egiaztatu desplazamendua eta unitatea",
 "warn_scale": "Makinaren fitxategiak lana luzatzen du (eskala {x} x {y}, ez 1)",
 "warn_out_of_course": "Planak {axis} ardatza {mm} mm eramaten du bere ibilbidetik harago",
+"warn_units_supposed": "Fitxategiak ez du unitaterik adierazten; zenbakiak hazbetearen milaren zati gisa irakurtzen dira",
 "err_outside_course": "Planaren urrats zehatzek ardatz bat bere ibilbidetik harago eramaten dute. Mugitu lana mahaian, edo ezarri dry_run = warn makinaren doikuntzan zer egiten ari zaren badakizu.",
 "err_artifact_in_use": "Zeregin bat artefaktu honetan lanean ari da oraindik edo hura sortu zuen: kendu lehenengo zeregina.",
 "err_bad_artifact": "Artefaktuaren deskribapena ez da baliozkoa (izena, formatua, emaitza mota, sarrerak edo parametroak).",

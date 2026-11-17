@@ -455,6 +455,7 @@
 "warn_far": "Práce začíná {d} mm od rohu stolu: zkontrolujte posun a jednotku",
 "warn_scale": "Soubor stroje práci natahuje (měřítko {x} x {y}, ne 1)",
 "warn_out_of_course": "Plán vede osu {axis} o {mm} mm za její zdvih",
+"warn_units_supposed": "Soubor neuvádí jednotku; čísla se čtou jako tisíciny palce",
 "err_outside_course": "Přesné kroky plánu vedou osu za její zdvih. Posuňte práci na stole, nebo nastavte dry_run = warn v ladění stroje, pokud víte, co děláte.",
 "err_artifact_in_use": "Nějaký úkol na tomto artefaktu stále pracuje nebo jej vytvořil: nejprve úkol odstraňte.",
 "err_bad_artifact": "Popis artefaktu není platný (název, formát, typ výsledku, vstupy nebo parametry).",

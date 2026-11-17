@@ -455,6 +455,7 @@
 "warn_far": "Verkið byrjar {d} mm frá horni borðsins: athugaðu frávikið og eininguna",
 "warn_scale": "Vélarskráin teygir verkið (kvarði {x} x {y}, ekki 1)",
 "warn_out_of_course": "Áætlunin fer með ás {axis} {mm} mm fram yfir slaglengd hans",
+"warn_units_supposed": "Skráin tilgreinir ekki einingu; tölurnar eru lesnar sem þúsundustu hlutar úr tommu",
 "err_outside_course": "Nákvæm skref áætlunarinnar fara með ás fram yfir slaglengd hans. Færðu verkið á borðinu, eða stilltu dry_run = warn í fínstillingu vélarinnar ef þú veist hvað þú ert að gera.",
 "err_artifact_in_use": "Verkefni vinnur enn með þennan grip eða bjó hann til: fjarlægðu verkefnið fyrst.",
 "err_bad_artifact": "Lýsing gripsins er ógild (nafn, snið, gerð niðurstöðu, inntak eða stikar).",

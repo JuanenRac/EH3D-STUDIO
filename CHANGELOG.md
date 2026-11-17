@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The warning that the unit of a drill file was supposed is shown in the summary of a job:** when the server says a drilling file does not state its unit (`units_supposed`), the summary shows the text in the language of the program (37 languages; the two variants inherit). Tested with the key, the absence of numbers to fill in and every language of the core.
+
 ## [0.1.5] - The pages archive is attached to the release again, a simulated server for the client and more tests
 
 - **The release file is attached again:** version 0.1.4 was published without `eh3d-studio-0.1.4.tar.gz` (and its `.sha256`), so the update of Studio from the server said that the release had no such file. This version is built and attached from its own commit by the release workflow, with the names the update helper of EH3D-SERVER looks for (`eh3d-studio-<version>.tar.gz` and its `.sha256`).

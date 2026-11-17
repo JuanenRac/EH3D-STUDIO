@@ -455,6 +455,7 @@
 "warn_far": "Tosaíonn an obair {d} mm ó chúinne an tábla: seiceáil an fhritháireamh agus an t-aonad",
 "warn_scale": "Sineann comhad an mheaisín an obair (scála {x} x {y}, ní 1)",
 "warn_out_of_course": "Tógann an plean aiseal {axis} {mm} mm thar a chúrsa",
+"warn_units_supposed": "Ní luann an comhad a aonad; léitear na huimhreacha mar mhíleúin d'orlach",
 "err_outside_course": "Tógann céimeanna cruinne an phlean aiseal thar a chúrsa. Bog an obair ar an tábla, nó socraigh dry_run = warn i gcoigeartú an mheaisín má tá a fhios agat cad atá á dhéanamh agat.",
 "err_artifact_in_use": "Tá tasc ag obair fós ar an déantán seo nó rinne sé é: bain an tasc ar dtús.",
 "err_bad_artifact": "Níl cur síos an déantáin bailí (ainm, formáid, cineál toraidh, ionchuir nó paraiméadair).",

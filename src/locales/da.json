@@ -455,6 +455,7 @@
 "warn_far": "Arbejdet begynder {d} mm fra bordets hjørne: kontrollér forskydningen og enheden",
 "warn_scale": "Maskinfilen strækker arbejdet (skala {x} x {y}, ikke 1)",
 "warn_out_of_course": "Planen fører akse {axis} {mm} mm ud over dens vandring",
+"warn_units_supposed": "Filen angiver ikke sin enhed; tallene læses som tusindedele tommer",
 "err_outside_course": "Planens nøjagtige trin fører en akse ud over dens vandring. Flyt arbejdet på bordet, eller sæt dry_run = warn i maskinens tuning, hvis du ved, hvad du gør.",
 "err_artifact_in_use": "En opgave arbejder stadig på dette artefakt eller har lavet det: fjern opgaven først.",
 "err_bad_artifact": "Artefaktets beskrivelse er ikke gyldig (navn, format, resultattype, input eller parametre).",

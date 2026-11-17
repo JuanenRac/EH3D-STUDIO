@@ -455,6 +455,7 @@
 "warn_far": "Darbs sākas {d} mm no galda stūra: pārbaudiet nobīdi un mērvienību",
 "warn_scale": "Iekārtas fails izstiepj darbu (mērogs {x} x {y}, nevis 1)",
 "warn_out_of_course": "Plāns aizved asi {axis} {mm} mm aiz tās gājiena",
+"warn_units_supposed": "Failā nav norādīta mērvienība; skaitļi tiek lasīti kā collas tūkstošdaļas",
 "err_outside_course": "Plāna precīzie soļi aizved asi aiz tās gājiena. Pārvietojiet darbu uz galda vai iestatiet dry_run = warn iekārtas pielāgojumos, ja zināt, ko darāt.",
 "err_artifact_in_use": "Uzdevums vēl strādā ar šo artefaktu vai to izveidoja: vispirms noņemiet uzdevumu.",
 "err_bad_artifact": "Artefakta apraksts nav derīgs (nosaukums, formāts, rezultāta tips, ievades vai parametri).",

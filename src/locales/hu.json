@@ -455,6 +455,7 @@
 "warn_far": "A munka {d} mm-re kezdődik az asztal sarkától: ellenőrizze az eltolást és a mértékegységet",
 "warn_scale": "A gépfájl megnyújtja a munkát (méretezés {x} x {y}, nem 1)",
 "warn_out_of_course": "A terv a(z) {axis} tengelyt {mm} mm-rel túlviszi a lökethatárán",
+"warn_units_supposed": "A fájl nem adja meg a mértékegységet; a számokat ezred hüvelykként olvassa be",
 "err_outside_course": "A terv pontos lépései egy tengelyt túlvisznek a lökethatárán. Mozdítsa el a munkát az asztalon, vagy állítsa be a dry_run = warn értéket a gép hangolásában, ha tudja, mit tesz.",
 "err_artifact_in_use": "Egy feladat még dolgozik ezen az artefaktumon, vagy ő hozta létre: előbb távolítsa el a feladatot.",
 "err_bad_artifact": "Az artefaktum leírása nem érvényes (név, formátum, eredménytípus, bemenetek vagy paraméterek).",
