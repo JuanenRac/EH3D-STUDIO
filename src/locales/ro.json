@@ -455,6 +455,7 @@
 "warn_far": "Lucrarea începe la {d} mm de colțul mesei: verificați decalajul și unitatea",
 "warn_scale": "Fișierul mașinii întinde lucrarea (scară {x} x {y}, nu 1)",
 "warn_out_of_course": "Planul duce axa {axis} cu {mm} mm dincolo de cursa ei",
+"warn_units_supposed": "Fișierul nu indică unitatea de măsură; numerele sunt citite ca miimi de inch",
 "err_outside_course": "Pașii exacți ai planului duc o axă dincolo de cursa ei. Mutați lucrarea pe masă sau setați dry_run = warn în reglajul mașinii dacă știți ce faceți.",
 "err_artifact_in_use": "O sarcină încă lucrează la acest artefact sau l-a creat: eliminați mai întâi sarcina.",
 "err_bad_artifact": "Descrierea artefactului nu este validă (nume, format, tipul rezultatului, intrări sau parametri).",

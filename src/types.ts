@@ -165,7 +165,7 @@ export interface DryRunView {
 
 /** One thing that looks wrong in the work (`values` are the numbers it is about, in mm; `axis` is X, Y or Z for out_of_course). */
 export interface WorkWarning {
-  code: "tiny" | "too_big" | "far" | "scale" | "out_of_course";
+  code: "tiny" | "too_big" | "far" | "scale" | "out_of_course" | "units_supposed";
   axis?: string;
   values: number[];
 }

@@ -455,6 +455,7 @@
 "warn_far": "El treball comença a {d} mm de la cantonada de la taula: comprova el desplaçament i la unitat",
 "warn_scale": "El fitxer de la màquina estira el treball (escala {x} x {y}, no 1)",
 "warn_out_of_course": "El pla porta l'eix {axis} {mm} mm més enllà de la seva cursa",
+"warn_units_supposed": "El fitxer no indica la unitat; els nombres es llegeixen com a mil·lèsimes de polzada",
 "err_outside_course": "Els passos exactes del pla porten un eix més enllà de la seva cursa. Mou el treball a la taula, o posa dry_run = warn a l'ajust de la màquina si saps el que fas.",
 "err_artifact_in_use": "Una tasca encara treballa en aquest artefacte o l'ha fet: elimina primer la tasca.",
 "err_bad_artifact": "La descripció de l'artefacte no és vàlida (nom, format, tipus de resultat, entrades o paràmetres).",

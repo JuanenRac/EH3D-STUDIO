@@ -455,6 +455,7 @@
 "warn_far": "Praca zaczyna się {d} mm od narożnika stołu: sprawdź przesunięcie i jednostkę",
 "warn_scale": "Plik maszyny rozciąga pracę (skala {x} x {y}, nie 1)",
 "warn_out_of_course": "Plan wyprowadza oś {axis} o {mm} mm poza jej skok",
+"warn_units_supposed": "Plik nie podaje jednostki; liczby są odczytywane jako tysięczne części cala",
 "err_outside_course": "Dokładne kroki planu wyprowadzają oś poza jej skok. Przesuń pracę na stole lub ustaw dry_run = warn w strojeniu maszyny, jeśli wiesz, co robisz.",
 "err_artifact_in_use": "Zadanie obliczeniowe nadal pracuje na tym artefakcie lub go utworzyło: najpierw usuń zadanie.",
 "err_bad_artifact": "Opis artefaktu jest nieprawidłowy (nazwa, format, typ wyniku, wejścia lub parametry).",

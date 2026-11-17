@@ -455,6 +455,7 @@
 "warn_far": "Het werk begint {d} mm van de hoek van de tafel: controleer de offset en de eenheid",
 "warn_scale": "Het machinebestand rekt het werk op (schaal {x} x {y}, niet 1)",
 "warn_out_of_course": "Het plan brengt as {axis} {mm} mm voorbij zijn slag",
+"warn_units_supposed": "Het bestand vermeldt geen eenheid; de getallen worden gelezen als duizendsten van een inch",
 "err_outside_course": "De exacte stappen van het plan brengen een as voorbij zijn slag. Verplaats het werk op de tafel, of stel dry_run = warn in in de afstelling van de machine als je weet wat je doet.",
 "err_artifact_in_use": "Een taak werkt nog aan dit artefact of heeft het gemaakt: verwijder eerst de taak.",
 "err_bad_artifact": "De beschrijving van het artefact is ongeldig (naam, formaat, resultaattype, invoer of parameters).",

@@ -455,6 +455,7 @@
 "warn_far": "Rad počinje {d} mm od kuta stola: provjerite pomak i jedinicu",
 "warn_scale": "Datoteka stroja rasteže rad (mjerilo {x} x {y}, ne 1)",
 "warn_out_of_course": "Plan vodi os {axis} {mm} mm izvan njezina hoda",
+"warn_units_supposed": "Datoteka ne navodi mjernu jedinicu; brojevi se čitaju kao tisućinke inča",
 "err_outside_course": "Točni koraci plana vode os izvan njezina hoda. Pomaknite rad na stolu ili postavite dry_run = warn u podešavanju stroja ako znate što radite.",
 "err_artifact_in_use": "Zadatak još radi na ovom artefaktu ili ga je stvorio: prvo uklonite zadatak.",
 "err_bad_artifact": "Opis artefakta nije valjan (ime, format, vrsta rezultata, ulazi ili parametri).",

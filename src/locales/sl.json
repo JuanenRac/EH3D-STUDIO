@@ -455,6 +455,7 @@
 "warn_far": "Delo se začne {d} mm od kota mize: preverite zamik in enoto",
 "warn_scale": "Datoteka stroja delo raztegne (merilo {x} x {y}, ne 1)",
 "warn_out_of_course": "Načrt vodi os {axis} {mm} mm preko njenega hoda",
+"warn_units_supposed": "Datoteka ne navaja enote; števila se berejo kot tisočinke palca",
 "err_outside_course": "Natančni koraki načrta vodijo os preko njenega hoda. Premaknite delo na mizi ali nastavite dry_run = warn v uglaševanju stroja, če veste, kaj počnete.",
 "err_artifact_in_use": "Opravilo še vedno dela na tem artefaktu ali ga je ustvarilo: najprej odstranite opravilo.",
 "err_bad_artifact": "Opis artefakta ni veljaven (ime, oblika, vrsta rezultata, vhodi ali parametri).",

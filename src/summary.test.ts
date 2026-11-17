@@ -68,6 +68,19 @@ describe("the summary before a job starts", () => {
     expect(s.warnings.map((w) => w.key)).toEqual(["warn_tiny", "warn_too_big", "warn_far", "warn_scale", "warn_out_of_course"]);
   });
 
+  it("says in every language that the unit of the file was supposed, with no numbers to fill in", () => {
+    const w: WorkWarning = { code: "units_supposed", values: [] };
+    expect(warningKey(w.code)).toBe("warn_units_supposed");
+    expect(warningVars(w)).toEqual({});
+    expect(ROWS).toHaveProperty("warn_units_supposed");
+    for (const lang of LANGS) {
+      const line = text(lang, "warn_units_supposed" as TextKey, warningVars(w));
+      expect(line, lang).not.toContain("{");
+      expect(line.length, lang).toBeGreaterThan(10);
+    }
+    expect(startSummary(view({ warnings: [w] })).warnings.map((x) => x.key)).toEqual(["warn_units_supposed"]);
+  });
+
   it("has every text of the summary in the eight languages and the refusal of a plan outside the course", () => {
     for (const k of ["sum_title", "sum_count", "sum_size", "sum_time", "sum_reach", "sum_dry_ok", "sum_dry_bad", "sum_start", "sum_cancel", "sum_loading", "pref_confirm_start", "pref_confirm_start_hint"] as const) {
       expect(ROWS, k).toHaveProperty(k);

@@ -455,6 +455,7 @@
 "warn_far": "Töö algab {d} mm laua nurgast: kontrolli nihet ja ühikut",
 "warn_scale": "Masinafail venitab tööd (mastaap {x} x {y}, mitte 1)",
 "warn_out_of_course": "Plaan viib telje {axis} {mm} mm oma käigust kaugemale",
+"warn_units_supposed": "Failis pole ühikut märgitud; arve loetakse tolli tuhandikena",
 "err_outside_course": "Plaani täpsed sammud viivad telje oma käigust kaugemale. Liiguta tööd laual või määra masina häälestuses dry_run = warn, kui tead, mida teed.",
 "err_artifact_in_use": "Ülesanne töötab sellel artefaktil veel või tegi selle: eemalda esmalt ülesanne.",
 "err_bad_artifact": "Artefakti kirjeldus ei kõlba (nimi, vorming, tulemuse tüüp, sisendid või parameetrid).",
