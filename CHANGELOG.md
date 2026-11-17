@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The stop button gives up waiting sooner and tries once more:** the call of the stop waits 3 seconds instead of the 15 of an ordinary request and, when it gets no answer or does not reach the server, it is sent once more (the stop is harmless with no job to end). A stop the server answered, even with an error, is not repeated. Tested with a first attempt that hangs, two that hang and an answered error.
+
 - **The warning that the unit of a drill file was supposed is shown in the summary of a job:** when the server says a drilling file does not state its unit (`units_supposed`), the summary shows the text in the language of the program (37 languages; the two variants inherit). Tested with the key, the absence of numbers to fill in and every language of the core.
 
 ## [0.1.5] - The pages archive is attached to the release again, a simulated server for the client and more tests

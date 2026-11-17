@@ -100,3 +100,39 @@ describe("a page that asks again every few seconds", () => {
     expect(started).toBe(2);
   });
 });
+
+describe("the stop button", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it("waits only the time of the stop, not that of an ordinary request, and tries once more", async () => {
+    let calls = 0;
+    const api = new Api("t", (_url, _init) => {
+      calls += 1;
+      return calls === 1 ? silent() : Promise.resolve(new Response(JSON.stringify({ ok: true, stopped: true, job: "j1" }), { status: 200 }));
+    });
+    const done = api.stopMachine("m1");
+    await vi.advanceTimersByTimeAsync(DEFAULT_TIMEOUTS.stop + 1);
+    expect(await done).toEqual({ ok: true, stopped: true, job: "j1" });
+    expect(calls).toBe(2);
+    expect(DEFAULT_TIMEOUTS.stop).toBeLessThan(DEFAULT_TIMEOUTS.normal);
+  });
+
+  it("gives up after the second attempt with the error of the transport", async () => {
+    const api = new Api("t", silent);
+    const done = api.stopMachine("m1").catch((e: unknown) => e);
+    await vi.advanceTimersByTimeAsync(DEFAULT_TIMEOUTS.stop + 1);
+    await vi.advanceTimersByTimeAsync(DEFAULT_TIMEOUTS.stop + 1);
+    expect(await done).toMatchObject({ status: 0, code: "timeout" });
+  });
+
+  it("does not repeat a stop the server answered, even with an error", async () => {
+    let calls = 0;
+    const api = new Api("t", async () => {
+      calls += 1;
+      return new Response(JSON.stringify({ error: "not_found" }), { status: 404 });
+    });
+    await expect(api.stopMachine("m1")).rejects.toMatchObject({ status: 404 });
+    expect(calls).toBe(1);
+  });
+});

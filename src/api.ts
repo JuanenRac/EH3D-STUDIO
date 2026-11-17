@@ -19,8 +19,9 @@ const BASE = "/api/v1";
 export const LOGIN_APP = "studio";
 
 /** How long a request may take before it is given up, in milliseconds: the health check is short (it is what says whether the server answers at all), the planning of a big file is long. */
-export type Timeouts = { normal: number; health: number; long: number };
-export const DEFAULT_TIMEOUTS: Timeouts = { normal: 15000, health: 5000, long: 60000 };
+export type Timeouts = { normal: number; health: number; long: number; stop: number };
+/** `stop` is the time the stop button waits for an answer before it tries once more: a stop that hangs for the time of an ordinary request is a stop that did not happen. */
+export const DEFAULT_TIMEOUTS: Timeouts = { normal: 15000, health: 5000, long: 60000, stop: 3000 };
 
 export class Api {
   /** The login token of this person (kept by the application, never by this class). */
@@ -44,7 +45,7 @@ export class Api {
     const headers: Record<string, string> = {};
     if (this.token) headers.authorization = `Bearer ${this.token}`;
     if (body !== undefined) headers["content-type"] = "application/json";
-    const limit = path === "/health" ? this.timeouts.health : long ? this.timeouts.long : this.timeouts.normal;
+    const limit = path === "/health" ? this.timeouts.health : method === "POST" && /^\/machines\/[^/]+\/stop$/.test(path) ? this.timeouts.stop : long ? this.timeouts.long : this.timeouts.normal;
     const controller = new AbortController();
     let timer: ReturnType<typeof setTimeout> | undefined;
     const late = new Promise<never>((_, reject) => {
@@ -168,7 +169,16 @@ export class Api {
   /** The address of the camera picture of the node: a picture cannot carry a header, so the address carries a ticket. */
   headStreamUrl = (machine: string, ticket: string) => `${BASE}/machines/${encodeURIComponent(machine)}/head/stream?ticket=${encodeURIComponent(ticket)}`;
   /** The stop button: ends the job that is active on the machine at once, whichever it is (the server reaches the machine without waiting for the line it is sending). */
-  stopMachine = (machine: string) => this.request<{ ok: boolean; stopped: boolean; job: string | null }>("POST", `/machines/${encodeURIComponent(machine)}/stop`, {});
+  stopMachine = async (machine: string): Promise<{ ok: boolean; stopped: boolean; job: string | null }> => {
+    const send = () => this.request<{ ok: boolean; stopped: boolean; job: string | null }>("POST", `/machines/${encodeURIComponent(machine)}/stop`, {});
+    try {
+      return await send();
+    } catch (e) {
+      // The stop is idempotent in the server (with no job to end it answers stopped: false), so a stop that got no answer or never reached the server is sent once more.
+      if (e instanceof ApiError && e.status === 0 && (e.code === "timeout" || e.code === "unreachable")) return send();
+      throw e;
+    }
+  };
 
   // ---- the updates of the installed services, from the releases of GitHub (administrator)
   updates = () => this.request<UpdatesView>("GET", "/updates");
