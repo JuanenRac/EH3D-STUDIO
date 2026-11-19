@@ -79,7 +79,7 @@ describe("the catalog of the error codes of the server", () => {
   });
 
   it("shows a code that has no row with what the server said", () => {
-    expect(errorText("es", new ApiError(422, "bad_hole", "a hole has a coordinate that is not a number"))).toBe("bad_hole: a hole has a coordinate that is not a number");
+    expect(errorText("es", new ApiError(422, "a_code_of_a_newer_server", "a hole has a coordinate that is not a number"))).toBe("a_code_of_a_newer_server: a hole has a coordinate that is not a number");
     expect(errorText("de", new ApiError(409, "not_running", ""))).toBe(text("de", "err_not_running"));
   });
 });

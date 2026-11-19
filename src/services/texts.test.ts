@@ -86,7 +86,7 @@ describe("the texts of the pages of the common services", () => {
       }
     }
     // a code that has no sentence says what the server said
-    expect(errorText("en", new ApiError(422, "bad_rack", "rack.slots: place 6 is given to two tools"))).toBe("bad_rack: rack.slots: place 6 is given to two tools");
+    expect(errorText("en", new ApiError(422, "a_code_of_a_newer_server", "rack.slots: place 6 is given to two tools"))).toBe("a_code_of_a_newer_server: rack.slots: place 6 is given to two tools");
   });
 });
 
