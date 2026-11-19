@@ -11,8 +11,7 @@ import { describeEvent } from "./pages/Monitor";
 
 /** The codes of the server that the Studio shows with the text given by the server (the detail it sends says what is wrong with the work or the file). Every other code of
  * the catalog has a row `err_<code>` in the eight languages. */
-const GENERIC_ACCEPTED = [
-];
+const GENERIC_ACCEPTED: string[] = [];
 
 type Entry = { code: string; status: number; description: string };
 const catalog = JSON.parse(readFileSync(new URL("./examples/error_codes.json", import.meta.url), "utf8")) as Entry[];
