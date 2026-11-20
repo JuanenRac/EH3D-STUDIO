@@ -4,6 +4,24 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **36 more refusals of the server have a sentence in the eight languages and in the other 29:** the codes of the laser (`laser_estop_latched`, `laser_power_limit`, `laser_feed_limit`, `air_assist_off`, `enclosure_open`, `focus_not_checked`, `test_fire_refused`), of the pick-and-place machine, the board work (`bad_gerber`, `missing_layer`, `unit_unknown`), the router (`machine_alarm`, `jog_while_running`, `out_of_travel`), the 3D printer (`printer_latched`, `thermal_runaway`, `temperature_over_limit`, `program_over_limit`, `farm_no_free_printer`), the slicer and the compatibility routes were shown as `code: detail`; each now has its own sentence, written in its own words in every language, and the test against the catalog of the server covers all 151 codes.
+
+- **A machine that has only run against a simulator says so:** the machines of the plugins `laser`, `pnp`, `pcb`, `cnc`, `gerber`, `cam`, `printer3d`, `vision` and `cad` carry a *simulator only* badge on the Machines tab (and their plugin in the list of plugins), read from the `detail` and the capabilities that the server sends, so none is shown as proven on hardware.
+
+- **The interlocks of a machine are shown in red:** a latch, the latch of an emergency stop and an alarm (also the `Alarm` state word of a router) are badges next to the state of the machine, a queue that starts its jobs by itself is called out, and the other facts the plugin sends (power, mode, position flags) are listed under the name.
+
+- **The emergency stop is one touch for an operator:** the button stops a router or a 3D printer by the route of its plugin (heaters off, motors released, machine latched) and any other machine by cancelling its job, never asks "Sure?", is not offered to a viewer or to a machine that is already held, and is sent once more when the server did not answer the first time.
+
+- **Only an administrator releases a latch, and asks twice:** a machine held by an emergency stop, a fault or an alarm gets a release button for an administrator (the laser by its own route), with the second touch that the other dangerous buttons have; an operator sees the latch and no way to undo it.
+
+- **A person starts the print of a 3D printer:** a print that waits in the queue says so, starting it asks twice like every start, and Studio never switches a queue to start by itself.
+
+- **The four switches of the server that are off are explained on the Security page:** `mdns_announce`, `compat_api`, `compat_write` and `slice_enabled` show what they do and that they are off by default, and turning one on is asked again (`confirm_weak`) before it is applied.
+
+- **The simulated server knows the machines of the plugins and the switches of security, and the contract is tested:** it holds a laser, a router and a latched printer and answers the emergency stop, the releases and the policy as the server does; new tests run the client against it and, next to the repository of the server, against its routes, its switches and its codes.
+
+- **38 more tests:** the rules of the safe actions by role and scope, the interlocks and the facts of a machine, the routes of the stop and the release, the pages of the machines and the security with each role, a stop that does not arrive, and the contract with the server.
+
 ## [0.1.6] - Safer CSV of jobs and numbers that are not finite
 
 - **Every refusal of the server has a text in the eight languages:** 29 codes of the catalog of the server (machine and project store, catalogs, the inspection of the drill head, the tool rack, unsafe file names) were shown as the bare code; they now have their own sentence, and a test compares the catalog of the server with the texts when the server repository is next to this one.
