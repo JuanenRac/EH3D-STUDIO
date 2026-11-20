@@ -52,6 +52,8 @@ jobs:
         with:
           node-version: "22"
           cache: npm
+      - name: The copy of the settings contract is the one of the server
+        run: python3 -I tools/sync_settings_contract.py --check
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint

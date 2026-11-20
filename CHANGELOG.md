@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A copy of the contract with a check:** `tools/sync_settings_contract.py --check` fails in the CI when the copy at `src/data/settings-contract.json` is not the file of the server (next to this repository) or is not a contract of the version Studio understands (alone, it checks the schema); `--write` refreshes it from the server.
+
 - **Signing in again without leaving the page of the updates:** when the server restarts in the middle of an update and the login ends with it, the page shows a box with the name and the password right where the update is, with the same sign-in as the first screen. Once you are in, the page goes on following the job where it was (the steps, the bars, the log and the earlier jobs come from the server) with no reload and no loss of what was shown. The button that did nothing useful is gone.
 
 - **The last known state stays on the page and says so:** while the sign-in is asked for, the steps, the bars and the log of the update stay as the last answer of the server, marked as the last known state, and the page keeps following the update afterwards (a Studio that was replaced still reloads once).
