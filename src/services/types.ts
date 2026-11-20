@@ -98,6 +98,8 @@ export interface WorkMachineInfo {
   state: "idle" | "busy";
   job?: string | null;
   capabilities?: Record<string, unknown>;
+  /** What the plugin says of the machine besides its state: the interlocks (`latched`, `estop_latched`, `alarm`) and, for the plugins that have only run against a simulator, `evidence: "simulator"` and `simulator_only: true`. */
+  detail?: Record<string, unknown>;
 }
 
 export interface NewWorkMachine {

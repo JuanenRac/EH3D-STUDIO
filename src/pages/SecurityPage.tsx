@@ -10,6 +10,7 @@ import { useServices } from "../services/context";
 import { auditDetail, closesCurrent, editableKind, orderSessions, policyRows, policyScore, secondsLeft, spanText, switchValue, wholeNumber } from "../services/authsvc";
 import { whenText, useNowS } from "../services/format";
 import { allowedActions } from "../services/permissions";
+import { SWITCH_NOTES } from "../services/safety";
 import type { Action } from "../services/permissions";
 import { ApiError } from "../api";
 import { ROLES } from "../types";
@@ -244,6 +245,7 @@ export function SecurityPage() {
                 <tbody>
                   {policyRows(policy.data).map(({ sw, attention }) => {
                     const known = SERVER_SETTINGS.find((s) => s.key === sw.key);
+                    const note: TextKey | undefined = SWITCH_NOTES[sw.key];
                     return (
                       <tr key={sw.key} className={attention ? "flag" : ""}>
                         <td>
@@ -254,7 +256,7 @@ export function SecurityPage() {
                         </td>
                         <td>{attention ? <Badge tone="wait">▲ {t("sec_look")}</Badge> : <Badge tone="ok">✔ {t("sec_strict")}</Badge>}</td>
                         <td>
-                          {known ? t(known.text) : ""}
+                          {known ? t(known.text) : note ? t(note) : ""}
                           {restartKeys.includes(sw.key) && <span className="hint"> {t("sec_restart_needed")}</span>}
                         </td>
                         <td>{editor(sw)}</td>

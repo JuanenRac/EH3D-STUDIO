@@ -527,3 +527,5 @@ button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-
 .matrix th.me { color: var(--accent); }
 .matrix td, .matrix th { text-align: center; }
 .matrix td:first-child, .matrix th:first-child { text-align: left; }
+.machine-facts { display: block; margin-top: 2px; }
+.badge + .badge { margin-left: 4px; }

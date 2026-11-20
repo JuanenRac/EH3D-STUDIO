@@ -6,6 +6,8 @@
 import type { DesignRequest } from "./design";
 import type { ServiceHttp } from "./http";
 import { can } from "./permissions";
+import { ApiError } from "../api";
+import { releaseRoute, stopRoute } from "./safety";
 import type { Who } from "./permissions";
 import type { NewWorkJob, NewWorkMachine, PluginInfo, WorkJob, WorkJobPage, WorkJobSummary, WorkMachineInfo, WorkNotification, WorkState } from "./types";
 
@@ -28,6 +30,29 @@ export class WorkClient {
   resume = (id: string) => this.http.json<WorkJob>("POST", `/work/jobs/${encodeURIComponent(id)}/resume`, { json: {} });
   cancel = (id: string) => this.http.json<WorkJob>("POST", `/work/jobs/${encodeURIComponent(id)}/cancel`, { json: {} });
   remove = (id: string) => this.http.json<unknown>("DELETE", `/work/jobs/${encodeURIComponent(id)}`);
+
+  /**
+   * The emergency stop of a machine, at once and with no question: the route of its plugin when it has one (`cnc`, `printer3d`: heaters off, motors released, machine latched), else the
+   * cancel of the job that runs on it (a laser: the beam goes off and the machine latches). With neither a route nor a job it asks for nothing and answers null.
+   */
+  emergencyStop = async (machine: string, plugin: string, job?: string | null): Promise<unknown> => {
+    const route = stopRoute(plugin);
+    if (route === null && !job) return null;
+    const send = (): Promise<unknown> => (route !== null ? this.http.json<unknown>("POST", `/work/machines/${encodeURIComponent(machine)}/${route}`) : this.cancel(job as string));
+    try {
+      return await send();
+    } catch (e) {
+      // A stop is idempotent in the server, and one that never arrived is worse than one that arrives twice: a stop that got no answer is sent once more.
+      if (e instanceof ApiError && e.status === 0 && (e.code === "timeout" || e.code === "unreachable")) return send();
+      throw e;
+    }
+  };
+  /** Releases the latch of an emergency stop or of a fault (an administrator); a plugin that does not latch has no such route and nothing is asked. */
+  release = async (machine: string, plugin: string): Promise<unknown> => {
+    const route = releaseRoute(plugin);
+    if (route === null) return null;
+    return this.http.json<unknown>("POST", `/work/machines/${encodeURIComponent(machine)}/${route}`);
+  };
 
   notifications = async (unread = false): Promise<WorkNotification[]> =>
     (await this.http.json<{ notifications: WorkNotification[] }>("GET", "/notifications", { query: { unread: unread ? "true" : undefined, limit: 100 } })).notifications;

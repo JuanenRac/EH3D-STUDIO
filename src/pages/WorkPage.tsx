@@ -30,8 +30,9 @@ import {
   withNotification,
 } from "../services/work";
 import type { JobAction } from "../services/work";
+import { INTERLOCK_TEXT, detailFacts, interlocks, isSimulatorOnly, needsManualStart, safetyActions, startsByItself } from "../services/safety";
 import { WORK_STATES } from "../services/types";
-import type { WorkJob, WorkJobSummary, WorkNotification, WorkState } from "../services/types";
+import type { WorkJob, WorkJobSummary, WorkMachineInfo, WorkNotification, WorkState } from "../services/types";
 import type { TextKey } from "../i18n";
 
 const TABS = ["queue", "machines", "live", "atc", "notices"] as const;
@@ -297,6 +298,7 @@ function QueueCard({ jobs, machines, reload }: { jobs: WorkJobSummary[] | null; 
                         ),
                       )}
                       {isFinished(j.state) && actions.length === 0 ? <span className="muted">-</span> : null}
+                      {j.state === "queued" && needsManualStart(j.plugin) ? <small className="hint">{t("wk_manual_start")}</small> : null}
                     </div>
                   </td>
                 </tr>
@@ -404,7 +406,7 @@ function NewJob({
 
 // ---- plugins and machines
 
-function MachinesCard({ machines, plugins, reload }: { machines: { id: string; name: string; plugin: string; state: string; job?: string | null }[] | null; plugins: { kind: string; title: string; manages_machines: boolean; capabilities: Record<string, unknown> }[] | null; reload: () => void }) {
+function MachinesCard({ machines, plugins, reload }: { machines: WorkMachineInfo[] | null; plugins: { kind: string; title: string; manages_machines: boolean; capabilities: Record<string, unknown> }[] | null; reload: () => void }) {
   const { t, err, say } = useApp();
   const sv = useServices();
   const admin = sv.allowed("machines.manage");
@@ -440,6 +442,27 @@ function MachinesCard({ machines, plugins, reload }: { machines: { id: string; n
       say(err(e), "error");
     }
   };
+  /** The emergency stop: at once, with no question, and the machine is asked again either way, because it may have latched. */
+  const emergency = async (m: WorkMachineInfo) => {
+    try {
+      await sv.work.emergencyStop(m.id, m.plugin, m.job);
+      say(t("wk_estop_done"), "ok");
+    } catch (e) {
+      say(err(e), "error");
+    } finally {
+      reload();
+    }
+  };
+  const release = async (m: WorkMachineInfo) => {
+    try {
+      await sv.work.release(m.id, m.plugin);
+      say(t("wk_release_done"), "ok");
+    } catch (e) {
+      say(err(e), "error");
+    } finally {
+      reload();
+    }
+  };
   const remove = async (machine: string) => {
     try {
       await sv.work.deleteMachine(machine);
@@ -469,24 +492,47 @@ function MachinesCard({ machines, plugins, reload }: { machines: { id: string; n
               </tr>
             </thead>
             <tbody>
-              {machines.map((m) => (
-                <tr key={m.id}>
-                  <td>
-                    <strong>{m.name || m.id}</strong> <small className="muted">{m.id}</small>
-                  </td>
-                  <td>{plugins?.find((p) => p.kind === m.plugin)?.title ?? m.plugin}</td>
-                  <td>
-                    <Badge tone={m.state === "busy" ? "run" : "ok"}>{m.state === "busy" ? t("st_busy") : t("st_idle")}</Badge>
-                  </td>
-                  <td>{m.job ? <code>{m.job.slice(0, 12)}</code> : "-"}</td>
-                  <td>
-                    <div className="row-actions">
-                      {m.job && sv.allowed("jobs.cancel") && <DangerButton label={t("act_stop")} onConfirm={() => void stop(m.job!)} />}
-                      {admin && plugins?.find((p) => p.kind === m.plugin)?.manages_machines && <DangerButton label={t("act_delete")} disabled={m.state === "busy"} onConfirm={() => void remove(m.id)} />}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {machines.map((m) => {
+                const acts = safetyActions(sv.who, m.plugin, m.detail, m.job);
+                const held = interlocks(m.detail);
+                const facts = detailFacts(m.detail);
+                return (
+                  <tr key={m.id}>
+                    <td>
+                      <strong>{m.name || m.id}</strong> <small className="muted">{m.id}</small>
+                    </td>
+                    <td>{plugins?.find((p) => p.kind === m.plugin)?.title ?? m.plugin}</td>
+                    <td>
+                      <Badge tone={m.state === "busy" ? "run" : "ok"}>{m.state === "busy" ? t("st_busy") : t("st_idle")}</Badge>
+                      {isSimulatorOnly(m.detail, m.capabilities ?? plugins?.find((p) => p.kind === m.plugin)?.capabilities) && <Badge tone="wait">{t("sim_only")}</Badge>}
+                      {held.map((i) => (
+                        <Badge key={i} tone="bad">
+                          {t(INTERLOCK_TEXT[i])}
+                        </Badge>
+                      ))}
+                      {startsByItself(m.detail) && <Badge tone="bad">{t("il_auto_start")}</Badge>}
+                      {facts.length > 0 && (
+                        <small className="muted machine-facts">
+                          {facts.map((f) => `${f.key}: ${f.value}`).join(" · ")}
+                        </small>
+                      )}
+                    </td>
+                    <td>{m.job ? <code>{m.job.slice(0, 12)}</code> : "-"}</td>
+                    <td>
+                      <div className="row-actions">
+                        {acts.includes("emergency_stop") && (
+                          <button type="button" className="danger" onClick={() => void emergency(m)}>
+                            {t("act_estop")}
+                          </button>
+                        )}
+                        {acts.includes("release") && <DangerButton label={t("act_release")} onConfirm={() => void release(m)} />}
+                        {m.job && !acts.includes("emergency_stop") && sv.allowed("jobs.cancel") && <DangerButton label={t("act_stop")} onConfirm={() => void stop(m.job!)} />}
+                        {admin && plugins?.find((p) => p.kind === m.plugin)?.manages_machines && <DangerButton label={t("act_delete")} disabled={m.state === "busy"} onConfirm={() => void remove(m.id)} />}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
@@ -506,7 +552,7 @@ function MachinesCard({ machines, plugins, reload }: { machines: { id: string; n
               {plugins.map((p) => (
                 <tr key={p.kind}>
                   <td>
-                    <strong>{p.title}</strong> <small className="muted">{p.kind}</small>
+                    <strong>{p.title}</strong> <small className="muted">{p.kind}</small> {isSimulatorOnly(null, p.capabilities) && <Badge tone="wait">{t("sim_only")}</Badge>}
                   </td>
                   <td>{requestKinds(p.capabilities).join(", ") || "-"}</td>
                 </tr>

@@ -231,6 +231,147 @@ describe("the machines and the jobs", () => {
   });
 });
 
+describe("the machines of the plugins and their safety", () => {
+  const SIM = { evidence: "simulator", simulator_only: true };
+  const MACHINES: Record<string, Handler> = {
+    "GET /work/machines": () => ({
+      machines: [
+        { id: "laser-1", name: "Bench laser", plugin: "laser", state: "busy", job: "w-9", capabilities: { requests: ["gcode"], evidence: "simulator" }, detail: { ...SIM, estop_latched: false, power: 30 } },
+        { id: "laser-2", name: "Spare laser", plugin: "laser", state: "idle", job: null, detail: { ...SIM, estop_latched: true } },
+        { id: "cnc-1", name: "Router", plugin: "cnc", state: "idle", job: null, detail: { ...SIM, latched: false, state_word: "Idle" } },
+        { id: "cnc-2", name: "Old router", plugin: "cnc", state: "idle", job: null, detail: { ...SIM, state_word: "Alarm" } },
+        { id: "print-1", name: "Printer", plugin: "printer3d", state: "idle", job: null, detail: { ...SIM, latched: true, auto_start_queue: true } },
+        { id: "plain-1", name: "Plain demo", plugin: "demo", state: "idle", job: null },
+      ],
+    }),
+    "GET /plugins": () => ({
+      plugins: [
+        { kind: "laser", title: "Laser", capabilities: { requests: ["gcode"], evidence: "simulator" }, manages_machines: true },
+        { kind: "demo", title: "Demonstration", capabilities: { requests: ["demo"] }, manages_machines: true },
+      ],
+    }),
+    "GET /work/jobs": () => ({
+      total: 1,
+      offset: 0,
+      limit: 100,
+      items: [{ id: "w-5", machine: "print-1", plugin: "printer3d", name: "Benchy", state: "queued", position: 1, owner: "ana", created: 1700000000 }],
+    }),
+    "GET /notifications": () => ({ notifications: [] }),
+    "POST /work/machines/cnc-1/emergency-stop": () => ({ ok: true }),
+    "POST /work/jobs/w-9/cancel": () => ({ id: "w-9", state: "cancelled" }),
+    "POST /work/machines/print-1/release": () => ({ ok: true }),
+    "POST /work/machines/laser-2/laser/release": () => ({ ok: true }),
+    "POST /work/jobs/w-5/start": () => ({ id: "w-5", state: "running" }),
+  };
+
+  const machinesTab = async (role: Role) => {
+    const p = await show(<WorkPage route="" />, role, MACHINES);
+    await click(p.$$("[role=tab]").find((t) => t.textContent === "Machines"));
+    return p;
+  };
+  const rowOf = (name: string) => [...box!.querySelectorAll("tr")].find((r) => r.textContent?.includes(name)) as HTMLElement;
+  const rowButtons = (name: string) => [...rowOf(name).querySelectorAll("button")].map((b) => b.textContent?.trim());
+  const rowButton = (name: string, label: string) => [...rowOf(name).querySelectorAll("button")].find((b) => b.textContent?.trim() === label);
+
+  it("marks every machine that has only run against a simulator and no other", async () => {
+    await machinesTab("viewer");
+    for (const name of ["Bench laser", "Spare laser", "Router", "Old router", "Printer"]) expect(rowOf(name).textContent, name).toContain("SIMULATOR ONLY");
+    expect(rowOf("Plain demo").textContent).not.toContain("SIMULATOR ONLY");
+  });
+
+  it("shows the latches, the alarm and a queue that starts by itself in red, and the other facts of the machine", async () => {
+    await machinesTab("viewer");
+    const red = (name: string) => [...rowOf(name).querySelectorAll(".badge.bad")].map((b) => b.textContent);
+    expect(red("Printer")).toEqual(["Latched", "Starts jobs by itself"]);
+    expect(red("Spare laser")).toEqual(["Emergency stop latched"]);
+    expect(red("Old router")).toEqual(["Alarm"]);
+    expect(red("Router")).toEqual([]);
+    expect(rowOf("Bench laser").textContent).toContain("power: 30");
+  });
+
+  it("gives a viewer no button of safety", async () => {
+    await machinesTab("viewer");
+    for (const name of ["Bench laser", "Router", "Printer", "Spare laser"]) expect(rowButtons(name), name).toEqual([]);
+  });
+
+  it("stops a machine with one touch for an operator, by the route of its plugin or by the cancel of its job", async () => {
+    const p = await machinesTab("operator");
+    expect(rowButton("Router", "Emergency stop")).toBeTruthy();
+    await click(rowButton("Router", "Emergency stop"));
+    expect(button("Sure?")).toBeUndefined();
+    expect(p.server.calls.filter((c) => c.method === "POST").map((c) => c.path)).toEqual(["/work/machines/cnc-1/emergency-stop"]);
+    await click(rowButton("Bench laser", "Emergency stop"));
+    expect(button("Sure?")).toBeUndefined();
+    expect(p.server.calls.some((c) => c.method === "POST" && c.path === "/work/jobs/w-9/cancel")).toBe(true);
+  });
+
+  it("offers an operator no emergency stop for a machine that is held, a laser with no job, or a plugin with no way to stop, and no release at all", async () => {
+    await machinesTab("operator");
+    expect(rowButtons("Printer")).toEqual([]);
+    expect(rowButtons("Old router")).toEqual([]);
+    expect(rowButtons("Spare laser")).toEqual([]);
+    expect(rowButtons("Plain demo")).toEqual([]);
+    expect(box!.textContent).not.toContain("Release the latch");
+  });
+
+  it("gives an administrator the release of a latch and asks twice before it sends it", async () => {
+    const p = await machinesTab("admin");
+    expect(rowButton("Printer", "Release the latch")).toBeTruthy();
+    expect(rowButton("Router", "Release the latch")).toBeUndefined();
+    await click(rowButton("Printer", "Release the latch"));
+    expect(p.server.calls.some((c) => c.path.endsWith("/release"))).toBe(false);
+    await click(button("Sure?"));
+    expect(p.server.calls.some((c) => c.method === "POST" && c.path === "/work/machines/print-1/release")).toBe(true);
+    await click(rowButton("Spare laser", "Release the latch"));
+    await click(button("Sure?"));
+    expect(p.server.calls.some((c) => c.method === "POST" && c.path === "/work/machines/laser-2/laser/release")).toBe(true);
+    expect(rowButton("Old router", "Release the latch")).toBeTruthy();
+  });
+
+  it("lets a person start the print of a 3D printer, tells them so, asks twice and starts nothing by itself", async () => {
+    const p = await show(<WorkPage route="" />, "operator", MACHINES);
+    expect(p.text()).toContain("A person must start this print: nothing starts by itself.");
+    expect(p.server.calls.some((c) => c.path.endsWith("/start"))).toBe(false);
+    await click(button("Start"));
+    expect(p.server.calls.some((c) => c.path.endsWith("/start"))).toBe(false);
+    await click(button("Sure?"));
+    expect(p.server.calls.filter((c) => c.path.endsWith("/start")).map((c) => c.path)).toEqual(["/work/jobs/w-5/start"]);
+  });
+
+  it("explains the four switches of the server that are off, and turns one on only after the person confirms it", async () => {
+    const puts: Call[] = [];
+    const POLICY = {
+      switches: ["mdns_announce", "compat_api", "compat_write", "slice_enabled"].map((key) => ({ key, value: false, safe: true })),
+      attention: [],
+      extra_apps: [],
+      editable: ["mdns_announce", "compat_api", "compat_write", "slice_enabled"],
+    };
+    const p = await show(<SecurityPage />, "admin", {
+      "GET /auth/sessions": () => ({ sessions: [] }),
+      "GET /auth/policy": () => POLICY,
+      "GET /audit": () => ({ enabled: true, lines: [] }),
+      "GET /auth/keys": () => ({ tokens: [], tls: { configured: false } }),
+      "PUT /auth/policy": (c) => {
+        puts.push(c);
+        return (c.body as { confirm_weak?: boolean }).confirm_weak ? POLICY : refusal(409, "weak_confirm_required");
+      },
+    });
+    for (const key of POLICY.editable) expect(p.text(), key).toContain(key);
+    expect(p.text()).toContain("the server announces itself on the local network");
+    expect(p.text()).toContain("Nothing starts by itself.");
+    expect(p.text()).toContain("the server may slice meshes into G-code");
+    const on = p.$$("button").filter((b) => b.textContent === "Edit: on");
+    expect(on).toHaveLength(4);
+    await click(on[1]);
+    expect(puts).toHaveLength(1);
+    expect(puts[0].body).toEqual({ key: "compat_api", value: true });
+    expect(p.text()).toContain("Apply it anyway?");
+    await click(button("Confirm"));
+    expect(puts).toHaveLength(2);
+    expect(puts[1].body).toEqual({ key: "compat_api", value: true, confirm_weak: true });
+  });
+});
+
 describe("the security", () => {
   const SESSIONS: Record<string, Handler> = {
     "GET /auth/sessions": () => ({

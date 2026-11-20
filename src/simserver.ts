@@ -18,6 +18,20 @@ export type SimMode =
   | "html" // answers 500 with a page that is not JSON (a proxy in front of the server)
   | "flaky"; // the connection fails by chance, `flakyPerMille` in a thousand, from the seed
 
+/** A machine of a plugin as the simulated server holds it, shaped as `WorkMachineInfo` in docs/openapi.json of EH3D-SERVER (the plugins of the machines have only run against simulators). */
+export type SimWorkMachine = {
+  id: string;
+  name: string;
+  plugin: string;
+  state: "idle" | "busy";
+  job: string | null;
+  capabilities: Record<string, unknown>;
+  detail: Record<string, unknown>;
+};
+
+/** The switches of security that the server brings off and lets change while it runs (`PUT /auth/policy`); turning one on is looser than recommended and needs `confirm_weak`. */
+export const SIM_POLICY_KEYS = ["mdns_announce", "compat_api", "compat_write", "slice_enabled"] as const;
+
 /** One request as the simulated server saw it. */
 export type SimRequest = { method: string; path: string; authorization: string | null };
 
@@ -55,6 +69,16 @@ export class SimServer {
   requests: SimRequest[] = [];
   /** How many requests were made, those that failed to connect included. */
   attempts = 0;
+  /** The bodies of the requests that were sent (a request with no body is null), in the same order as `requests`. */
+  bodies: unknown[] = [];
+  /** The machines of the plugins: a laser and a CNC machine that are free, and a 3D printer that an emergency stop latched. */
+  workMachines: SimWorkMachine[] = [
+    { id: "laser-1", name: "Laser", plugin: "laser", state: "idle", job: null, capabilities: { evidence: "simulator", requests: ["gcode", "vector"] }, detail: { evidence: "simulator", simulator_only: true, estop_latched: false, beam_on: false } },
+    { id: "cnc-1", name: "Router", plugin: "cnc", state: "idle", job: null, capabilities: { evidence: "simulator", requests: ["gcode"] }, detail: { evidence: "simulator", simulator_only: true, latched: false, state_word: "Idle" } },
+    { id: "print-1", name: "Printer", plugin: "printer3d", state: "idle", job: null, capabilities: { evidence: "simulator", requests: ["print", "preheat"] }, detail: { evidence: "simulator", simulator_only: true, latched: true, auto_start_queue: false } },
+  ];
+  /** The value of each switch of security the simulated server lets change. All off, as a server starts. */
+  policy: Record<string, boolean> = { mdns_announce: false, compat_api: false, compat_write: false, slice_enabled: false };
   private rng: SimRng;
   private tokens = new Set<string>();
   private issued = 0;
@@ -84,10 +108,41 @@ export class SimServer {
     const headers = (init?.headers ?? {}) as Record<string, string>;
     const authorization = headers.authorization ?? null;
     this.requests.push({ method, path, authorization });
+    this.bodies.push(typeof init?.body === "string" ? (JSON.parse(init.body) as unknown) : null);
     if (this.mode === "unavailable") return Promise.resolve(json(503, { error: "unavailable", detail: "the server is starting" }));
     if (this.mode === "html") return Promise.resolve(new Response("<html><body>Bad gateway</body></html>", { status: 500 }));
     return Promise.resolve(this.answer(method, path, authorization, init?.body));
   };
+
+  /** The emergency stop and the releases, as the plugins answer them: the stop latches a CNC machine or a 3D printer (a laser stops by cancelling its job), the release lets go of a latch. */
+  private operate(id: string, route: string): Response {
+    const m = this.workMachines.find((x) => x.id === id);
+    if (!m) return json(404, { error: "not_found", detail: id });
+    const stopRoute = route === "emergency-stop";
+    const mine = stopRoute ? m.plugin === "cnc" || m.plugin === "printer3d" : route === "laser/release" ? m.plugin === "laser" : m.plugin === "cnc" || m.plugin === "printer3d";
+    if (!mine) return json(404, { error: "not_found", detail: `${route} on ${m.plugin}` });
+    const key = m.plugin === "laser" ? "estop_latched" : "latched";
+    m.detail = { ...m.detail, [key]: stopRoute };
+    if (stopRoute) {
+      m.job = null;
+      m.state = "idle";
+    }
+    return json(200, { ok: true, machine: m.id, latched: stopRoute });
+  }
+
+  /** The policy as `GET /auth/policy` answers it: every switch with its value and whether it is as strict as recommended (off is), and the keys that can change. */
+  private policyView(): unknown {
+    return { switches: Object.entries(this.policy).map(([key, value]) => ({ key, value, safe: value === false })), attention: Object.entries(this.policy).filter(([, value]) => value).map(([key]) => key), extra_apps: [], editable: Object.keys(this.policy) };
+  }
+
+  /** A switch of security: a value that is looser than recommended (on) is refused with `weak_confirm_required` until the request says `confirm_weak`. */
+  private changePolicy(change: { key?: string; value?: unknown; confirm_weak?: boolean }): Response {
+    const key = change.key ?? "";
+    if (!(key in this.policy) || typeof change.value !== "boolean") return json(422, { error: "bad_request", detail: key });
+    if (change.value && change.confirm_weak !== true) return json(409, { error: "weak_confirm_required", detail: key });
+    this.policy[key] = change.value;
+    return json(200, this.policyView());
+  }
 
   private signedIn(authorization: string | null): boolean {
     const m = /^Bearer (.+)$/.exec(authorization ?? "");
@@ -108,6 +163,13 @@ export class SimServer {
     if (method === "GET" && path === "/session") return json(200, sessionExample);
     if (method === "GET" && path === "/fleet") return json(200, fleetExample);
     if (method === "GET" && path === "/jobs") return json(200, jobsExample);
+    if (method === "GET" && path === "/work/machines") return json(200, { machines: this.workMachines });
+    const act = /^\/work\/machines\/([^/]+)\/(emergency-stop|release|laser\/release)$/.exec(path);
+    if (method === "POST" && act) return this.operate(decodeURIComponent(act[1]), act[2]);
+    if (method === "GET" && path === "/auth/policy") {
+      return json(200, this.policyView());
+    }
+    if (method === "PUT" && path === "/auth/policy") return this.changePolicy(JSON.parse(typeof body === "string" ? body : "{}") as { key?: string; value?: unknown; confirm_weak?: boolean });
     return json(404, { error: "not_found", detail: `${method} ${path}` });
   }
 }
