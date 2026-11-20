@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.1.7] - Safety of the machines of the plugins, simulator badge, emergency stop and release by role and 36 more refusal codes in every language
+
 - **36 more refusals of the server have a sentence in the eight languages and in the other 29:** the codes of the laser (`laser_estop_latched`, `laser_power_limit`, `laser_feed_limit`, `air_assist_off`, `enclosure_open`, `focus_not_checked`, `test_fire_refused`), of the pick-and-place machine, the board work (`bad_gerber`, `missing_layer`, `unit_unknown`), the router (`machine_alarm`, `jog_while_running`, `out_of_travel`), the 3D printer (`printer_latched`, `thermal_runaway`, `temperature_over_limit`, `program_over_limit`, `farm_no_free_printer`), the slicer and the compatibility routes were shown as `code: detail`; each now has its own sentence, written in its own words in every language, and the test against the catalog of the server covers all 151 codes.
 
 - **A machine that has only run against a simulator says so:** the machines of the plugins `laser`, `pnp`, `pcb`, `cnc`, `gerber`, `cam`, `printer3d`, `vision` and `cad` carry a *simulator only* badge on the Machines tab (and their plugin in the list of plugins), read from the `detail` and the capabilities that the server sends, so none is shown as proven on hardware.
