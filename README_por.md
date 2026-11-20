@@ -18,7 +18,7 @@
 
 ---
 
-**Verificação de honestidade - o que corre hoje:** uma aplicação web em React e TypeScript que entra no EH3D-SERVER e mostra e altera o que ele guarda: as máquinas com a sua estação, o seu nó e os ficheiros de configuração, os trabalhos, os utilizadores e os tokens, os eventos em direto. O cliente da API, as regras dos formulários, o menu por perfil e os 37 idiomas estão cobertos por 503 testes, e as páginas foram vistas num navegador contra um servidor local com máquinas simuladas. **Não foi usada com máquinas numa bancada**, e o servidor ainda não termina TLS.
+**Verificação de honestidade - o que corre hoje:** uma aplicação web em React e TypeScript que entra no EH3D-SERVER e mostra e altera o que ele guarda: as máquinas com a sua estação, o seu nó e os ficheiros de configuração, os trabalhos, os utilizadores e os tokens, os eventos em direto. O cliente da API, as regras dos formulários, o menu por perfil e os 37 idiomas estão cobertos por 558 testes, e as páginas foram vistas num navegador contra um servidor local com máquinas simuladas. **Não foi usada com máquinas numa bancada**, e o servidor ainda não termina TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Versão | `0.1.7` |
 | Maturidade | Funcional |
-| Testes | 503 testes (`npm test`) |
+| Testes | 558 testes (`npm test`) |
 | Tecnologias | React 19, TypeScript, Vite |
 | Em hardware real | Não com máquinas numa bancada: vista num navegador contra um servidor local com máquinas simuladas |
 
@@ -45,7 +45,7 @@ Cada linha é uma parte deste repositório e a luz diz até onde chega hoje. É 
 | Área | Estado | O que significa aqui |
 |---|---|---|
 | Software | 🟡 | A aplicação compila sem avisos (tipos, lint, compilação) e é servida pelo servidor na raiz do seu endereço; já correu num navegador contra um servidor local. |
-| Testes | 🟡 | Passam 503 testes (`npm test`): o cliente da API com os seus erros, as regras de nomes, palavras-passe e endereços, o menu por perfil, a frota por estação, as ações de um trabalho, os 37 idiomas e o cliente perante um servidor simulado que cai, recusa, não diz nada, faz caducar a sessão ou falha ao acaso. |
+| Testes | 🟡 | Passam 558 testes (`npm test`): o cliente da API com os seus erros, as regras de nomes, palavras-passe e endereços, o menu por perfil, a frota por estação, as ações de um trabalho, os 37 idiomas e o cliente perante um servidor simulado que cai, recusa, não diz nada, faz caducar a sessão ou falha ao acaso. |
 | Páginas | 🟡 | Resumo, máquinas por estação, trabalhos, eventos em direto, máquinas, utilizadores e tokens, servidor, conta, preferências e acerca de estão escritos; os trabalhos e as máquinas gerem-se com a API real do servidor. Nenhuma página foi experimentada por alguém que não seja o autor. |
 | Serviços comuns | 🟠 | Projetos, máquinas e trabalhos, segurança e relatórios de projeto estão escritos e testados contra um substituto do servidor; não contra o EH3D-SERVER em funcionamento nem no CM5. |
 | Idiomas | 🟡 | 37 idiomas em cada texto, incluindo as recusas do servidor; os textos são lidos por um teste, mas só o inglês e algumas frases dos outros foram lidos por uma pessoa; os 29 idiomas a seguir aos oito primeiros são traduções do modelo à espera de revisão por falantes nativos. |
@@ -55,7 +55,7 @@ Cada linha é uma parte deste repositório e a luz diz até onde chega hoje. É 
 ## 🎯 Visão geral
 
 * **Monitorização:** o resumo (máquinas livres, em curso e à espera, trabalhos prontos, ativos, terminados e falhados), as máquinas sob as suas estações com o progresso de cada trabalho, a lista de trabalhos com filtros e ações, e os eventos em direto do servidor pelo seu websocket.
-* **Configuração:** as máquinas (identificador, nome, modelo, estação, um nó com o seu endereço e token ou o simulador, o texto dos dois ficheiros de configuração e o ficheiro de máquina), os utilizadores com o seu perfil, os tokens dos programas e a referência das definições do servidor.
+* **Configuração:** as máquinas (identificador, nome, modelo, estação, um nó com o seu endereço e token ou o simulador, o texto dos dois ficheiros de configuração e o ficheiro de máquina), os utilizadores com o seu perfil, os tokens dos programas e as definições do servidor, desenhadas a partir do seu contrato: cada definição e interruptor, alterados aqui quando o servidor permite alterá-los com ele a funcionar.
 * **Conta:** a palavra-passe da pessoa, o idioma, o tema e de quanto em quanto tempo as páginas voltam a perguntar ao servidor.
 * **O aspeto do BUNGARD-GUI:** o tema Forge por omissão (preto quente, âmbar, cartões com dois cantos cortados, botões com contorno âmbar) e mais três: Papel, Néon e Meia-noite.
 * **Servido pelo servidor:** com `studio_dir` em `server.cfg` o servidor serve estas páginas na raiz do seu próprio endereço, por isso não há mais nada a instalar nem definição de origem cruzada.
@@ -184,7 +184,7 @@ Como as partes deste repositório se encaixam: quem fala com ele, o que contém 
 
 ## ⚙️ Configuração
 
-O Studio não tem ficheiro de definições próprio: as definições do servidor estão no seu `server.cfg` (a página Servidor lista-as), e o que uma pessoa escolhe fica guardado no seu navegador.
+O Studio não tem ficheiro de definições próprio: as definições do servidor estão no seu `server.cfg` (a página Servidor mostra-as e altera as que o servidor deixa alterar com ele a funcionar), e o que uma pessoa escolhe fica guardado no seu navegador.
 
 | Definição | Omissão | Intervalo | O que faz |
 |---|---|---|---|
@@ -208,7 +208,7 @@ Copie `dist/` para a CM5 (por exemplo para `/opt/eh3d-studio`), ponha `studio_di
 
 ## 🧪 Testes
 
-`npm test` executa 503 testes e passam todos: o cliente da API (o token, o corpo, a consulta, os erros, uma rede que falha, os caminhos com nomes que precisam de escape), as regras de nomes, palavras-passe e endereços de nó, o que está errado numa máquina, o menu de cada perfil, as máquinas agrupadas por estação, as contagens e as ações de um trabalho, e os 37 idiomas (cada idioma tem todos os textos, os mesmos marcadores em todo o lado, as duas variantes só com chaves da fonte, chinês e japonês na sua escrita, nenhum escrito da direita para a esquerda). `npm run typecheck` e `npm run lint` também passam. Também lê os exemplos de respostas que os testes do servidor produzem, de modo que uma resposta que muda sem que o Studio a acompanhe falha aqui. Também testa o tempo máximo de cada pedido (com um relógio movido à mão), a consulta que espera pelo último pedido, os textos contra o catálogo de códigos de erro do servidor e as regras dos tokens dos programas. Também testa a segurança das máquinas dos plugins: o distintivo de uma máquina que só correu contra um simulador, os bloqueios a vermelho, a paragem de emergência sem pergunta para um operador e a libertação de um bloqueio só para um administrador (pedida duas vezes), a impressão de uma impressora 3D que uma pessoa inicia e os quatro interruptores do servidor que estão desligados, contra o servidor simulado e, ao lado do repositório do servidor, contra o seu contrato.
+`npm test` executa 558 testes e passam todos: o cliente da API (o token, o corpo, a consulta, os erros, uma rede que falha, os caminhos com nomes que precisam de escape), as regras de nomes, palavras-passe e endereços de nó, o que está errado numa máquina, o menu de cada perfil, as máquinas agrupadas por estação, as contagens e as ações de um trabalho, e os 37 idiomas (cada idioma tem todos os textos, os mesmos marcadores em todo o lado, as duas variantes só com chaves da fonte, chinês e japonês na sua escrita, nenhum escrito da direita para a esquerda). `npm run typecheck` e `npm run lint` também passam. Também lê os exemplos de respostas que os testes do servidor produzem, de modo que uma resposta que muda sem que o Studio a acompanhe falha aqui. Também testa o tempo máximo de cada pedido (com um relógio movido à mão), a consulta que espera pelo último pedido, os textos contra o catálogo de códigos de erro do servidor e as regras dos tokens dos programas. Também testa a segurança das máquinas dos plugins: o distintivo de uma máquina que só correu contra um simulador, os bloqueios a vermelho, a paragem de emergência sem pergunta para um operador e a libertação de um bloqueio só para um administrador (pedida duas vezes), a impressão de uma impressora 3D que uma pessoa inicia e os quatro interruptores do servidor que estão desligados, contra o servidor simulado e, ao lado do repositório do servidor, contra o seu contrato. Também testa o ecrã das definições do servidor: a cópia do seu contrato face ao ficheiro do servidor, os grupos, o controlo de cada tipo, o texto no idioma da pessoa, o valor por omissão que se pode repor, o intervalo verificado antes de enviar, o reinício necessário, o papel que pode alterar uma definição, o segredo que nunca é mostrado, as recusas do servidor com o seu texto e uma chave que ninguém descreveu.
 
 ## 🏗️ Compilação e publicação
 
@@ -238,6 +238,7 @@ EH3D-STUDIO/
 │   ├── App.tsx context.tsx                      a estrutura, o menu em quatro grupos, o que as páginas partilham
 │   ├── api.ts types.ts                          o cliente da API do servidor
 │   ├── services/                                clientes, regras e eventos dos quatro serviços
+│   ├── data/                                    a cópia do contrato de definições do servidor
 │   ├── model.ts                                 perfis, regras dos formulários, frota e trabalhos
 │   ├── jobtools.ts attention.ts                 as ferramentas dos trabalhos: furos, pedidos, plano, pesquisa, CSV
 │   ├── tokenstore.ts                            onde o token de sessão é guardado: este separador, ou o navegador se lembrado
@@ -246,7 +247,8 @@ EH3D-STUDIO/
 │   └── styles.css                               o tema Forge e mais três
 ├── tools/
 │   ├── demo_seed.mjs shots.mjs                  dados de demonstração e as imagens do README
-│   └── ci_validate.py                           verificação de CI e de README
+│   ├── ci_validate.py                           verificação de CI e de README
+│   └── sync_settings_contract.py                verifica a cópia do contrato de definições
 ├── docs/                                        as fontes dos dois desenhos
 ├── public/                                      o ícone da página
 ├── images/                                      banner, desenhos e capturas
@@ -273,7 +275,7 @@ EH3D-STUDIO/
 
 * Não foi usada com máquinas numa bancada: nenhuma máquina de uma oficina foi configurada por ela e nenhum trabalho correu a partir dela numa máquina real.
 * O servidor não termina TLS, por isso o token e as palavras-passe viajam em claro numa rede sem cifra.
-* As definições do servidor são mostradas como referência, não editadas: a API não as fornece, e alteram-se em `server.cfg` na máquina que executa o servidor.
+* As definições do servidor só se alteram a partir do Studio se o servidor o permitir com ele a funcionar; as outras definem-se em `server.cfg` e aqui são mostradas só de leitura. Sem o contrato do servidor, o Studio mostra a sua própria cópia, só de leitura.
 * Só o dono olhou para as páginas; os textos dos idiomas que não o inglês não foram lidos por falantes nativos.
 * Ainda não há página do visor de um trabalho (a planta dos furos).
 * As páginas dos serviços comuns só correram contra um substituto do servidor; as rotas que agora usam para a execução do projeto, a auditoria, as chaves, as alterações da política e a quota foram escritas a partir do contrato do EH3D-SERVER e não foram experimentadas contra um servidor em funcionamento. A execução do projeto precisa de um servidor preparado para isso (senão responde 501) e não foi experimentada com o programa de projeto real.
@@ -283,7 +285,7 @@ EH3D-STUDIO/
 * Experimentá-la com as máquinas de uma bancada: juntar cada máquina, chegar ao seu nó e executar um trabalho a partir da página dos trabalhos.
 * Uma página para ver um trabalho (a planta dos furos e onde vai).
 * Terminar TLS no servidor, ou documentar um proxy inverso, e mostrar o estado da ligação.
-* Editar as definições do servidor a partir do Studio quando o servidor as fornecer.
+* Alterar a partir do Studio as definições que se fixam em `server.cfg`, quando o servidor fornecer uma rota para elas.
 
 ## 🌍 Idiomas
 

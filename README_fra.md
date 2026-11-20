@@ -18,7 +18,7 @@
 
 ---
 
-**Vérification d'honnêteté - ce qui tourne aujourd'hui :** une application web en React et TypeScript qui se connecte à EH3D-SERVER et montre et modifie ce qu'il contient : les machines avec leur station, leur nœud et leurs fichiers de configuration, les travaux, les utilisateurs et les jetons, les événements en direct. Le client de l'API, les règles des formulaires, le menu par rôle et les 37 langues sont couverts par 503 tests, et les pages ont été vues dans un navigateur contre un serveur local avec des machines simulées. **Elle n'a pas été utilisée avec des machines sur un banc**, et le serveur ne termine pas encore TLS.
+**Vérification d'honnêteté - ce qui tourne aujourd'hui :** une application web en React et TypeScript qui se connecte à EH3D-SERVER et montre et modifie ce qu'il contient : les machines avec leur station, leur nœud et leurs fichiers de configuration, les travaux, les utilisateurs et les jetons, les événements en direct. Le client de l'API, les règles des formulaires, le menu par rôle et les 37 langues sont couverts par 558 tests, et les pages ont été vues dans un navigateur contre un serveur local avec des machines simulées. **Elle n'a pas été utilisée avec des machines sur un banc**, et le serveur ne termine pas encore TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.1.7` |
 | Maturité | Fonctionnel |
-| Tests | 503 tests (`npm test`) |
+| Tests | 558 tests (`npm test`) |
 | Pile technique | React 19, TypeScript, Vite |
 | Sur du matériel réel | Pas avec des machines sur un banc : vue dans un navigateur contre un serveur local avec des machines simulées |
 
@@ -45,7 +45,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Logiciel | 🟡 | L'application se construit sans avertissement (types, lint, build) et est servie par le serveur à la racine de son adresse ; elle a tourné dans un navigateur contre un serveur local. |
-| Tests | 🟡 | 503 tests réussissent (`npm test`) : le client de l'API avec ses erreurs, les règles des noms, mots de passe et adresses, le menu par rôle, la flotte par station, les actions d'un travail, les 37 langues et le client face à un serveur simulé qui tombe, refuse, ne dit rien, fait expirer la connexion ou échoue au hasard. |
+| Tests | 🟡 | 558 tests réussissent (`npm test`) : le client de l'API avec ses erreurs, les règles des noms, mots de passe et adresses, le menu par rôle, la flotte par station, les actions d'un travail, les 37 langues et le client face à un serveur simulé qui tombe, refuse, ne dit rien, fait expirer la connexion ou échoue au hasard. |
 | Pages | 🟡 | Aperçu, machines par station, travaux, événements en direct, machines, utilisateurs et jetons, serveur, compte, préférences et à propos sont écrits ; travaux et machines se gèrent avec la vraie API du serveur. Aucune page n'a été essayée par quelqu'un d'autre que l'auteur. |
 | Services communs | 🟠 | Projets, machines et travaux, sécurité et rapports de conception sont écrits et testés contre un serveur de substitution ; pas contre EH3D-SERVER en marche ni sur le CM5. |
 | Langues | 🟡 | 37 langues dans chaque texte, refus du serveur compris ; les textes sont lus par un test, mais seuls l'anglais et quelques phrases des autres ont été lus par une personne ; les 29 langues après les huit premières sont des traductions du modèle qui attendent une relecture par des locuteurs natifs. |
@@ -55,7 +55,7 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 ## 🎯 Présentation
 
 * **Supervision :** l'aperçu (machines libres, en marche et en attente, travaux prêts, actifs, terminés et échoués), les machines sous leurs stations avec la progression de chaque travail, la liste des travaux avec filtres et actions, et les événements en direct du serveur par son websocket.
-* **Configuration :** les machines (identifiant, nom, modèle, station, un nœud avec son adresse et son jeton ou le simulateur, le texte des deux fichiers de configuration et le fichier de machine), les utilisateurs avec leur rôle, les jetons des programmes et la référence des réglages du serveur.
+* **Configuration :** les machines (identifiant, nom, modèle, station, un nœud avec son adresse et son jeton ou le simulateur, le texte des deux fichiers de configuration et le fichier de machine), les utilisateurs avec leur rôle, les jetons des programmes et les réglages du serveur, dessinés à partir de son contrat : chaque réglage et interrupteur, modifié ici quand le serveur permet de le changer en fonctionnement.
 * **Compte :** le mot de passe de la personne, la langue, le thème et la fréquence à laquelle les pages interrogent à nouveau le serveur.
 * **Le style de BUNGARD-GUI :** le thème Forge par défaut (noir chaud, ambre, cartes à deux coins coupés, boutons à contour ambre) et trois autres : Papier, Néon et Minuit.
 * **Servi par le serveur :** avec `studio_dir` dans `server.cfg` le serveur sert ces pages à la racine de sa propre adresse : rien d'autre à installer et aucun réglage d'origine croisée.
@@ -184,7 +184,7 @@ Comment s'assemblent les parties de ce dépôt : qui lui parle, ce qu'il contien
 
 ## ⚙️ Configuration
 
-Studio n'a pas de fichier de réglages propre : les réglages du serveur sont dans son `server.cfg` (la page Serveur les liste), et ce qu'une personne choisit est gardé dans son navigateur.
+Studio n'a pas de fichier de réglages propre : les réglages du serveur sont dans son `server.cfg` (la page Serveur les montre et change ceux que le serveur laisse changer en fonctionnement), et ce qu'une personne choisit est gardé dans son navigateur.
 
 | Réglage | Défaut | Plage | Ce que ça fait |
 |---|---|---|---|
@@ -208,7 +208,7 @@ Copiez `dist/` sur la CM5 (par exemple dans `/opt/eh3d-studio`), mettez `studio_
 
 ## 🧪 Tests
 
-`npm test` lance 503 tests et tous réussissent : le client de l'API (le jeton, le corps, la requête, les erreurs, un réseau qui tombe, les chemins avec des noms à échapper), les règles des noms, mots de passe et adresses de nœud, ce qui ne va pas dans une machine, le menu de chaque rôle, les machines groupées par station, les comptes et les actions d'un travail, et les 37 langues (chaque langue a chaque texte, les mêmes marqueurs partout, les deux variantes seulement avec des clés de la source, chinois et japonais dans leur écriture, aucune écrite de droite à gauche). `npm run typecheck` et `npm run lint` réussissent aussi. Il lit aussi les exemples de réponses que produisent les tests du serveur : une réponse qui change sans que Studio suive échoue ici. Il teste aussi la limite de temps de chaque requête (avec une horloge avancée à la main), l'interrogation qui attend la dernière requête, les textes face au catalogue des codes d'erreur du serveur et les règles des jetons des programmes. Il teste aussi la sécurité des machines des plugins : l'insigne d'une machine qui n'a tourné que contre un simulateur, les verrouillages en rouge, l'arrêt d'urgence sans question pour un opérateur et la levée d'un verrouillage réservée à un administrateur (demandée deux fois), l'impression d'une imprimante 3D qu'une personne lance, et les quatre interrupteurs du serveur qui sont éteints, contre le serveur simulé et, à côté du dépôt du serveur, contre son contrat.
+`npm test` lance 558 tests et tous réussissent : le client de l'API (le jeton, le corps, la requête, les erreurs, un réseau qui tombe, les chemins avec des noms à échapper), les règles des noms, mots de passe et adresses de nœud, ce qui ne va pas dans une machine, le menu de chaque rôle, les machines groupées par station, les comptes et les actions d'un travail, et les 37 langues (chaque langue a chaque texte, les mêmes marqueurs partout, les deux variantes seulement avec des clés de la source, chinois et japonais dans leur écriture, aucune écrite de droite à gauche). `npm run typecheck` et `npm run lint` réussissent aussi. Il lit aussi les exemples de réponses que produisent les tests du serveur : une réponse qui change sans que Studio suive échoue ici. Il teste aussi la limite de temps de chaque requête (avec une horloge avancée à la main), l'interrogation qui attend la dernière requête, les textes face au catalogue des codes d'erreur du serveur et les règles des jetons des programmes. Il teste aussi la sécurité des machines des plugins : l'insigne d'une machine qui n'a tourné que contre un simulateur, les verrouillages en rouge, l'arrêt d'urgence sans question pour un opérateur et la levée d'un verrouillage réservée à un administrateur (demandée deux fois), l'impression d'une imprimante 3D qu'une personne lance, et les quatre interrupteurs du serveur qui sont éteints, contre le serveur simulé et, à côté du dépôt du serveur, contre son contrat. Elle teste aussi l'écran des réglages du serveur : la copie de son contrat face au fichier du serveur, les groupes, le contrôle de chaque type, le texte dans la langue de la personne, la valeur par défaut que l'on peut rétablir, la plage vérifiée avant l'envoi, le redémarrage nécessaire, le rôle qui peut modifier un réglage, le secret qui n'est jamais affiché, les refus du serveur avec leur texte et une clé que personne n'a décrite.
 
 ## 🏗️ Compilation et publication
 
@@ -238,6 +238,7 @@ EH3D-STUDIO/
 │   ├── App.tsx context.tsx                      l'ossature, le menu en quatre groupes, ce que les pages partagent
 │   ├── api.ts types.ts                          le client de l'API du serveur
 │   ├── services/                                clients, règles et événements des quatre services
+│   ├── data/                                    la copie du contrat des réglages du serveur
 │   ├── model.ts                                 rôles, règles des formulaires, flotte et travaux
 │   ├── jobtools.ts attention.ts                 les outils des travaux : trous, requêtes, plan, recherche, CSV
 │   ├── tokenstore.ts                            où le jeton de connexion est gardé : cet onglet, ou le navigateur si mémorisé
@@ -246,7 +247,8 @@ EH3D-STUDIO/
 │   └── styles.css                               le thème Forge et trois autres
 ├── tools/
 │   ├── demo_seed.mjs shots.mjs                  données de démonstration et les images du README
-│   └── ci_validate.py                           contrôle CI et README
+│   ├── ci_validate.py                           contrôle CI et README
+│   └── sync_settings_contract.py                vérifie la copie du contrat des réglages
 ├── docs/                                        les sources des deux images
 ├── public/                                      l'icône de la page
 ├── images/                                      bannière, images et captures
@@ -273,7 +275,7 @@ EH3D-STUDIO/
 
 * Elle n'a pas été utilisée avec des machines sur un banc : aucune machine d'un atelier n'a été configurée par elle et aucun travail n'a tourné depuis elle sur une vraie machine.
 * Le serveur ne termine pas TLS, donc jeton et mots de passe circulent en clair sur un réseau non chiffré.
-* Les réglages du serveur sont montrés comme référence, pas modifiés : l'API ne les donne pas, et ils se changent dans `server.cfg` sur la machine qui exécute le serveur.
+* Les réglages du serveur ne se changent depuis Studio que si le serveur le permet en fonctionnement ; les autres se règlent dans `server.cfg` et sont montrés ici en lecture seule. Sans le contrat du serveur, Studio montre sa propre copie, en lecture seule.
 * Seul le propriétaire a regardé les pages ; les textes des langues autres que l'anglais n'ont pas été lus par des locuteurs natifs.
 * Il n'y a pas encore de page de visualisation d'un travail (le plan des trous).
 * Les pages des services communs n'ont tourné que contre un serveur de substitution ; les routes qu'elles utilisent maintenant pour l'exécution de conception, l'audit, les clés, les changements de la politique et le quota sont écrites d'après le contrat d'EH3D-SERVER et n'ont pas été essayées contre un serveur en marche. L'exécution de conception demande que le serveur soit prévu pour cela (sinon il répond 501) et n'a pas été essayée avec le vrai programme de conception.
@@ -283,7 +285,7 @@ EH3D-STUDIO/
 * L'essayer avec les machines d'un banc : ajouter chaque machine, atteindre son nœud et exécuter un travail depuis la page des travaux.
 * Une page pour voir un travail (le plan des trous et où il en est).
 * Terminer TLS dans le serveur, ou documenter un proxy inverse, et montrer l'état de la connexion.
-* Modifier les réglages du serveur depuis Studio quand le serveur les fournira.
+* Modifier depuis Studio les réglages définis dans `server.cfg`, quand le serveur fournira une route pour eux.
 
 ## 🌍 Langues
 

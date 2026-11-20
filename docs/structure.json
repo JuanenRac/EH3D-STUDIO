@@ -69,6 +69,20 @@
         },
         {
           "desc": {
+            "en": "the copy of the settings contract of the server",
+            "es": "la copia del contrato de ajustes del servidor",
+            "it": "la copia del contratto delle impostazioni del server",
+            "de": "die Kopie des Einstellungsvertrags des Servers",
+            "fr": "la copie du contrat des réglages du serveur",
+            "pt": "a cópia do contrato de definições do servidor",
+            "zh": "服务器设置契约的副本",
+            "ja": "サーバー設定の契約のコピー"
+          },
+          "name": "data/",
+          "tree_name": "data/"
+        },
+        {
+          "desc": {
             "en": "roles, rules of the forms, fleet and jobs",
             "es": "roles, reglas de los formularios, flota y trabajos",
             "it": "ruoli, regole dei moduli, flotta e lavori",
@@ -190,6 +204,20 @@
             "ja": "CI と README のチェック"
           },
           "name": "ci_validate.py"
+        },
+        {
+          "desc": {
+            "en": "checks the copy of the settings contract",
+            "es": "comprueba la copia del contrato de ajustes",
+            "it": "controlla la copia del contratto delle impostazioni",
+            "de": "prüft die Kopie des Einstellungsvertrags",
+            "fr": "vérifie la copie du contrat des réglages",
+            "pt": "verifica a cópia do contrato de definições",
+            "zh": "检查设置契约的副本",
+            "ja": "設定の契約のコピーを検査"
+          },
+          "name": "sync_settings_contract.py",
+          "tree_name": "sync_settings_contract.py"
         }
       ],
       "sub": {

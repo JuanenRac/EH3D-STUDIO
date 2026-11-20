@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **55 more tests:** the copy of the contract against the file of the server, every key with a control and a text in the eight languages of the contract, the groups, the text by language, the control by type, who may write, the range, the restore of the default, the restart, the secret, the refusals by their code, the live contract against the copy, and a key nobody described.
+
 - **The page of the server draws every setting and switch from the contract of the server:** the groups (network, storage, logins, audit, updates, machines, compatibility, slicer, printers, tasks, artifacts, projects, catalogs, events and design), and for each key its label, help and warning in the language of the person, the value in force, the default, and whether a change applies at once or needs a restart. Studio reads `GET /api/v1/settings/contract` and no longer keeps a list of its own, so a setting the server adds appears without a new version of Studio.
 
 - **Every switch and setting the server lets change can be changed from Studio:** an administrator changes the keys of the policy with the control of their type (a switch, a number with its range and unit, a text, a list or a choice), each written by the route and method the contract names (`PUT /api/v1/auth/policy`), with a button to restore the default and the sentence of the server for each refusal.

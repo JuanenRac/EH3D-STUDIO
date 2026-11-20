@@ -18,7 +18,7 @@
 
 ---
 
-**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the 37 languages are covered by 503 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
+**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the 37 languages are covered by 558 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.1.7` |
 | Maturity | Functional |
-| Tests | 503 tests (`npm test`) |
+| Tests | 558 tests (`npm test`) |
 | Stack | React 19, TypeScript, Vite |
 | On real hardware | Not against machines on a bench: looked at in a browser against a local server with simulated machines |
 
@@ -45,7 +45,7 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟡 | The application builds without warnings (typecheck, lint, build) and is served by the server at the root of its address; it has been run in a browser against a local server. |
-| Tests | 🟡 | 503 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job, the 37 languages, and the client against a simulated server that goes down, refuses, says nothing, expires the login or fails by chance. |
+| Tests | 🟡 | 558 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job, the 37 languages, and the client against a simulated server that goes down, refuses, says nothing, expires the login or fails by chance. |
 | Pages | 🟡 | Overview, machines by station, jobs, live events, machines, users and tokens, server, account, preferences and about are written; the jobs and the machines are managed against the real API of the server. No page has been tried by someone who is not the author. |
 | Common services | 🟠 | Projects, machines and jobs, security and design reports are written and tested against a stand-in of the server; not against EH3D-SERVER running or on the CM5. |
 | Languages | 🟡 | 37 languages in every text, the refusals of the server included; the texts are read by a test, but only English and a few phrases of the others have been read by a person; the 29 languages beyond the first eight are translations by the model that wait for a review by native speakers. |
@@ -55,7 +55,7 @@ Each line is one part of this repository and the light says how far it is today.
 ## 🎯 Overview
 
 * **Monitor:** the overview (machines free, running and waiting, jobs ready, active, done and failed), the machines under their stations with the progress of each job, the list of jobs with filters and their actions, and the live events of the server over its websocket.
-* **Configure:** the machines (identifier, name, model, station, a node with its address and token or the simulator, the text of the two configuration files and the machine file), the users with their role, the tokens of the programs and the reference of the settings of the server.
+* **Configure:** the machines (identifier, name, model, station, a node with its address and token or the simulator, the text of the two configuration files and the machine file), the users with their role, the tokens of the programs and the settings of the server, drawn from its contract: every setting and switch, changed here when the server lets it be changed while it runs.
 * **Account:** the password of the person, the language, the theme and how often the pages ask the server again.
 * **The look of BUNGARD-GUI:** the Forge theme by default (warm black, amber, cards with two cut corners, amber-outlined chips) and three more: Paper, Neon and Midnight.
 * **Served by the server:** with `studio_dir` in `server.cfg` the server serves these pages at the root of its own address, so there is nothing else to install and no cross-origin setting.
@@ -184,7 +184,7 @@ How the parts of this repository fit together: who talks to it, what it holds an
 
 ## ⚙️ Configuration
 
-Studio has no settings file of its own: the server's settings are in its `server.cfg` (the page Server lists them), and what a person chooses is kept in their browser.
+Studio has no settings file of its own: the server's settings are in its `server.cfg` (the page Server shows them and changes the ones the server lets change while it runs), and what a person chooses is kept in their browser.
 
 | Setting | Default | Range | What it does |
 |---|---|---|---|
@@ -208,7 +208,7 @@ Copy `dist/` to the CM5 (for example to `/opt/eh3d-studio`), put `studio_dir = /
 
 ## 🧪 Testing
 
-`npm test` runs 503 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the 37 languages (every language has every text, the same placeholders everywhere, the two variants only with keys of the source, Chinese and Japanese in their own scripts, none written right to left). `npm run typecheck` and `npm run lint` pass as well. It also reads the examples of the answers that the tests of the server make, so an answer that changes without Studio following fails here. It also tests the time limit of every request (with a clock that is moved by hand), the polling that waits for the last request, the texts against the catalog of the error codes of the server, and the rules for the tokens of the programs. It also tests the safety of the machines of the plugins: the badge of a machine that has only run against a simulator, the interlocks in red, the emergency stop with no question for an operator and the release of a latch for an administrator only (asked twice), the print of a 3D printer that a person starts, and the four switches of the server that are off, against the simulated server and, next to the repository of the server, against its contract.
+`npm test` runs 558 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the 37 languages (every language has every text, the same placeholders everywhere, the two variants only with keys of the source, Chinese and Japanese in their own scripts, none written right to left). `npm run typecheck` and `npm run lint` pass as well. It also reads the examples of the answers that the tests of the server make, so an answer that changes without Studio following fails here. It also tests the time limit of every request (with a clock that is moved by hand), the polling that waits for the last request, the texts against the catalog of the error codes of the server, and the rules for the tokens of the programs. It also tests the safety of the machines of the plugins: the badge of a machine that has only run against a simulator, the interlocks in red, the emergency stop with no question for an operator and the release of a latch for an administrator only (asked twice), the print of a 3D printer that a person starts, and the four switches of the server that are off, against the simulated server and, next to the repository of the server, against its contract. It also tests the page of the settings of the server: the copy of its contract against the file of the server, the groups, the control of each type, the text in the language of the person, the default that can be restored, the range checked before sending, the restart that is needed, the role that may change a setting, the secret that is never shown, the refusals of the server with their text, and a key that nobody described.
 
 ## 🏗️ Build & Release
 
@@ -238,6 +238,7 @@ EH3D-STUDIO/
 │   ├── App.tsx context.tsx                      the shell, the menu in four groups, what the pages share
 │   ├── api.ts types.ts                          the client of the API of the server
 │   ├── services/                                clients, rules and events of the four services
+│   ├── data/                                    the copy of the settings contract of the server
 │   ├── model.ts                                 roles, rules of the forms, fleet and jobs
 │   ├── jobtools.ts attention.ts                 the job tools: holes, requests, plan, search, CSV
 │   ├── tokenstore.ts                            where the login token is kept: this tab, or the browser if remembered
@@ -246,7 +247,8 @@ EH3D-STUDIO/
 │   └── styles.css                               the Forge theme and three more
 ├── tools/
 │   ├── demo_seed.mjs shots.mjs                  demo data and the pictures of the README
-│   └── ci_validate.py                           CI check and README check
+│   ├── ci_validate.py                           CI check and README check
+│   └── sync_settings_contract.py                checks the copy of the settings contract
 ├── docs/                                        the sources of the two pictures
 ├── public/                                      the icon of the page
 ├── images/                                      banner, pictures and screenshots
@@ -273,7 +275,7 @@ EH3D-STUDIO/
 
 * It has not been used against machines on a bench: no machine of a workshop has been set up through it and no job has run on a real machine from it.
 * The server does not terminate TLS, so the token and the passwords travel in clear text on a plain network.
-* The settings of the server are shown as a reference, not edited: the API does not give them out, and they are changed in `server.cfg` on the machine that runs the server.
+* The settings of the server are changed from Studio only when the server lets them change while it runs; the others are set in `server.cfg` and shown here read-only. Without the contract of the server, Studio shows its own copy, read-only.
 * Only the owner has looked at the pages; the texts of the languages other than English have not been read by native speakers.
 * There is no page of the viewer of a job (the plan of the holes) yet.
 * The pages of the common services have only run against a stand-in of the server; the routes they now use for the design run, the audit, the keys, the changes of the policy and the quota are written from the contract of EH3D-SERVER and have not been tried against a running server. The design run needs the server set up for it (it answers 501 otherwise) and has not been tried with the real design program.
@@ -283,7 +285,7 @@ EH3D-STUDIO/
 * Try it with the machines of a bench: add each machine, reach its node and run a job from the page of the jobs.
 * A page to view a job (the plan of the holes and where the job is).
 * Terminate TLS in the server, or document a reverse proxy, and show the state of the connection.
-* Edit the settings of the server from Studio when the server gives them out.
+* Change from Studio the settings that are set in `server.cfg`, when the server gives a route for them.
 
 ## 🌍 Languages
 
