@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Mitfi awtomatikament. Mixgħul: is-server jħabbar lilu nnifsu fin-netwerk lokali.",
 "sw_note_compat_api": "Mitfi awtomatikament. Mixgħul: it-toroq ta’ Moonraker u OctoPrint iwieġbu għall-qari fl-għerq tal-indirizz.",
 "sw_note_compat_write": "Mitfi awtomatikament. Mixgħul: dawk it-toroq jistgħu jikteb ukoll (waqfa, tħassir, tella’ fajl fil-kju). Xejn ma jibda waħdu.",
-"sw_note_slice_enabled": "Mitfi awtomatikament. Mixgħul: is-server jista’ jaqta’ r-rewixt f’G-code."
+"sw_note_slice_enabled": "Mitfi awtomatikament. Mixgħul: is-server jista’ jaqta’ r-rewixt f’G-code.",
+"up_signed_out": "Il-login intemm meta s-server reġa' beda: idħol mill-ġdid biex tkompli tsegwi l-aġġornament, li jkompli waħdu.",
+"up_stale": "L-aħħar stat magħruf, minn qabel intemm il-login.",
+"sw_note_persist_sessions": "Żomm is-sessjonijiet meta s-server jerġa' jibda. Mitfi awtomatikament. Mixgħul: il-logins jibqgħu wara li s-server jerġa' jibda (fuq id-disk jinżamm biss hash ta' kull token). Qabbdu QABEL ma taġġorna biex ma jkollokx għalfejn tidħol mill-ġdid."
 }

@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Domyślnie wyłączone. Włączone: serwer ogłasza się w sieci lokalnej.",
 "sw_note_compat_api": "Domyślnie wyłączone. Włączone: trasy Moonrakera i OctoPrinta odpowiadają na odczyty w korzeniu adresu.",
 "sw_note_compat_write": "Domyślnie wyłączone. Włączone: te trasy mogą także zapisywać (wstrzymać, anulować, wysłać plik do kolejki). Nic nie rusza samo.",
-"sw_note_slice_enabled": "Domyślnie wyłączone. Włączone: serwer może ciąć siatki na G-code."
+"sw_note_slice_enabled": "Domyślnie wyłączone. Włączone: serwer może ciąć siatki na G-code.",
+"up_signed_out": "Logowanie wygasło przy restarcie serwera: zaloguj się ponownie, aby dalej śledzić aktualizację, która trwa sama.",
+"up_stale": "Ostatni znany stan, sprzed końca logowania.",
+"sw_note_persist_sessions": "Zachowaj sesje po restarcie serwera. Domyślnie wyłączone. Włączone: logowania przetrwają restart serwera (na dysku zapisywany jest tylko skrót każdego tokenu). Włącz to PRZED aktualizacją, aby nie musieć logować się ponownie."
 }

@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Vaikimisi väljas. Sees: server teatab end kohtvõrgus.",
 "sw_note_compat_api": "Vaikimisi väljas. Sees: Moonrakeri ja OctoPrinti teed vastavad lugemistele aadressi juures.",
 "sw_note_compat_write": "Vaikimisi väljas. Sees: need teed võivad ka kirjutada (peatada, tühistada, laadida fail järjekorda). Miski ei käivitu ise.",
-"sw_note_slice_enabled": "Vaikimisi väljas. Sees: server võib võrke G-koodiks viilutada."
+"sw_note_slice_enabled": "Vaikimisi väljas. Sees: server võib võrke G-koodiks viilutada.",
+"up_signed_out": "Sisselogimine lõppes serveri taaskäivitamisel: logige uuesti sisse, et uuendust edasi jälgida; uuendus jätkub ise.",
+"up_stale": "Viimane teadaolev olek, enne sisselogimise lõppu.",
+"sw_note_persist_sessions": "Säilita seansid serveri taaskäivitamisel. Vaikimisi väljas. Sees: sisselogimised jäävad serveri taaskäivitusest hoolimata kehtima (kettale salvestatakse ainult iga tokeni räsi). Lülita see sisse ENNE uuendamist, et sul ei tuleks uuesti sisse logida."
 }

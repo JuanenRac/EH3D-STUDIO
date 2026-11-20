@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Apagat de manera predeterminada. Encès: el servidor s'anuncia a la xarxa local.",
 "sw_note_compat_api": "Apagat de manera predeterminada. Encès: les rutes de Moonraker i OctoPrint responen a lectures a l'arrel de l'adreça.",
 "sw_note_compat_write": "Apagat de manera predeterminada. Encès: aquestes rutes també poden escriure (pausar, cancel·lar, pujar un fitxer a la cua). Res no s'inicia sol.",
-"sw_note_slice_enabled": "Apagat de manera predeterminada. Encès: el servidor pot laminar malles a G-code."
+"sw_note_slice_enabled": "Apagat de manera predeterminada. Encès: el servidor pot laminar malles a G-code.",
+"up_signed_out": "La sessió ha acabat quan el servidor s'ha reiniciat: torna a iniciar la sessió per continuar veient l'actualització, que segueix sola.",
+"up_stale": "Últim estat conegut, d'abans que acabés la sessió.",
+"sw_note_persist_sessions": "Mantén les sessions en reiniciar el servidor. Desactivat per defecte. Activat: les sessions sobreviuen a un reinici del servidor (al disc només es guarda un hash de cada token). Activa-ho ABANS d'actualitzar per no haver de tornar a entrar."
 }

@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "E fikur si parazgjedhje. E ndezur: serveri njofton veten në rrjetin lokal.",
 "sw_note_compat_api": "E fikur si parazgjedhje. E ndezur: rrugët e Moonraker dhe OctoPrint u përgjigjen leximeve në rrënjën e adresës.",
 "sw_note_compat_write": "E fikur si parazgjedhje. E ndezur: ato rrugë mund të shkruajnë edhe (pauzë, anulim, ngarkim i një skedari në radhë). Asgjë nuk niset vetë.",
-"sw_note_slice_enabled": "E fikur si parazgjedhje. E ndezur: serveri mund t’i presë rrjetat në G-code."
+"sw_note_slice_enabled": "E fikur si parazgjedhje. E ndezur: serveri mund t’i presë rrjetat në G-code.",
+"up_signed_out": "Hyrja përfundoi kur serveri u rinis: hyni sërish për të vazhduar ta ndiqni përditësimin, i cili vazhdon vetë.",
+"up_stale": "Gjendja e fundit e njohur, nga para se të përfundonte hyrja.",
+"sw_note_persist_sessions": "Mbaj seancat kur serveri rinis. E çaktivizuar si parazgjedhje. E aktivizuar: hyrjet mbijetojnë rinisjen e serverit (në disk ruhet vetëm një hash i çdo tokeni). Aktivizoje PARA përditësimit që të mos duhet të hysh sërish."
 }

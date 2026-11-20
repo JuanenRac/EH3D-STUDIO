@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Prema zadanom isključeno. Uključeno: poslužitelj se najavljuje na lokalnoj mreži.",
 "sw_note_compat_api": "Prema zadanom isključeno. Uključeno: rute za Moonraker i OctoPrint odgovaraju na čitanja u korijenu adrese.",
 "sw_note_compat_write": "Prema zadanom isključeno. Uključeno: te rute smiju i pisati (pauza, otkazivanje, slanje datoteke u red). Ništa ne kreće samo.",
-"sw_note_slice_enabled": "Prema zadanom isključeno. Uključeno: poslužitelj smije rezati mreže u G-code."
+"sw_note_slice_enabled": "Prema zadanom isključeno. Uključeno: poslužitelj smije rezati mreže u G-code.",
+"up_signed_out": "Prijava je završila pri ponovnom pokretanju poslužitelja: prijavite se ponovno kako biste nastavili pratiti ažuriranje, koje se nastavlja samo.",
+"up_stale": "Zadnje poznato stanje, prije nego što je prijava završila.",
+"sw_note_persist_sessions": "Zadrži sesije pri ponovnom pokretanju poslužitelja. Prema zadanim postavkama isključeno. Uključeno: prijave prežive ponovno pokretanje poslužitelja (na disku se čuva samo hash svakog tokena). Uključite ga PRIJE ažuriranja da se ne biste morali ponovno prijavljivati."
 }

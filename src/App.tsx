@@ -7,7 +7,7 @@ import { useAttention, useReachable } from "./attention";
 import { browserLang, isLang, text } from "./i18n";
 import type { Lang, TextKey } from "./i18n";
 import { forgetPrograms } from "./jobtools";
-import { browserStores, clearToken, readToken, saveToken } from "./tokenstore";
+import { browserStores, clearToken, isRemembered, readToken, saveToken } from "./tokenstore";
 import { parseRoute, pagesFor } from "./model";
 import type { PageId } from "./model";
 import type { Session } from "./types";
@@ -116,6 +116,16 @@ export default function App() {
     setSession(await api.session());
   };
 
+  // a sign-in made inside a page keeps the new token in the same kind of store as the old one (the password is never kept)
+  const stayedIn = async () => {
+    if (api.token) saveToken(stores, api.token, isRemembered(stores));
+    try {
+      setSession(await api.session());
+    } catch {
+      /* the next request says what is wrong */
+    }
+  };
+
   const t = useMemo(() => makeText(lang), [lang]);
   const err = useMemo(() => makeErr(lang), [lang]);
   const changeLang = (l: Lang) => {
@@ -142,6 +152,7 @@ export default function App() {
       return err(e);
     },
     say: (message, kind = "ok") => setNews({ message, kind }),
+    afterRelogin: stayedIn,
   };
   const allowed = pagesFor(session.role);
   const current = allowed.some((p) => p.id === page) ? page : "overview";

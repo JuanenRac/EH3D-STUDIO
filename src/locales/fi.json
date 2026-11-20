@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Oletuksena pois päältä. Päällä: palvelin ilmoittaa itsestään paikallisverkossa.",
 "sw_note_compat_api": "Oletuksena pois päältä. Päällä: Moonrakerin ja OctoPrintin reitit vastaavat lukupyyntöihin osoitteen juuressa.",
 "sw_note_compat_write": "Oletuksena pois päältä. Päällä: nämä reitit saavat myös kirjoittaa (keskeyttää, peruuttaa, lähettää tiedosto jonoon). Mikään ei käynnisty itsestään.",
-"sw_note_slice_enabled": "Oletuksena pois päältä. Päällä: palvelin saa viipaloida verkkoja G-koodiksi."
+"sw_note_slice_enabled": "Oletuksena pois päältä. Päällä: palvelin saa viipaloida verkkoja G-koodiksi.",
+"up_signed_out": "Kirjautuminen päättyi palvelimen uudelleenkäynnistyksessä: kirjaudu uudelleen sisään seurataksesi päivitystä; päivitys jatkuu itsestään.",
+"up_stale": "Viimeksi tiedetty tila ajalta ennen kirjautumisen päättymistä.",
+"sw_note_persist_sessions": "Säilytä istunnot palvelimen uudelleenkäynnistyksessä. Oletuksena pois. Päällä: kirjautumiset säilyvät palvelimen uudelleenkäynnistyksen yli (levylle tallennetaan vain kunkin tunnisteen tiiviste). Kytke päälle ENNEN päivitystä, jotta sinun ei tarvitse kirjautua uudelleen."
 }

@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Oprit implicit. Pornit: serverul se anunță în rețeaua locală.",
 "sw_note_compat_api": "Oprit implicit. Pornit: rutele Moonraker și OctoPrint răspund la citiri la rădăcina adresei.",
 "sw_note_compat_write": "Oprit implicit. Pornit: acele rute pot și să scrie (pauză, anulare, încărcarea unui fișier în coadă). Nimic nu pornește singur.",
-"sw_note_slice_enabled": "Oprit implicit. Pornit: serverul poate feli plase în G-code."
+"sw_note_slice_enabled": "Oprit implicit. Pornit: serverul poate feli plase în G-code.",
+"up_signed_out": "Autentificarea s-a încheiat la repornirea serverului: autentificați-vă din nou pentru a urmări în continuare actualizarea, care merge singură mai departe.",
+"up_stale": "Ultima stare cunoscută, de dinainte de încheierea autentificării.",
+"sw_note_persist_sessions": "Păstrează sesiunile la repornirea serverului. Dezactivat implicit. Activat: autentificările supraviețuiesc repornirii serverului (pe disc se păstrează doar un hash al fiecărui token). Activați-l ÎNAINTE de actualizare ca să nu fie nevoie să vă autentificați din nou."
 }

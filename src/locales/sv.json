@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Avstängt som standard. På: servern annonserar sig på det lokala nätverket.",
 "sw_note_compat_api": "Avstängt som standard. På: rutterna för Moonraker och OctoPrint svarar på läsningar i adressens rot.",
 "sw_note_compat_write": "Avstängt som standard. På: de rutterna får också skriva (pausa, avbryta, ladda upp en fil till kön). Inget startar av sig självt.",
-"sw_note_slice_enabled": "Avstängt som standard. På: servern får skiva nät till G-code."
+"sw_note_slice_enabled": "Avstängt som standard. På: servern får skiva nät till G-code.",
+"up_signed_out": "Inloggningen upphörde när servern startade om: logga in igen för att fortsätta följa uppdateringen, som går vidare av sig själv.",
+"up_stale": "Senast kända tillstånd, från före inloggningens slut.",
+"sw_note_persist_sessions": "Behåll sessionerna när servern startar om. Av som standard. På: inloggningar överlever en omstart av servern (bara en hash av varje token sparas på disken). Slå på det INNAN uppdateringen så slipper du logga in igen."
 }

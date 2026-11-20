@@ -10,7 +10,7 @@ import { AppContext } from "./context";
 import type { AppState } from "./context";
 import { makeErr, makeText } from "./context";
 import { UpdatesPage } from "./pages/Configure";
-import { reloadAfterUpdate, updatePhase } from "./model";
+import { lastKnown, reloadAfterUpdate, reloginReady, updatePhase } from "./model";
 import { fakeServer, json, refusal } from "./services/testkit";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -100,10 +100,10 @@ describe("the page of the updates when the server restarts in the middle of one"
     const page = await show((n) => (n === 0 ? json(restarting) : refusal(401, "unauthorized")), out);
     // the page asks again as soon as it sees the helper busy, and the restarted server refuses the login
     expect(page.phase()).toBe("signed_out");
-    expect(page.text()).toContain(makeText("en")("err_unauthorized"));
-    // the buttons are back and the person can sign in again
-    await act(async () => page.button("Sign in")!.click());
-    expect(out.count).toBe(1);
+    expect(page.text()).toContain(makeText("en")("up_signed_out"));
+    // the page does not drop the application any more: it asks for the name and the password inside itself
+    expect(out.count).toBe(0);
+    expect(page.button("Sign in")).toBeTruthy();
   });
 
   it("keeps asking while the server does not answer and shows the result when it comes back", async () => {
@@ -133,5 +133,165 @@ describe("the page of the updates when the server restarts in the middle of one"
     } finally {
       Date.now = realNow;
     }
+  });
+});
+
+describe("the sign-in again that follows a restart", () => {
+  it("goes back to the phases of the update once the login is there again", () => {
+    const busy = { pending: false, state: "updating" };
+    // signed out, then signed in: the failure is gone and the phase comes from the answer again
+    expect(updatePhase({ view: busy, failure: { status: 401 } })).toBe("signed_out");
+    expect(updatePhase({ view: busy, failure: null })).toBe("applying");
+    expect(updatePhase({ view: { pending: true, state: "idle" }, failure: null })).toBe("started");
+    expect(updatePhase({ view: { ...busy, steps: [{ id: "server.restart", state: "running" }] }, failure: null })).toBe("restarting");
+    expect(updatePhase({ view: { pending: false, state: "done" }, failure: null })).toBe("done");
+    // the login ending wins over the time limit of a server that did not answer, both before and after
+    expect(updatePhase({ view: busy, failure: { status: 401 }, lost: true })).toBe("signed_out");
+  });
+
+  it("asks for a name and a password, and keeps the last answer when none comes", () => {
+    expect(reloginReady("ana", "x")).toBe(true);
+    expect(reloginReady("  ", "x")).toBe(false);
+    expect(reloginReady("ana", "")).toBe(false);
+    expect(reloginReady("ana", " ")).toBe(true);
+    const before = { state: "updating", steps: [1] };
+    expect(lastKnown(before, null)).toBe(before);
+    expect(lastKnown(null, null)).toBeNull();
+    const after = { state: "done", steps: [] };
+    expect(lastKnown(before, after)).toBe(after);
+  });
+});
+
+/** A server that restarted: it answers the update only to the token that the new login gave, and refuses the one that the old login had. */
+async function showSignedOut(password: string) {
+  const out = { count: 0 };
+  const logins: unknown[] = [];
+  let first = true;
+  const after = view({ state: "updating", message: "studio: downloading", percent: 70, steps: [{ id: "server.restart", state: "done", percent: 100 }, { id: "studio.download", state: "running", percent: 40 }] });
+  const server = fakeServer({
+    "GET /updates": (call) => {
+      if (call.headers.authorization === "Bearer fresh") return json(after);
+      if (first) {
+        first = false;
+        return json(restarting);
+      }
+      return refusal(401, "unauthorized");
+    },
+    "POST /auth/login": (call) => {
+      logins.push(call.body);
+      if ((call.body as { password?: string }).password !== password) return refusal(401, "unauthorized");
+      return json({ token: "fresh", name: "ana", role: "admin", expires_s: 3600 });
+    },
+  });
+  const text = makeText("en");
+  const err = makeErr("en");
+  const app: AppState = {
+    api: new Api("tok", server.fetcher, { normal: 500 }),
+    session: { name: "ana", role: "admin", is_token: false },
+    lang: "en",
+    theme: "forge",
+    refreshS: 0,
+    alerts: false,
+    t: text,
+    err: (e) => {
+      if (e instanceof ApiError && e.status === 401) out.count++;
+      return err(e);
+    },
+    say: () => undefined,
+  };
+  root = createRoot(box!);
+  await act(async () => root!.render(<AppContext.Provider value={app}><UpdatesPage /></AppContext.Provider>));
+  await wait(80);
+  const page = {
+    text: () => box!.textContent ?? "",
+    phase: () => box!.querySelector("[data-phase]")?.getAttribute("data-phase") ?? "",
+    form: () => box!.querySelector("form.up-relogin") as HTMLFormElement | null,
+    input: (type: string) => box!.querySelector(`form.up-relogin input${type === "password" ? "[type=password]" : ":not([type=password])"}`) as HTMLInputElement,
+    stale: () => box!.querySelector("[data-stale]") != null,
+    bars: () => box!.querySelectorAll("[role=progressbar]").length,
+    type: async (el: HTMLInputElement, value: string) => {
+      await act(async () => {
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(el, value);
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+    },
+    submit: async () => act(async () => (box!.querySelector("form.up-relogin button[type=submit]") as HTMLButtonElement).click()),
+  };
+  return { page, out, logins };
+}
+
+describe("the box to sign in again inside the page of the updates", () => {
+  it("shows its own sentence, the box and the last known steps, instead of the two sentences that confused", async () => {
+    const { page } = await showSignedOut("s3cret pass");
+    expect(page.phase()).toBe("signed_out");
+    const en = makeText("en");
+    expect(page.text()).toContain(en("up_signed_out"));
+    expect(page.text()).not.toContain(en("up_waiting"));
+    expect(page.text()).not.toContain(en("err_unauthorized"));
+    expect(page.form()).not.toBeNull();
+    expect(page.input("text").value).toBe("ana");
+    // what the server said before the login ended is still on the page, marked as the last known
+    expect(page.stale()).toBe(true);
+    expect(page.text()).toContain(en("up_stale"));
+    expect(page.text()).toContain("server: restarting");
+    expect(page.bars()).toBeGreaterThan(0);
+  });
+
+  it("signs in with the same call as the login and goes on where the update was, without reloading", async () => {
+    const { page, out, logins } = await showSignedOut("s3cret pass");
+    await page.type(page.input("password"), "s3cret pass");
+    await page.submit();
+    await wait(120);
+    expect(logins).toHaveLength(1);
+    expect(logins[0]).toMatchObject({ name: "ana", password: "s3cret pass" });
+    // the box is gone and the page follows the job from the server: the steps, the bar and the message are the new ones
+    expect(page.form()).toBeNull();
+    expect(page.stale()).toBe(false);
+    expect(page.phase()).toBe("applying");
+    expect(page.text()).toContain("studio: downloading");
+    expect(page.bars()).toBeGreaterThan(1);
+    // the application was not asked to drop the page
+    expect(out.count).toBe(0);
+  });
+
+  it("never keeps the password: the field is emptied and no store of the browser has it", async () => {
+    const secret = "s3cret pass";
+    const { page } = await showSignedOut(secret);
+    const el = page.input("password");
+    await page.type(el, secret);
+    expect(el.value).toBe(secret);
+    await page.submit();
+    await wait(120);
+    const dump = JSON.stringify([...Array(sessionStorage.length).keys()].map((i) => [sessionStorage.key(i), sessionStorage.getItem(sessionStorage.key(i)!)])) + JSON.stringify([...Array(localStorage.length).keys()].map((i) => [localStorage.key(i), localStorage.getItem(localStorage.key(i)!)]));
+    expect(dump).not.toContain(secret);
+    expect(box!.innerHTML).not.toContain(secret);
+  });
+
+  it("says the password is wrong inside the box, empties it, keeps the page and does not drop the application", async () => {
+    const { page, out, logins } = await showSignedOut("s3cret pass");
+    await page.type(page.input("password"), "wrong one");
+    await page.submit();
+    await wait(80);
+    expect(logins).toHaveLength(1);
+    expect(page.phase()).toBe("signed_out");
+    expect(page.form()).not.toBeNull();
+    expect(page.input("password").value).toBe("");
+    expect(box!.querySelector("form.up-relogin [role=alert]")?.textContent).toBe(makeErr("en")(new ApiError(401, "unauthorized", "")));
+    expect(page.stale()).toBe(true);
+    expect(out.count).toBe(0);
+    // and it can be tried again
+    await page.type(page.input("password"), "s3cret pass");
+    await page.submit();
+    await wait(120);
+    expect(page.form()).toBeNull();
+    expect(page.phase()).toBe("applying");
+  });
+
+  it("does not send an empty password", async () => {
+    const { page, logins } = await showSignedOut("s3cret pass");
+    await page.submit();
+    await wait(40);
+    expect(logins).toHaveLength(0);
+    expect((box!.querySelector("form.up-relogin button[type=submit]") as HTMLButtonElement).disabled).toBe(true);
   });
 });

@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Apagado por defecto. Aceso: o servidor anúnciase na rede local.",
 "sw_note_compat_api": "Apagado por defecto. Aceso: as rutas de Moonraker e OctoPrint responden ás lecturas na raíz do enderezo.",
 "sw_note_compat_write": "Apagado por defecto. Aceso: esas rutas tamén poden escribir (pausar, cancelar, subir un ficheiro á cola). Nada arranca só.",
-"sw_note_slice_enabled": "Apagado por defecto. Aceso: o servidor pode fatiar mallas a G-code."
+"sw_note_slice_enabled": "Apagado por defecto. Aceso: o servidor pode fatiar mallas a G-code.",
+"up_signed_out": "A sesión rematou ao reiniciarse o servidor: volve iniciar a sesión para seguir vendo a actualización, que continúa soa.",
+"up_stale": "Último estado coñecido, de antes de rematar a sesión.",
+"sw_note_persist_sessions": "Manter as sesións ao reiniciar o servidor. Desactivado por defecto. Activado: as sesións sobreviven a un reinicio do servidor (no disco só se garda un hash de cada token). Actívao ANTES de actualizar para non ter que volver entrar."
 }

@@ -4,6 +4,16 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Signing in again without leaving the page of the updates:** when the server restarts in the middle of an update and the login ends with it, the page shows a box with the name and the password right where the update is, with the same sign-in as the first screen. Once you are in, the page goes on following the job where it was (the steps, the bars, the log and the earlier jobs come from the server) with no reload and no loss of what was shown. The button that did nothing useful is gone.
+
+- **The last known state stays on the page and says so:** while the sign-in is asked for, the steps, the bars and the log of the update stay as the last answer of the server, marked as the last known state, and the page keeps following the update afterwards (a Studio that was replaced still reloads once).
+
+- **A clear sentence when the login ends with the restart:** the page no longer says two things at once (the server is restarting and the name or password is wrong); it says that the login ended when the server restarted and asks to sign in again to keep watching the update, in the 37 languages. The password is only in the form while the request goes: it is emptied as soon as the answer comes and is never written to any store of the browser; a wrong password is said inside the box and does not take you out of the page.
+
+- **The switch that keeps the logins when the server restarts is explained in the security table:** `persist_sessions` shows a text of its own in the 37 languages (keep the sessions when the server restarts, with the advice to turn it on before updating so that nobody has to sign in again), and it can be changed there when the server lists it as editable; it is shown only when the server brings it.
+
+- **9 more tests:** the phases of an update after a sign-in again, the rules of the box, the last known answer, the box against a server that restarted (sentence, last known steps, sign-in and continuation, wrong password, empty password, the password in no store) and the text and the editing of the switch.
+
 ## [0.1.7] - Safety of the machines of the plugins, simulator badge, emergency stop and release by role and 36 more refusal codes in every language
 
 - **36 more refusals of the server have a sentence in the eight languages and in the other 29:** the codes of the laser (`laser_estop_latched`, `laser_power_limit`, `laser_feed_limit`, `air_assist_off`, `enclosure_open`, `focus_not_checked`, `test_fire_refused`), of the pick-and-place machine, the board work (`bad_gerber`, `missing_layer`, `unit_unknown`), the router (`machine_alarm`, `jog_while_running`, `out_of_travel`), the 3D printer (`printer_latched`, `thermal_runaway`, `temperature_over_limit`, `program_over_limit`, `farm_no_free_printer`), the slicer and the compatibility routes were shown as `code: detail`; each now has its own sentence, written in its own words in every language, and the test against the catalog of the server covers all 151 codes.

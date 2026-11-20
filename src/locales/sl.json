@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Privzeto izklopljeno. Vklopljeno: strežnik se oglasi v lokalnem omrežju.",
 "sw_note_compat_api": "Privzeto izklopljeno. Vklopljeno: poti Moonraker in OctoPrint odgovarjajo na branja v korenu naslova.",
 "sw_note_compat_write": "Privzeto izklopljeno. Vklopljeno: te poti smejo tudi pisati (premor, preklic, nalaganje datoteke v čakalno vrsto). Nič se ne zažene samo.",
-"sw_note_slice_enabled": "Privzeto izklopljeno. Vklopljeno: strežnik sme mreže rezati v G-code."
+"sw_note_slice_enabled": "Privzeto izklopljeno. Vklopljeno: strežnik sme mreže rezati v G-code.",
+"up_signed_out": "Prijava se je končala ob ponovnem zagonu strežnika: prijavite se znova, da boste lahko še naprej spremljali posodobitev, ki se nadaljuje sama.",
+"up_stale": "Zadnje znano stanje, še pred koncem prijave.",
+"sw_note_persist_sessions": "Ohrani seje ob ponovnem zagonu strežnika. Privzeto izklopljeno. Vklopljeno: prijave preživijo ponovni zagon strežnika (na disku se hrani le zgoščena vrednost vsakega žetona). Vklopite to PRED posodobitvijo, da se vam ne bo treba znova prijaviti."
 }

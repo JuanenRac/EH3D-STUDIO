@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Lehenespenez itzalita. Piztuta: zerbitzariak bere burua iragartzen du sare lokalean.",
 "sw_note_compat_api": "Lehenespenez itzalita. Piztuta: Moonraker eta OctoPrint-en bideek irakurketei erantzuten diete helbidearen erroan.",
 "sw_note_compat_write": "Lehenespenez itzalita. Piztuta: bide horiek idatzi ere dezakete (pausatu, bertan behera utzi, fitxategi bat ilaran kargatu). Ezer ez da bere kabuz hasten.",
-"sw_note_slice_enabled": "Lehenespenez itzalita. Piztuta: zerbitzariak sareak G-code bihurtzeko xerra ditzake."
+"sw_note_slice_enabled": "Lehenespenez itzalita. Piztuta: zerbitzariak sareak G-code bihurtzeko xerra ditzake.",
+"up_signed_out": "Saioa amaitu zen zerbitzaria berrabiaraztean: hasi saioa berriro eguneraketa jarraitzen ikusteko; eguneraketak bere kabuz jarraitzen du.",
+"up_stale": "Azken egoera ezaguna, saioa amaitu aurrekoa.",
+"sw_note_persist_sessions": "Mantendu saioak zerbitzaria berrabiaraztean. Lehenespenez desaktibatuta. Aktibatuta: saioek zerbitzariaren berrabiarazteari eusten diote (diskoan token bakoitzaren hash bat soilik gordetzen da). Aktibatu eguneratu AURREN, berriro saioa hasi beharrik izan ez dezazun."
 }

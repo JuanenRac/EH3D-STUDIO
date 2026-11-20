@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Pēc noklusējuma izslēgts. Ieslēgts: serveris paziņo par sevi vietējā tīklā.",
 "sw_note_compat_api": "Pēc noklusējuma izslēgts. Ieslēgts: Moonraker un OctoPrint maršruti atbild uz lasīšanu adreses saknē.",
 "sw_note_compat_write": "Pēc noklusējuma izslēgts. Ieslēgts: šie maršruti var arī rakstīt (pauzēt, atcelt, augšupielādēt failu rindā). Nekas nesākas pats.",
-"sw_note_slice_enabled": "Pēc noklusējuma izslēgts. Ieslēgts: serveris drīkst sagriezt režģus G-kodā."
+"sw_note_slice_enabled": "Pēc noklusējuma izslēgts. Ieslēgts: serveris drīkst sagriezt režģus G-kodā.",
+"up_signed_out": "Pieteikšanās beidzās, kad serveris pārstartējās: pieteicieties vēlreiz, lai turpinātu sekot atjauninājumam, kas turpinās pats.",
+"up_stale": "Pēdējais zināmais stāvoklis, pirms pieteikšanās beigām.",
+"sw_note_persist_sessions": "Saglabāt sesijas, kad serveris pārstartējas. Pēc noklusējuma izslēgts. Ieslēgts: pieteikšanās pārdzīvo servera pārstartēšanu (diskā tiek glabāts tikai katra marķiera jaucējkods). Ieslēdziet to PIRMS atjaunināšanas, lai nevajadzētu pieteikties vēlreiz."
 }

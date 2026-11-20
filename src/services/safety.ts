@@ -92,6 +92,11 @@ export function detailFacts(detail: Detail, limit = 6): { key: string; value: st
   return out;
 }
 
+/** The switch that keeps the logins across a restart of the server (the update of the server restarts it): its own text says to turn it on BEFORE updating. It wins over the generic line of the settings of the server. */
+export const PERSISTENCE_NOTES: Readonly<Record<string, "sw_note_persist_sessions">> = {
+  persist_sessions: "sw_note_persist_sessions",
+};
+
 /** The switches of security that the server brings and whose meaning the page explains: all of them are off by default. */
 export const SWITCH_NOTES: Readonly<Record<string, "sw_note_mdns_announce" | "sw_note_compat_api" | "sw_note_compat_write" | "sw_note_slice_enabled">> = {
   mdns_announce: "sw_note_mdns_announce",

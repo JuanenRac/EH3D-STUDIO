@@ -23,6 +23,8 @@ export interface AppState {
   /** A refusal or a failure as a sentence in the language of the person. */
   err: (e: unknown) => string;
   say: (message: string, kind?: "ok" | "error") => void;
+  /** Called after a sign-in made inside a page (the updates page asks again for the name and the password when the server restarted): keeps the new token where the old one was. */
+  afterRelogin?: () => Promise<void>;
 }
 
 export const AppContext = createContext<AppState | null>(null);

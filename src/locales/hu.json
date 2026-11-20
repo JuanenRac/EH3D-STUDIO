@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Alapértelmezés szerint kikapcsolva. Bekapcsolva: a kiszolgáló bejelentkezik a helyi hálózaton.",
 "sw_note_compat_api": "Alapértelmezés szerint kikapcsolva. Bekapcsolva: a Moonraker és az OctoPrint útvonalai a cím gyökerénél válaszolnak az olvasásra.",
 "sw_note_compat_write": "Alapértelmezés szerint kikapcsolva. Bekapcsolva: ezek az útvonalak írhatnak is (szüneteltetés, megszakítás, fájl feltöltése a sorba). Semmi sem indul magától.",
-"sw_note_slice_enabled": "Alapértelmezés szerint kikapcsolva. Bekapcsolva: a kiszolgáló hálókat szeletelhet G-kóddá."
+"sw_note_slice_enabled": "Alapértelmezés szerint kikapcsolva. Bekapcsolva: a kiszolgáló hálókat szeletelhet G-kóddá.",
+"up_signed_out": "A bejelentkezés a szerver újraindulásakor megszűnt: jelentkezzen be újra, hogy tovább követhesse a frissítést, amely magától folytatódik.",
+"up_stale": "Utolsó ismert állapot, a bejelentkezés megszűnése előttről.",
+"sw_note_persist_sessions": "Munkamenetek megtartása a szerver újraindításakor. Alapértelmezés szerint kikapcsolva. Bekapcsolva: a bejelentkezések túlélik a szerver újraindítását (a lemezen csak az egyes tokenek hash-e marad). Kapcsolja be a frissítés ELŐTT, hogy ne kelljen újra bejelentkeznie."
 }

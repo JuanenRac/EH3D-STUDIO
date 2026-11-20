@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Slökkt sjálfgefið. Kveikt: þjónninn tilkynnir sig á staðarnetinu.",
 "sw_note_compat_api": "Slökkt sjálfgefið. Kveikt: leiðir Moonraker og OctoPrint svara lestri í rót vistfangsins.",
 "sw_note_compat_write": "Slökkt sjálfgefið. Kveikt: þessar leiðir mega einnig skrifa (gera hlé, hætta við, senda skrá í röðina). Ekkert fer af stað af sjálfu sér.",
-"sw_note_slice_enabled": "Slökkt sjálfgefið. Kveikt: þjónninn má sneiða net í G-code."
+"sw_note_slice_enabled": "Slökkt sjálfgefið. Kveikt: þjónninn má sneiða net í G-code.",
+"up_signed_out": "Innskráningunni lauk þegar þjónninn endurræsti sig: skráðu þig inn aftur til að halda áfram að fylgjast með uppfærslunni, sem heldur áfram sjálf.",
+"up_stale": "Síðasta þekkta staða, frá því áður en innskráningunni lauk.",
+"sw_note_persist_sessions": "Halda lotunum þegar þjónninn endurræsist. Slökkt sjálfgefið. Kveikt: innskráningar lifa af endurræsingu þjónsins (aðeins hass hvers tákns er geymt á diskinum). Kveiktu á því ÁÐUR en þú uppfærir svo þú þurfir ekki að skrá þig inn aftur."
 }

@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Pagal numatytąją reikšmę išjungta. Įjungta: serveris paskelbia save vietiniame tinkle.",
 "sw_note_compat_api": "Pagal numatytąją reikšmę išjungta. Įjungta: Moonraker ir OctoPrint maršrutai atsako į skaitymą adreso šaknyje.",
 "sw_note_compat_write": "Pagal numatytąją reikšmę išjungta. Įjungta: šie maršrutai gali ir rašyti (pristabdyti, atšaukti, įkelti failą į eilę). Niekas nepasileidžia pats.",
-"sw_note_slice_enabled": "Pagal numatytąją reikšmę išjungta. Įjungta: serveris gali pjaustyti tinklus į G-kodą."
+"sw_note_slice_enabled": "Pagal numatytąją reikšmę išjungta. Įjungta: serveris gali pjaustyti tinklus į G-kodą.",
+"up_signed_out": "Prisijungimas baigėsi serveriui persileidus: prisijunkite iš naujo, kad galėtumėte toliau stebėti naujinimą, kuris tęsiasi pats.",
+"up_stale": "Paskutinė žinoma būsena, buvusi prieš pasibaigiant prisijungimui.",
+"sw_note_persist_sessions": "Išsaugoti seansus serveriui persileidus. Pagal numatytuosius nustatymus išjungta. Įjungta: prisijungimai išlieka po serverio paleidimo iš naujo (diske saugoma tik kiekvieno žetono maiša). Įjunkite PRIEŠ naujindami, kad nereikėtų prisijungti iš naujo."
 }

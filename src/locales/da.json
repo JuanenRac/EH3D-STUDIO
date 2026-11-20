@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Som standard slået fra. Slået til: serveren melder sig på det lokale netværk.",
 "sw_note_compat_api": "Som standard slået fra. Slået til: ruterne til Moonraker og OctoPrint svarer på læsninger i adressens rod.",
 "sw_note_compat_write": "Som standard slået fra. Slået til: disse ruter må også skrive (pause, annullere, sende en fil til køen). Intet starter af sig selv.",
-"sw_note_slice_enabled": "Som standard slået fra. Slået til: serveren må skære net om til G-code."
+"sw_note_slice_enabled": "Som standard slået fra. Slået til: serveren må skære net om til G-code.",
+"up_signed_out": "Loginnet sluttede, da serveren genstartede: log ind igen for at følge opdateringen videre; den fortsætter af sig selv.",
+"up_stale": "Sidst kendte tilstand, fra før loginnet sluttede.",
+"sw_note_persist_sessions": "Behold sessionerne, når serveren genstarter. Slået fra som standard. Slået til: logins overlever en genstart af serveren (kun en hash af hvert token gemmes på disken). Slå det til FØR opdatering, så du ikke skal logge ind igen."
 }

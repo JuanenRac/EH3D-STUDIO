@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { ROWS } from "../texts";
+import { editableKind, policyRows } from "./authsvc";
 import { ServiceHttp } from "./http";
-import { INTERLOCK_TEXT, SWITCH_NOTES, detailFacts, interlocks, isSimulatorOnly, needsManualStart, releaseRoute, safetyActions, startsByItself, stopRoute } from "./safety";
+import { INTERLOCK_TEXT, PERSISTENCE_NOTES, SWITCH_NOTES, detailFacts, interlocks, isSimulatorOnly, needsManualStart, releaseRoute, safetyActions, startsByItself, stopRoute } from "./safety";
 import { fakeServer } from "./testkit";
 import { WorkClient } from "./work";
 import type { Who } from "./permissions";
@@ -165,5 +166,25 @@ describe("the emergency stop and the release through the client", () => {
   it("let the refusal of the server reach the caller", async () => {
     const { work } = client({ "POST /work/machines/cnc-1/release": () => new Response(JSON.stringify({ error: "forbidden", detail: "" }), { status: 403 }) });
     await expect(work.release("cnc-1", "cnc")).rejects.toMatchObject({ status: 403, code: "forbidden" });
+  });
+});
+
+describe("the switch that keeps the logins when the server restarts", () => {
+  it("has a text of its own in every language that says to turn it on before updating", () => {
+    expect(Object.keys(PERSISTENCE_NOTES)).toEqual(["persist_sessions"]);
+    expect(ROWS).toHaveProperty(PERSISTENCE_NOTES.persist_sessions);
+    const row = ROWS[PERSISTENCE_NOTES.persist_sessions] as readonly string[];
+    expect(row).toHaveLength(8);
+    expect(row[0]).toContain("BEFORE updating");
+    // it is not one of the switches that the contract of the server lists as off, so it is not among the four
+    expect(Object.keys(SWITCH_NOTES)).not.toContain("persist_sessions");
+  });
+
+  it("is shown and changed only when the server lists it", () => {
+    const policy = { switches: [{ key: "persist_sessions", value: false, safe: true }], attention: [], extra_apps: [], editable: ["persist_sessions"] };
+    expect(editableKind(policy as never, policy.switches[0] as never)).toBe("flag");
+    expect(editableKind({ ...policy, editable: [] } as never, policy.switches[0] as never)).toBeNull();
+    expect(policyRows({ ...policy, switches: [] } as never)).toEqual([]);
+    expect(policyRows(policy as never).map((r) => r.sw.key)).toEqual(["persist_sessions"]);
   });
 });

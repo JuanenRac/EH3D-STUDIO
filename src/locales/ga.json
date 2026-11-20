@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "As de réir réamhshocraithe. Ar siúl: fógraíonn an freastalaí é féin ar an líonra áitiúil.",
 "sw_note_compat_api": "As de réir réamhshocraithe. Ar siúl: freagraíonn bealaí Moonraker agus OctoPrint do léamha ag fréamh an seolta.",
 "sw_note_compat_write": "As de réir réamhshocraithe. Ar siúl: féadfaidh na bealaí sin scríobh freisin (sos, cealú, comhad a uaslódáil sa scuaine). Ní thosaíonn faic uaidh féin.",
-"sw_note_slice_enabled": "As de réir réamhshocraithe. Ar siúl: féadfaidh an freastalaí mogalla a shlisniú ina G-code."
+"sw_note_slice_enabled": "As de réir réamhshocraithe. Ar siúl: féadfaidh an freastalaí mogalla a shlisniú ina G-code.",
+"up_signed_out": "Chríochnaigh an logáil isteach nuair a atosaíodh an freastalaí: logáil isteach arís chun leanúint ag féachaint ar an nuashonrú, a leanann leis féin.",
+"up_stale": "An staid is déanaí is eol, ó roimh dheireadh na logála isteach.",
+"sw_note_persist_sessions": "Coinnigh na seisiúin nuair a atosaítear an freastalaí. As de réir réamhshocraithe. Air: maireann na logálacha isteach atosú an fhreastalaí (ní choinnítear ar an diosca ach hais gach comhartha). Cuir air é ROIMH an nuashonrú ionas nach mbeidh ort logáil isteach arís."
 }

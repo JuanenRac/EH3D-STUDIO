@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Ve výchozím stavu vypnuto. Zapnuto: server se ohlašuje v místní síti.",
 "sw_note_compat_api": "Ve výchozím stavu vypnuto. Zapnuto: cesty Moonraker a OctoPrint odpovídají na čtení v kořeni adresy.",
 "sw_note_compat_write": "Ve výchozím stavu vypnuto. Zapnuto: tyto cesty mohou i zapisovat (pozastavit, zrušit, nahrát soubor do fronty). Nic se nespustí samo.",
-"sw_note_slice_enabled": "Ve výchozím stavu vypnuto. Zapnuto: server smí rozřezávat sítě na G-code."
+"sw_note_slice_enabled": "Ve výchozím stavu vypnuto. Zapnuto: server smí rozřezávat sítě na G-code.",
+"up_signed_out": "Přihlášení skončilo při restartu serveru: přihlaste se znovu, abyste mohli aktualizaci dál sledovat; aktualizace pokračuje sama.",
+"up_stale": "Poslední známý stav, ještě před koncem přihlášení.",
+"sw_note_persist_sessions": "Zachovat relace při restartu serveru. Ve výchozím stavu vypnuto. Zapnuto: přihlášení přežije restart serveru (na disku se uchovává jen hash každého tokenu). Zapněte to PŘED aktualizací, abyste se nemuseli znovu přihlašovat."
 }

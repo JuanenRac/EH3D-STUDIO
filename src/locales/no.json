@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Av som standard. På: serveren melder seg på det lokale nettverket.",
 "sw_note_compat_api": "Av som standard. På: rutene for Moonraker og OctoPrint svarer på lesing i roten av adressen.",
 "sw_note_compat_write": "Av som standard. På: disse rutene kan også skrive (pause, avbryte, laste opp en fil til køen). Ingenting starter av seg selv.",
-"sw_note_slice_enabled": "Av som standard. På: serveren kan skjære nett om til G-code."
+"sw_note_slice_enabled": "Av som standard. På: serveren kan skjære nett om til G-code.",
+"up_signed_out": "Innloggingen tok slutt da serveren startet på nytt: logg inn igjen for å fortsette å følge oppdateringen, som går videre av seg selv.",
+"up_stale": "Sist kjente tilstand, fra før innloggingen tok slutt.",
+"sw_note_persist_sessions": "Behold øktene når serveren starter på nytt. Av som standard. På: innlogginger overlever en omstart av serveren (bare en hash av hvert token lagres på disken). Slå det på FØR oppdateringen, så slipper du å logge inn igjen."
 }

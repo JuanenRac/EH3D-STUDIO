@@ -474,7 +474,9 @@ a { color: var(--accent); }
 .up-bar.ok i, .up-bar.done i { background: var(--ok); }
 .up-bar.bad i, .up-bar.failed i { background: var(--bad); }
 .up-bar.dim i, .up-bar.pending i { background: var(--muted); }
-.up-total { display: grid; grid-template-columns: 9em 1fr 3.5em; align-items: center; gap: 10px; margin: 10px 0; }
+.up-relogin { display: grid; grid-template-columns: repeat(auto-fit, minmax(14em, 1fr)); gap: 10px; align-items: end; margin: 10px 0; }
+.up-relogin .error { grid-column: 1 / -1; margin: 0; }
+.up-total { grid-template-columns: 9em 1fr 3.5em; align-items: center; gap: 10px; margin: 10px 0; }
 .up-total span:last-child { text-align: right; color: var(--muted); }
 .up-steps { list-style: none; margin: 8px 0 12px; padding: 0; display: grid; gap: 8px; }
 .up-steps li { display: grid; grid-template-columns: 14em 1fr; align-items: center; gap: 10px; }

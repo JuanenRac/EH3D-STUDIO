@@ -352,6 +352,16 @@ export function updatePhase(input: {
   return view.pending ? "started" : "idle";
 }
 
+/** Whether the sign-in box can be sent: a name and a password were typed (the password is never trimmed, it may have blanks). */
+export function reloginReady(name: string, password: string): boolean {
+  return name.trim() !== "" && password !== "";
+}
+
+/** The answer the page of the updates shows: the new one when there is one, else the last one it knew, so the steps, the bars and the log do not vanish while the login is asked for again. */
+export function lastKnown<T>(held: T | null, fresh: T | null): T | null {
+  return fresh ?? held;
+}
+
 /** The page loads itself again, once, when the update it was following replaced the pages of Studio. A page opened after the update finished does not, so it cannot loop. */
 export function reloadAfterUpdate(following: boolean, view: { state: string; steps?: { id: string; state: string }[] } | null): boolean {
   return following && view != null && studioReplaced(view);

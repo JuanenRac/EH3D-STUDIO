@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "V predvolenom stave vypnuté. Zapnuté: server sa ohlasuje v miestnej sieti.",
 "sw_note_compat_api": "V predvolenom stave vypnuté. Zapnuté: cesty Moonraker a OctoPrint odpovedajú na čítanie v koreni adresy.",
 "sw_note_compat_write": "V predvolenom stave vypnuté. Zapnuté: tieto cesty môžu aj zapisovať (pozastaviť, zrušiť, nahrať súbor do frontu). Nič sa nespustí samo.",
-"sw_note_slice_enabled": "V predvolenom stave vypnuté. Zapnuté: server smie rezať siete na G-code."
+"sw_note_slice_enabled": "V predvolenom stave vypnuté. Zapnuté: server smie rezať siete na G-code.",
+"up_signed_out": "Prihlásenie skončilo pri reštarte servera: prihláste sa znova, aby ste mohli aktualizáciu ďalej sledovať; aktualizácia pokračuje sama.",
+"up_stale": "Posledný známy stav spred konca prihlásenia.",
+"sw_note_persist_sessions": "Zachovať relácie pri reštarte servera. Predvolene vypnuté. Zapnuté: prihlásenia prežijú reštart servera (na disku sa uchováva len hash každého tokenu). Zapnite to PRED aktualizáciou, aby ste sa nemuseli znova prihlasovať."
 }

@@ -754,5 +754,8 @@
 "sw_note_mdns_announce": "Standaard uit. Aan: de server maakt zich bekend op het lokale netwerk.",
 "sw_note_compat_api": "Standaard uit. Aan: de routes van Moonraker en OctoPrint beantwoorden leesverzoeken in de root van het adres.",
 "sw_note_compat_write": "Standaard uit. Aan: die routes mogen ook schrijven (pauzeren, annuleren, een bestand in de wachtrij zetten). Er start niets vanzelf.",
-"sw_note_slice_enabled": "Standaard uit. Aan: de server mag netten in G-code slicen."
+"sw_note_slice_enabled": "Standaard uit. Aan: de server mag netten in G-code slicen.",
+"up_signed_out": "De aanmelding eindigde bij de herstart van de server: meld u opnieuw aan om de update te blijven volgen; die gaat vanzelf verder.",
+"up_stale": "Laatst bekende toestand, van vóór het einde van de aanmelding.",
+"sw_note_persist_sessions": "Sessies behouden bij het herstarten van de server. Standaard uit. Aan: aanmeldingen overleven een herstart van de server (alleen een hash van elk token staat op de schijf). Zet het aan VÓÓR het bijwerken, dan hoeft u niet opnieuw aan te melden."
 }

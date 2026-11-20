@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Field } from "../components/ui";
-import { cfgKeys, tokenDays, tokenState, connectionBody, dollarSwitchShown, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, parseReleaseNotes, reloadAfterUpdate, splitStep, studioReplaced, toInput, updatable, updatePhase, updatesBusy, UPDATE_LOST_AFTER_MS, validName, validPassword } from "../model";
+import { cfgKeys, tokenDays, tokenState, connectionBody, dollarSwitchShown, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, parseReleaseNotes, reloadAfterUpdate, splitStep, studioReplaced, toInput, updatable, lastKnown, reloginReady, updatePhase, updatesBusy, UPDATE_LOST_AFTER_MS, validName, validPassword } from "../model";
 import type { MachineProblem, UpdatePhase } from "../model";
 import { copyId, isWebLink, machineExport, machineImport } from "../jobtools";
 import { copyText } from "../clipboard";
 import { ApiError } from "../api";
 import type { ConnectionKind, MachineInput, Role } from "../types";
 import { CONNECTION_KINDS, ROLES } from "../types";
+import { errorText } from "../i18n";
 import type { TextKey } from "../i18n";
 
 const MODELS = ["ccd-mtc", "ccd-atc", "ccd2-mtc", "ccd2-atc", "ccd-premium-mtc", "ccd-premium-atc"];
@@ -513,8 +514,59 @@ const PHASE_TEXT: Record<Exclude<UpdatePhase, "idle">, TextKey> = {
   done: "up_state_done",
   failed: "up_state_error",
   lost: "err_unreachable",
-  signed_out: "err_unauthorized",
+  signed_out: "up_signed_out",
 };
+
+/** The box to sign in again inside the page of the updates: the restart of the server ended the login while the update goes on without us. It asks for the name and the password with
+ * the same call as the sign-in (`api.login`), and the page goes on where it was. The password lives only in the state of this form while the request goes: it is emptied when the
+ * answer comes, whatever it is, and it is never written to any store. */
+function ReloginBox({ onDone }: { onDone: () => void }) {
+  const { api, session, lang, t, afterRelogin } = useApp();
+  const [name, setName] = useState(session.name);
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState("");
+  const ok = reloginReady(name, password);
+  const submit = async () => {
+    setBusy(true);
+    setProblem("");
+    try {
+      await api.login(name.trim(), password);
+      await afterRelogin?.();
+      onDone();
+    } catch (e) {
+      // not the `err` of the application: it takes the person out of the page on a refusal 401, and a wrong password is one
+      setProblem(errorText(lang, e));
+    } finally {
+      setPassword("");
+      setBusy(false);
+    }
+  };
+  return (
+    <form
+      className="up-relogin"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (ok && !busy) void submit();
+      }}
+    >
+      <Field label={t("acc_name")}>
+        <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="username" />
+      </Field>
+      <Field label={t("acc_password")}>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+      </Field>
+      {problem && (
+        <p className="error" role="alert">
+          {problem}
+        </p>
+      )}
+      <button className="primary" type="submit" disabled={!ok || busy}>
+        {t("login_signin")}
+      </button>
+    </form>
+  );
+}
 
 /** The updates of the installed services from the releases of GitHub: what is installed and what is the latest (with what changes in it), a button for each service or for all,
  * and, while the helper works, the steps of the job with a bar each, the bar of the whole, the log, and the earlier jobs. */
@@ -522,7 +574,11 @@ export function UpdatesPage() {
   const { api, t, err, say } = useApp();
   const [fast, setFast] = useState(false);
   const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
-  const { data, error, reload } = usePolled(() => api.updates(), fast ? 1 : 10);
+  const { data: live, error, reload } = usePolled(() => api.updates(), fast ? 1 : 10);
+  // the last answer is kept: while the login is asked for again the steps, the bars and the log stay on the page as the last the server said
+  const [kept, setKept] = useState(live);
+  if (live !== null && live !== kept) setKept(live);
+  const data = lastKnown(kept, live);
   // an update is being followed from the moment the helper is seen busy; the server restarting in the middle of it cuts the requests (and, unless the logins are kept
   // across restarts, ends the login), so the answer that is held is old: what the page says comes from the last answer AND the last failure
   const followingRef = useRef(false);
@@ -618,15 +674,6 @@ export function UpdatesPage() {
                 <button onClick={() => window.location.reload()}>{t("up_reload")}</button>
               </>
             )}
-            {phase === "signed_out" && (
-              <>
-                {" "}
-                <span className="hint">{t("up_waiting")}</span>{" "}
-                <button className="primary" onClick={() => err(error)}>
-                  {t("login_signin")}
-                </button>
-              </>
-            )}
             {reloadNow && (
               <>
                 {" "}
@@ -635,6 +682,7 @@ export function UpdatesPage() {
             )}
           </p>
         )}
+        {phase === "signed_out" && <ReloginBox onDone={reload} />}
         <table className="table">
           <thead>
             <tr>
@@ -726,6 +774,11 @@ export function UpdatesPage() {
           <p>
             <Badge tone={stateTone}>{t(`up_state_${data.state}` as TextKey)}</Badge> {data.message}
           </p>
+          {phase === "signed_out" && (
+            <p className="hint" data-stale="true">
+              {t("up_stale")}
+            </p>
+          )}
           {steps.length > 0 && (
             <>
               <div className="up-total">
