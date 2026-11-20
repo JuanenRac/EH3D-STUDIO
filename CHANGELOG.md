@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.1.6] - Safer CSV of jobs and numbers that are not finite
+
 - **Every refusal of the server has a text in the eight languages:** 29 codes of the catalog of the server (machine and project store, catalogs, the inspection of the drill head, the tool rack, unsafe file names) were shown as the bare code; they now have their own sentence, and a test compares the catalog of the server with the texts when the server repository is next to this one.
 
 - **A stop that the ended login refused is sent again after the next login:** when the stop of a machine is answered with an ended session, the order is kept in memory only for two minutes and is sent once more as soon as the person logs in again, as the phone apps already do; an order older than that, or refused for another reason, is dropped so that it never stops a later job.
