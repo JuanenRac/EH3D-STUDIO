@@ -1,6 +1,6 @@
 /* The group Configure: the machines of the server (each with how to reach it, its stations and its configuration files), the people and the tokens of the programs,
- * and the reference of the settings of the server itself. */
-import { useEffect, useRef, useState } from "react";
+ * and the settings of the server itself, drawn from its contract. */
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Field } from "../components/ui";
 import { cfgKeys, tokenDays, tokenState, connectionBody, dollarSwitchShown, connectionKey, DEFAULT_BAUD, emptyMachine, machineProblems, parseReleaseNotes, reloadAfterUpdate, splitStep, studioReplaced, toInput, updatable, lastKnown, reloginReady, updatePhase, updatesBusy, UPDATE_LOST_AFTER_MS, validName, validPassword } from "../model";
@@ -12,6 +12,9 @@ import type { ConnectionKind, MachineInput, Role } from "../types";
 import { CONNECTION_KINDS, ROLES } from "../types";
 import { errorText } from "../i18n";
 import type { TextKey } from "../i18n";
+
+/** The settings of the server, drawn from its contract; in a chunk of its own because the copy of the contract is large. */
+const ServerSettings = lazy(() => import("../components/ServerSettings"));
 
 const MODELS = ["ccd-mtc", "ccd-atc", "ccd2-mtc", "ccd2-atc", "ccd-premium-mtc", "ccd-premium-atc"];
 
@@ -409,7 +412,7 @@ export function AccessPage() {
   );
 }
 
-/** The settings of `server.cfg`, with what each one does. The API does not show them (they are the server's own file), so this is a reference, not a form. */
+/** The short description of the main settings of `server.cfg`, kept for the table of the security page; the page of the server draws all of them from the contract of the server (components/ServerSettings.tsx). */
 export const SERVER_SETTINGS: { key: string; value: string; text: TextKey }[] = [
   { key: "listen", value: "127.0.0.1:18200", text: "srv_listen" },
   { key: "network_open", value: "false", text: "srv_network_open" },
@@ -466,31 +469,9 @@ export function ServerPage() {
           </dl>
         </Card>
       )}
-      <Card title={t("srv_settings")} wide>
-        <p className="hint">{t("srv_settings_help")}</p>
-        <table className="table">
-          <thead>
-            <tr>
-              <th>{t("srv_key")}</th>
-              <th>{t("srv_default")}</th>
-              <th>{t("srv_what")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {SERVER_SETTINGS.map((s) => (
-              <tr key={s.key}>
-                <td>
-                  <code>{s.key}</code>
-                </td>
-                <td>
-                  <code>{s.value}</code>
-                </td>
-                <td>{t(s.text)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
+      <Suspense fallback={<p className="muted">{t("svc_loading")}</p>}>
+        <ServerSettings />
+      </Suspense>
     </div>
   );
 }

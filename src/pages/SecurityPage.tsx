@@ -277,6 +277,7 @@ export function SecurityPage() {
                 </p>
               )}
               <p className="hint">{t("sec_policy_hint")}</p>
+              <button onClick={() => (window.location.hash = "#/server")}>{t("ssc_all_settings")}</button>
             </>
           )}
         </Card>

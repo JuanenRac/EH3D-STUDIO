@@ -8,6 +8,7 @@ import fleetExample from "./examples/fleet.json";
 import healthExample from "./examples/health.json";
 import jobsExample from "./examples/jobs.json";
 import sessionExample from "./examples/session.json";
+import contractExample from "./data/settings-contract.json";
 
 /** What the simulated server does with every request. */
 export type SimMode =
@@ -144,6 +145,14 @@ export class SimServer {
     return json(200, this.policyView());
   }
 
+  /** `GET /settings/contract`: the contract of the settings, the value in force of each key that is not a secret (the default, or what the policy holds now) and the version of the server. */
+  private contractView(): unknown {
+    const doc = contractExample as unknown as { settings: { key: string; default: unknown; secret: boolean }[] };
+    const values: Record<string, unknown> = {};
+    for (const s of doc.settings) if (!s.secret) values[s.key] = s.key in this.policy ? this.policy[s.key] : s.default;
+    return { ...contractExample, values, server_version: "0.0.0-sim" };
+  }
+
   private signedIn(authorization: string | null): boolean {
     const m = /^Bearer (.+)$/.exec(authorization ?? "");
     return m !== null && this.tokens.has(m[1]);
@@ -166,6 +175,7 @@ export class SimServer {
     if (method === "GET" && path === "/work/machines") return json(200, { machines: this.workMachines });
     const act = /^\/work\/machines\/([^/]+)\/(emergency-stop|release|laser\/release)$/.exec(path);
     if (method === "POST" && act) return this.operate(decodeURIComponent(act[1]), act[2]);
+    if (method === "GET" && path === "/settings/contract") return json(200, this.contractView());
     if (method === "GET" && path === "/auth/policy") {
       return json(200, this.policyView());
     }

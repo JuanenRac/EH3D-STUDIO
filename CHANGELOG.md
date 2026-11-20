@@ -4,6 +4,24 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The page of the server draws every setting and switch from the contract of the server:** the groups (network, storage, logins, audit, updates, machines, compatibility, slicer, printers, tasks, artifacts, projects, catalogs, events and design), and for each key its label, help and warning in the language of the person, the value in force, the default, and whether a change applies at once or needs a restart. Studio reads `GET /api/v1/settings/contract` and no longer keeps a list of its own, so a setting the server adds appears without a new version of Studio.
+
+- **Every switch and setting the server lets change can be changed from Studio:** an administrator changes the keys of the policy with the control of their type (a switch, a number with its range and unit, a text, a list or a choice), each written by the route and method the contract names (`PUT /api/v1/auth/policy`), with a button to restore the default and the sentence of the server for each refusal.
+
+- **A change is checked and asked before it goes out:** a number outside its range or a text that is too long is refused on the screen before anything is sent; a change that touches the security, the exposure, a machine or the data shows its warning and waits for a confirmation; a value looser than recommended is asked again when the server asks for `confirm_weak`.
+
+- **What needs a restart says so:** each key shows whether it applies at once or when the server restarts, and after saving one of the second kind the page says that it takes effect when the server restarts.
+
+- **The keys set in `server.cfg` are shown, not hidden:** they show their value and where they are set, with no control, and a secret never shows its value and is never written.
+
+- **The page still works when the live contract cannot be read:** a role without the scope, a server without the route or an answer Studio does not understand show the copy that Studio keeps, read-only, with the reason and no value in force; a person who is not an administrator sees the page read-only.
+
+- **A key nobody described does not break the page:** a value the server reports that neither contract lists, and a setting of a type Studio does not know, are shown with a generic read-only line, and a setting that the server describes and the copy of Studio does not is marked as newer than the copy.
+
+- **The table of switches of the security page and the new page do not repeat each other:** the explanations of `persist_sessions` and of the switches that are off by default are shown in both from the same texts, and the security page links to all the settings of the server. The simulated server answers the contract too.
+
+- **19 new texts in the 37 languages** for the page of the settings (the title and the buttons reuse the existing ones).
+
 - **A copy of the contract with a check:** `tools/sync_settings_contract.py --check` fails in the CI when the copy at `src/data/settings-contract.json` is not the file of the server (next to this repository) or is not a contract of the version Studio understands (alone, it checks the schema); `--write` refreshes it from the server.
 
 - **Signing in again without leaving the page of the updates:** when the server restarts in the middle of an update and the login ends with it, the page shows a box with the name and the password right where the update is, with the same sign-in as the first screen. Once you are in, the page goes on following the job where it was (the steps, the bars, the log and the earlier jobs come from the server) with no reload and no loss of what was shown. The button that did nothing useful is gone.
