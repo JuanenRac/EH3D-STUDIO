@@ -73,14 +73,14 @@ export function parseToolList(text: string): { tools: number[]; bad: string[] } 
 export function withSkips(r: JobRequest, skipTools: number[], skip: number): JobRequest {
   const out: JobRequest = { ...r };
   if (skipTools.length > 0) out.skip_tools = skipTools;
-  if (skip > 0) out.skip = Math.floor(skip);
+  if (Number.isFinite(skip) && skip > 0) out.skip = Math.floor(skip);
   return out;
 }
 
 /** The request of a free G-code program. `skip` is how many lines of the text are already done (a job that goes on after a stop); `restoreOutputs` starts the spindle and the coolant again when it goes on, and is off unless asked. */
 export function gcodeRequest(name: string, gcode: string, skip = 0, restoreOutputs = false): JobRequest {
   const r: JobRequest = { kind: "gcode", name, gcode };
-  if (skip > 0) r.skip = Math.floor(skip);
+  if (Number.isFinite(skip) && skip > 0) r.skip = Math.floor(skip);
   if (restoreOutputs) r.restore_outputs = true;
   return r;
 }
@@ -221,6 +221,7 @@ export function planBox(view: Pick<JobView, "bounds_mm">, marginMm = 2): PlanBox
   const b = view.bounds_mm;
   if (!b || b.length !== 4) return { x: 0, y: 0, w: 100, h: 80 };
   const [x0, y0, x1, y1] = b;
+  if (![x0, y0, x1, y1].every((n) => Number.isFinite(n))) return { x: 0, y: 0, w: 100, h: 80 };
   const w = Math.max(x1 - x0, 1) + 2 * marginMm;
   const h = Math.max(y1 - y0, 1) + 2 * marginMm;
   return { x: x0 - marginMm, y: y0 - marginMm, w, h };
@@ -238,7 +239,8 @@ export function holesDone(view: Pick<JobView, "hole_ends">, itemsDone: number): 
 export const TOOL_COLOURS = ["#4cc9f0", "#f72585", "#b5e048", "#ffb703", "#9d4edd", "#2ec4b6", "#ff6b35", "#8ecae6", "#e5989b", "#cdb4db"];
 
 export function toolColour(tool: number): string {
-  return TOOL_COLOURS[(Math.max(tool, 1) - 1) % TOOL_COLOURS.length];
+  if (!Number.isFinite(tool)) return TOOL_COLOURS[0];
+  return TOOL_COLOURS[(Math.max(Math.floor(tool), 1) - 1) % TOOL_COLOURS.length];
 }
 
 /** The size a hole is drawn at: a fifth of a millimetre at least would vanish on a big board, so it follows the box. */
@@ -281,7 +283,9 @@ export function finishedIds(jobs: JobSummary[]): string[] {
 }
 
 function csvCell(v: string | number | null): string {
-  const s = v == null ? "" : String(v);
+  let s = v == null ? "" : String(v);
+  // a text that starts like a formula of a spreadsheet (= + - @, or a tab or a return) is written with a quote in front, so that it is shown as text and not run
+  if (typeof v === "string" && /^[=+@\t\r-]/.test(s)) s = `'${s}`;
   return /[",\n\r;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 

@@ -300,6 +300,41 @@ describe("files and names", () => {
   });
 });
 
+describe("the plan with numbers that are not numbers", () => {
+  it("has the box of an empty plan when a bound is not a finite number", () => {
+    const none = { x: 0, y: 0, w: 100, h: 80 };
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      for (let at = 0; at < 4; at += 1) {
+        const b: [number, number, number, number] = [0, 0, 50, 20];
+        b[at] = bad;
+        expect(planBox({ bounds_mm: b })).toEqual(none);
+      }
+    }
+    expect(planBox({ bounds_mm: [0, 0, 50, 20] })).toEqual({ x: -2, y: -2, w: 54, h: 24 });
+  });
+
+  it("gives the first colour to a tool that is not a finite number and the colour of the whole part to a fraction", () => {
+    expect(toolColour(Number.NaN)).toBe(TOOL_COLOURS[0]);
+    expect(toolColour(Number.POSITIVE_INFINITY)).toBe(TOOL_COLOURS[0]);
+    expect(toolColour(Number.NEGATIVE_INFINITY)).toBe(TOOL_COLOURS[0]);
+    expect(toolColour(2.9)).toBe(TOOL_COLOURS[1]);
+    for (const tool of [1, 5, 10, 11, 99]) expect(TOOL_COLOURS).toContain(toolColour(tool));
+  });
+});
+
+describe("the work already done that is not a number", () => {
+  it("is not sent: no skip appears in the request of a drilling job or of a program", () => {
+    const base = { kind: "drill", name: "n" } as const;
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, -3, 0]) {
+      expect("skip" in withSkips(base, [], bad), String(bad)).toBe(false);
+      expect("skip" in gcodeRequest("g", "G0 X1", bad), String(bad)).toBe(false);
+    }
+    expect(withSkips(base, [], 4.9).skip).toBe(4);
+    expect(gcodeRequest("g", "G0 X1", 7.2).skip).toBe(7);
+    expect(JSON.stringify(withSkips(base, [], Number.POSITIVE_INFINITY))).not.toContain("null");
+  });
+});
+
 describe("the plan", () => {
   it("has a box for any bounds: none, wrong ones, a point, and upside down", () => {
     const none = { x: 0, y: 0, w: 100, h: 80 };
@@ -468,9 +503,28 @@ describe("the CSV of the jobs", () => {
     expect(jobsCsv([])).toBe(head.join(",") + "\r\n");
   });
 
-  it.skip("bug: a name that starts with = + - or @ is written as it is, and a spreadsheet runs it as a formula", () => {
+  it("writes a name that starts like a formula with a quote in front, so a spreadsheet shows it as text", () => {
     const rows = readCsv(jobsCsv([job({ name: "=HYPERLINK(\"http://x\",\"a\")" })]));
     expect(rows[1][1].startsWith("=")).toBe(false);
+    expect(rows[1][1]).toBe("'=HYPERLINK(\"http://x\",\"a\")");
+  });
+
+  it("does the same for + - @ and a leading tab or return, in the name and in the message, and leaves the rest as it was", () => {
+    const starters = ["+1", "-2", "@sum", "\tcell", "\rcell"];
+    const rows = readCsv(jobsCsv(starters.map((name, i) => job({ id: `s${i}`, name, message: name }))));
+    const head = rows[0];
+    expect(rows.slice(1).map((r) => r[1])).toEqual(starters.map((s) => `'${s}`));
+    expect(rows.slice(1).map((r) => r[head.indexOf("message")])).toEqual(starters.map((s) => `'${s}`));
+    const plain = ["board = 2", "a-b", "x@y", "1+1", "'already"];
+    const kept = readCsv(jobsCsv(plain.map((name, i) => job({ id: `p${i}`, name }))));
+    expect(kept.slice(1).map((r) => r[1])).toEqual(plain);
+  });
+
+  it("leaves the numbers as they are, even a negative one", () => {
+    const text = jobsCsv([job({ id: "n", created: -5, items_done: 3 })]);
+    const rows = readCsv(text);
+    expect(rows[1][rows[0].indexOf("created")]).toBe("-5");
+    expect(rows[1][rows[0].indexOf("items_done")]).toBe("3");
   });
 });
 

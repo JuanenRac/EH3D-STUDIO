@@ -10,6 +10,9 @@ All notable changes to this project are documented here.
 - **The stop button gives up waiting sooner and tries once more:** the call of the stop waits 3 seconds instead of the 15 of an ordinary request and, when it gets no answer or does not reach the server, it is sent once more (the stop is harmless with no job to end). A stop the server answered, even with an error, is not repeated. Tested with a first attempt that hangs, two that hang and an answered error.
 
 - **The warning that the unit of a drill file was supposed is shown in the summary of a job:** when the server says a drilling file does not state its unit (`units_supposed`), the summary shows the text in the language of the program (37 languages; the two variants inherit). Tested with the key, the absence of numbers to fill in and every language of the core.
+- **The CSV of the jobs no longer runs a name as a formula:** a name or a message that starts with `=`, `+`, `-`, `@`, a tab or a return is written with a quote in front, so that a spreadsheet shows it as text; numbers (even a negative one) and every other text are written as before. The test that waited for this fix is switched on, with tests for each starting character.
+- **A bound or a tool that is not a finite number no longer spoils the plan:** a plan whose bounds hold a number that is not finite is drawn in the box of an empty plan (it was a box of `NaN` that drew nothing), and a tool number that is not finite takes the first colour instead of an undefined one; a fraction takes the colour of its whole part.
+- **A work already done that is not a finite number is not sent:** `withSkips` and `gcodeRequest` leave `skip` out for `NaN` and infinity (the infinity was sent as `null` in the JSON of the request); a positive number is cut to a whole number as before. Tested with each kind of number.
 
 ## [0.1.5] - The pages archive is attached to the release again, a simulated server for the client and more tests
 
