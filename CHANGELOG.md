@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.1.8] - Settings panel drawn from the contract of the server, a new login after a change of policy and the pages package of the update helper
+
 - **55 more tests:** the copy of the contract against the file of the server, every key with a control and a text in the eight languages of the contract, the groups, the text by language, the control by type, who may write, the range, the restore of the default, the restart, the secret, the refusals by their code, the live contract against the copy, and a key nobody described.
 
 - **The page of the server draws every setting and switch from the contract of the server:** the groups (network, storage, logins, audit, updates, machines, compatibility, slicer, printers, tasks, artifacts, projects, catalogs, events and design), and for each key its label, help and warning in the language of the person, the value in force, the default, and whether a change applies at once or needs a restart. Studio reads `GET /api/v1/settings/contract` and no longer keeps a list of its own, so a setting the server adds appears without a new version of Studio.
