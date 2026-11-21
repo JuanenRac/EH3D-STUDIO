@@ -154,7 +154,13 @@ export function isPageId(s: string): s is PageId {
 /** The page and the thing it shows from the address after the `#`: `/jobs`, `/job/ab12`. */
 export function parseRoute(hash: string): { page: PageId; param: string } {
   const [id, ...rest] = hash.replace(/^#\/?/, "").split("/");
-  return { page: isPageId(id) ? id : "overview", param: decodeURIComponent(rest.join("/")) };
+  let param = rest.join("/");
+  try {
+    param = decodeURIComponent(param);
+  } catch {
+    /* a damaged escape (`%zz`) in a typed address stays as it was written, and never stops the page */
+  }
+  return { page: isPageId(id) ? id : "overview", param };
 }
 
 // ---- the rules of the server, checked before a request goes out
