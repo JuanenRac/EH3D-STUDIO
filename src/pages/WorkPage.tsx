@@ -5,6 +5,7 @@ import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Field, Progress, StartButton } from "../components/ui";
 import { AtcEditor, problemText } from "../components/AtcEditor";
 import { useFeed, useServices } from "../services/context";
+import { PnpNodesCard } from "../components/PnpNodes";
 import { EMPTY_FEED, affects, eventLine, feedReducer, matchesFeed } from "../services/events";
 import type { FeedEvent } from "../services/events";
 import { whenText } from "../services/format";
@@ -13,6 +14,7 @@ import { ApiError } from "../api";
 import {
   NEEDS_CONFIRMATION,
   WORK_TONE,
+  authState,
   countByState,
   filterQueue,
   isFinished,
@@ -25,6 +27,7 @@ import {
   percentOf,
   requestKinds,
   requestTemplate,
+  shortHash,
   unreadCount,
   validMachineId,
   withNotification,
@@ -35,8 +38,9 @@ import { WORK_STATES } from "../services/types";
 import type { WorkJob, WorkJobSummary, WorkMachineInfo, WorkNotification, WorkState } from "../services/types";
 import type { TextKey } from "../i18n";
 
-const TABS = ["queue", "machines", "live", "atc", "notices"] as const;
-const TAB_TEXT: Record<(typeof TABS)[number], TextKey> = { queue: "nav_jobs", machines: "ov_machines", live: "nav_live", atc: "atc_title", notices: "wk_tab_notices" };
+const TABS = ["queue", "machines", "nodes", "live", "atc", "notices"] as const;
+const TAB_TEXT: Record<(typeof TABS)[number], TextKey> = { queue: "nav_jobs", machines: "ov_machines", nodes: "pnp_tab", live: "nav_live", atc: "atc_title", notices: "wk_tab_notices" };
+const AUTH_TEXT: Record<"waiting" | "authorized" | "stale", TextKey> = { waiting: "wk_auth_waiting", authorized: "wk_auth_done", stale: "wk_auth_stale" };
 const STATE_TEXT: Record<WorkState, TextKey> = { queued: "wk_st_queued", running: "job_running", paused: "wk_st_paused", done: "job_done", failed: "job_failed", cancelled: "job_cancelled" };
 type Tab = (typeof TABS)[number];
 const FAMILIES = ["", "job", "machine", "project", "catalog", "notification"];
@@ -136,6 +140,7 @@ export function WorkPage({ route }: { route: string }) {
           </>
         )}
         {tab === "machines" && <MachinesCard machines={machines.data ?? null} plugins={plugins.data ?? null} reload={reloadAll} />}
+        {tab === "nodes" && <PnpNodesCard machines={(machines.data ?? []).filter((m) => m.plugin === "pnp")} />}
         {tab === "live" && <LiveCard events={feed.events} total={feed.total} resyncs={feed.resyncs} status={feedState} machines={(machines.data ?? []).map((m) => m.id)} onClear={() => feedDispatch({ type: "clear" })} />}
         {tab === "atc" && <AtcEditor request={request} onRequest={(x) => { setRequest(x); setTab("queue"); }} canEdit={sv.allowed("jobs.prepare")} />}
         {tab === "notices" && <NoticesCard notes={notes} setNotes={setNotes} />}
@@ -175,13 +180,19 @@ function QueueCard({ jobs, machines, reload }: { jobs: WorkJobSummary[] | null; 
   const act = async (job: WorkJobSummary, a: JobAction) => {
     setBusy(true);
     try {
-      if (a === "start") await sv.work.start(job.id);
+      if (a === "start") await sv.work.start(job.id, job.toolpath_sha256 || undefined);
+      else if (a === "authorize") {
+        await sv.work.authorize(job.id, job.toolpath_sha256 ?? "");
+        say(t("wk_authorized_done"), "ok");
+      }
       else if (a === "pause") await sv.work.pause(job.id);
       else if (a === "resume") await sv.work.resume(job.id);
       else if (a === "cancel") await sv.work.cancel(job.id);
       else await sv.work.remove(job.id);
       reload();
     } catch (e) {
+      // a refusal that names the hash (the job changed, or nobody authorised it) is answered by showing the job as it is now, with its hash
+      if (e instanceof ApiError && (e.code === "stale_authorization" || e.code === "authorization_required")) setOpen(job.id);
       say(err(e), "error");
       reload();
     } finally {
@@ -258,6 +269,18 @@ function QueueCard({ jobs, machines, reload }: { jobs: WorkJobSummary[] | null; 
                           <code>{j.id}</code> · {j.plugin} {j.app ? `· ${j.app}` : ""}
                         </small>
                         {j.message && <p>{j.message}</p>}
+                        {j.toolpath_sha256 ? (
+                          <p>
+                            <small className="muted">{t("wk_hash")}: </small>
+                            <code title={j.toolpath_sha256}>{j.toolpath_sha256}</code>
+                            {j.authorization && (
+                              <small className="muted">
+                                {" "}
+                                · {t("wk_authorized_by", { by: j.authorization.by })} · {whenText(j.authorization.at)}
+                              </small>
+                            )}
+                          </p>
+                        ) : null}
                         {detail?.history && detail.history.length > 0 ? (
                           <ol>
                             {detail.history.map((h, i) => (
@@ -277,6 +300,8 @@ function QueueCard({ jobs, machines, reload }: { jobs: WorkJobSummary[] | null; 
                   <td>
                     <Badge tone={WORK_TONE[j.state]}>{t(STATE_TEXT[j.state])}</Badge>
                     {j.state === "queued" && j.position ? <small className="muted"> #{j.position}</small> : null}
+                    {j.state === "queued" && authState(j) !== "none" ? <Badge tone={authState(j) === "authorized" ? "ok" : "wait"}>{t(AUTH_TEXT[authState(j) as "waiting" | "authorized" | "stale"])}</Badge> : null}
+                    {j.state === "queued" && j.toolpath_sha256 ? <small className="muted" title={j.toolpath_sha256}> {shortHash(j.toolpath_sha256)}</small> : null}
                   </td>
                   <td className="cell-bar">
                     <Progress percent={percentOf(j)} tone={j.state === "failed" ? "bad" : j.state === "done" ? "ok" : j.state === "paused" ? "wait" : "run"} />
@@ -289,6 +314,8 @@ function QueueCard({ jobs, machines, reload }: { jobs: WorkJobSummary[] | null; 
                       {actions.map((a) =>
                         a === "start" ? (
                           <StartButton key={a} label={t("act_start")} disabled={busy} onConfirm={() => void act(j, a)} />
+                        ) : a === "authorize" ? (
+                          <StartButton key={a} label={t("wk_authorize")} disabled={busy} onConfirm={() => void act(j, a)} />
                         ) : NEEDS_CONFIRMATION.includes(a) ? (
                           <DangerButton key={a} label={a === "remove" ? t("act_delete") : t("act_stop")} disabled={busy} onConfirm={() => void act(j, a)} />
                         ) : (

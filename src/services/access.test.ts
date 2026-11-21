@@ -36,7 +36,7 @@ describe("what each role may do", () => {
   it("names a scope for every action that has one, in the form the server uses", () => {
     for (const a of ACTIONS) {
       const scope = RULES[a].scope;
-      if (scope !== null) expect(scope, a).toMatch(/^(projects|catalog|machines|jobs):(read|write|view|manage|prepare|start|cancel)$/);
+      if (scope !== null) expect(scope, a).toMatch(/^(projects|catalog|machines|jobs):(read|write|view|manage|prepare|start|cancel|authorize)$/);
     }
   });
 

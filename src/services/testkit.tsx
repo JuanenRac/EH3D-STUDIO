@@ -11,6 +11,7 @@ import { EventFeed } from "./events";
 import type { SourceLike } from "./events";
 import { ServiceHttp } from "./http";
 import { can } from "./permissions";
+import { PnpClient } from "./pnp";
 import type { Who } from "./permissions";
 import { ServicesContext } from "./context";
 import type { ServicesState } from "./context";
@@ -113,6 +114,7 @@ export function makeServices(fetcher: (input: string, init?: RequestInit) => Pro
     http,
     auth: new AuthClient(http),
     work: new WorkClient(http),
+    pnp: new PnpClient(http),
     store: (app) => {
       let c = stores.get(app);
       if (!c) {

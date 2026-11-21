@@ -113,7 +113,7 @@ describe("the copy of the contract kept in Studio", () => {
 
   it("puts every group in the 8 languages and every setting in a group of the contract", () => {
     const ids = COPY.groups.map((g) => g.id);
-    expect(ids).toHaveLength(15);
+    expect(ids).toHaveLength(16);
     for (const g of COPY.groups) for (const lang of CONTRACT_LANGS) expect((g.label[lang] ?? "").length, `${g.id}.${lang}`).toBeGreaterThan(0);
     for (const s of COPY.settings) expect(ids, s.key).toContain(s.group);
   });

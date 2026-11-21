@@ -18,6 +18,7 @@ export type Action =
   | "jobs.prepare"
   | "jobs.start"
   | "jobs.cancel"
+  | "jobs.authorize"
   | "catalog.read"
   | "catalog.write"
   | "sessions.own"
@@ -38,6 +39,7 @@ export const RULES: Record<Action, { role: Role; scope: string | null }> = {
   "jobs.prepare": { role: "operator", scope: "jobs:prepare" },
   "jobs.start": { role: "operator", scope: "jobs:start" },
   "jobs.cancel": { role: "operator", scope: "jobs:cancel" },
+  "jobs.authorize": { role: "operator", scope: "jobs:authorize" },
   "catalog.read": { role: "viewer", scope: "catalog:read" },
   "catalog.write": { role: "admin", scope: "catalog:write" },
   "sessions.own": { role: "viewer", scope: null },

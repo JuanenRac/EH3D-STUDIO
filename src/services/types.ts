@@ -137,6 +137,16 @@ export interface WorkJobSummary {
   message?: string;
   /** The place among the queued jobs of its machine (1 is the next); 0 when it is not queued. */
   position?: number;
+  /** The hash of what the job will do, made when it was prepared: the one a person authorises and a start may name. Empty for a job prepared before the hash existed. */
+  toolpath_sha256?: string;
+  /** Who authorised which hash and when; null while nobody has. */
+  authorization?: WorkAuthorization | null;
+}
+
+export interface WorkAuthorization {
+  by: string;
+  at: number;
+  toolpath_sha256: string;
 }
 
 export interface WorkJob extends WorkJobSummary {

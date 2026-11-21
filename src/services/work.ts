@@ -25,7 +25,10 @@ export class WorkClient {
   design = (req: DesignRequest) => this.http.json<WorkJob>("POST", "/apps/pcb/jobs", { json: req, transfer: true });
   job = (id: string) => this.http.json<WorkJob>("GET", `/work/jobs/${encodeURIComponent(id)}`);
   create = (job: NewWorkJob) => this.http.json<WorkJob>("POST", "/work/jobs", { json: job, transfer: true });
-  start = (id: string) => this.http.json<WorkJob>("POST", `/work/jobs/${encodeURIComponent(id)}/start`, { json: {}, transfer: true });
+  /** Starts a queued job. With the hash the person was shown, the server refuses (`409 stale_authorization`) when the job is no longer the one that was shown. */
+  start = (id: string, hash?: string) => this.http.json<WorkJob>("POST", `/work/jobs/${encodeURIComponent(id)}/start`, { json: hash ? { toolpath_sha256: hash } : {}, transfer: true });
+  /** Authorises the hash of a queued job (a person with `jobs:authorize`): the job must still have that hash. */
+  authorize = (id: string, hash: string) => this.http.json<WorkJob>("POST", `/work/jobs/${encodeURIComponent(id)}/authorize`, { json: { toolpath_sha256: hash } });
   pause = (id: string) => this.http.json<WorkJob>("POST", `/work/jobs/${encodeURIComponent(id)}/pause`, { json: {} });
   resume = (id: string) => this.http.json<WorkJob>("POST", `/work/jobs/${encodeURIComponent(id)}/resume`, { json: {} });
   cancel = (id: string) => this.http.json<WorkJob>("POST", `/work/jobs/${encodeURIComponent(id)}/cancel`, { json: {} });
@@ -77,7 +80,22 @@ export const WORK_TONE: Record<WorkState, "ok" | "run" | "wait" | "bad" | "dim">
   cancelled: "dim",
 };
 
-export type JobAction = "start" | "pause" | "resume" | "cancel" | "remove";
+export type JobAction = "start" | "authorize" | "pause" | "resume" | "cancel" | "remove";
+
+/** Where a job stands with the authorization of its hash: `none` (the job has no hash), `waiting` (nobody authorised it), `authorized` (the hash in force) or `stale` (authorised, but the job is not the one that was authorised). */
+export type AuthState = "none" | "waiting" | "authorized" | "stale";
+
+export function authState(job: Pick<WorkJobSummary, "toolpath_sha256" | "authorization">): AuthState {
+  const hash = job.toolpath_sha256 ?? "";
+  if (hash === "") return "none";
+  if (!job.authorization) return "waiting";
+  return job.authorization.toolpath_sha256 === hash ? "authorized" : "stale";
+}
+
+/** The first characters of a hash, for a table (the whole hash is in the title and in the detail). */
+export function shortHash(hash: string | undefined): string {
+  return hash ? hash.slice(0, 12) : "";
+}
 
 /** Whether the machine of the job can be held: the capability `pause` of the plugin is `all`, `gcode` (only a free G-code job; the server refuses the rest) or none. A plugin that does not say is asked. */
 export function canHold(caps: Record<string, unknown> | undefined): boolean {
@@ -94,11 +112,12 @@ export function requestKinds(caps: Record<string, unknown> | undefined): string[
 }
 
 /** The buttons a job has in its state for this person: what the role allows and what the state makes possible. The server decides in the end. */
-export function jobActions(job: Pick<WorkJobSummary, "state">, who: Who | null | undefined, caps?: Record<string, unknown>): JobAction[] {
+export function jobActions(job: Pick<WorkJobSummary, "state" | "toolpath_sha256" | "authorization">, who: Who | null | undefined, caps?: Record<string, unknown>): JobAction[] {
   const out: JobAction[] = [];
   const start = can(who, "jobs.start");
   const cancel = can(who, "jobs.cancel");
   if (job.state === "queued") {
+    if (can(who, "jobs.authorize") && (authState(job) === "waiting" || authState(job) === "stale")) out.push("authorize");
     if (start) out.push("start");
     if (cancel) out.push("cancel");
   } else if (job.state === "running") {
