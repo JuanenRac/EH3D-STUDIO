@@ -6,7 +6,6 @@
  * asked for, shown or written. GPL-3.0-or-later.
  */
 import type { Lang } from "../i18n";
-import { VARIANT_OF } from "../i18n";
 import { atLeast } from "../model";
 import type { Role } from "../types";
 import type { Who } from "./permissions";
@@ -122,11 +121,10 @@ export function isContract(x: unknown): x is SettingsContract {
   return d.settings.every((s) => typeof s === "object" && s !== null && typeof (s as Setting).key === "string" && typeof (s as Setting).write === "object");
 }
 
-/** The text of a field of the contract in the language of the person: the language itself, its main language (pt-br reads pt), English, then any text there is. */
+/** The text of a field of the contract in the language of the person: the language itself, English, then any text there is. */
 export function contractText(map: Localized | undefined, lang: Lang): string {
   if (!map) return "";
-  const main = VARIANT_OF[lang];
-  return map[lang] ?? (main ? map[main] : undefined) ?? map.en ?? Object.values(map).find((v) => typeof v === "string" && v !== "") ?? "";
+  return map[lang] ?? map.en ?? Object.values(map).find((v) => typeof v === "string" && v !== "") ?? "";
 }
 
 /** One group of the page: its id, its label (the id when the contract has none) and its settings in the order of the contract. */

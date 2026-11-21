@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ApiError } from "./api";
 import { shouldAlert, titleFor } from "./attention";
 import { copyWithSelection } from "./clipboard";
-import { CORE_LANGS, LANGS, LANG_NAMES, VARIANT_OF, browserLang, errorText, isLang, text } from "./i18n";
+import { CORE_LANGS, LANGS, LANG_NAMES, browserLang, errorText, isLang, startLang, text } from "./i18n";
 import type { TextKey } from "./i18n";
 import { skipWhileBusy } from "./polling";
 import { ROWS } from "./texts";
@@ -115,36 +115,49 @@ describe("the copy to the clipboard with the old way", () => {
 });
 
 describe("the languages", () => {
-  it("are 37, with the names of each in itself and the Portuguese of Portugal", () => {
-    expect(LANGS).toHaveLength(37);
-    expect(new Set(LANGS).size).toBe(37);
+  it("are the eight official ones, with the names of each in itself and the Portuguese of Portugal", () => {
+    expect(LANGS).toHaveLength(8);
+    expect(new Set(LANGS).size).toBe(8);
     expect(LANGS.slice(0, 8)).toEqual(["en", "es", "it", "de", "fr", "pt", "zh", "ja"]);
-    expect(Object.keys(VARIANT_OF)).toEqual(["pt-br", "fr-ca"]);
     for (const l of LANGS) expect(LANG_NAMES[l].trim().length).toBeGreaterThan(0);
     expect(LANG_NAMES.pt).toContain("Portugal");
   });
 
   it("are known by their code only, in lower case", () => {
     for (const l of LANGS) expect(isLang(l)).toBe(true);
-    for (const bad of ["", "EN", "pt_br", "xx", "en-US", " en"]) expect(isLang(bad)).toBe(false);
+    for (const bad of ["", "EN", "pt_br", "pt-br", "fr-ca", "ru", "xx", "en-US", " en"]) expect(isLang(bad)).toBe(false);
     expect(isLang(null)).toBe(false);
     expect(isLang(undefined)).toBe(false);
   });
 
-  it("are chosen from the list of the browser: the first that is one of the 37, with or without a region", () => {
+  it("are chosen from the list of the browser: the first that is one of the eight, with or without a region", () => {
     expect(browserLang([])).toBe("en");
     expect(browserLang(["xx", "de-AT", "fr"])).toBe("de");
-    expect(browserLang(["PT-br"])).toBe("pt-br");
+    expect(browserLang(["PT-br"])).toBe("pt");
     expect(browserLang(["pt-PT"])).toBe("pt");
-    expect(browserLang(["fr-CA"])).toBe("fr-ca");
+    expect(browserLang(["fr-CA"])).toBe("fr");
     expect(browserLang(["fr-BE"])).toBe("fr");
-    expect(browserLang(["nb-NO"])).toBe("no");
-    expect(browserLang(["nn"])).toBe("no");
-    expect(browserLang(["sr-RS", "en"])).toBe("sr");
-    expect(browserLang(["ga-IE"])).toBe("ga");
+    expect(browserLang(["nb-NO"])).toBe("en");
+    expect(browserLang(["sr-RS", "es"])).toBe("es");
+    expect(browserLang(["ru", "uk", "de"])).toBe("de");
     expect(browserLang(["ko", "th"])).toBe("en");
     expect(browserLang(["zh-Hant-TW"])).toBe("zh");
     expect(browserLang(["ja_JP"])).toBe("ja");
+  });
+});
+
+describe("a saved language that was retired", () => {
+  it("falls to the language of the browser (English or Spanish when it is one of them), and a saved official one is kept", () => {
+    for (const gone of ["ru", "uk", "bg", "sr", "el", "pt-br", "fr-ca", "nl", "no"]) {
+      expect(isLang(gone), gone).toBe(false);
+      expect(startLang(gone, ["es-ES", "en"]), gone).toBe("es");
+      expect(startLang(gone, ["en-GB"]), gone).toBe("en");
+      expect(startLang(gone, ["ko"]), gone).toBe("en");
+      expect(startLang(gone, []), gone).toBe("en");
+    }
+    expect(startLang(null, ["es"])).toBe("es");
+    expect(startLang("ja", ["es"])).toBe("ja");
+    expect(startLang("pt", ["en"])).toBe("pt");
   });
 });
 

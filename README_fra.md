@@ -6,19 +6,19 @@
 
 <p align="center"><a href="README.md">🇺🇸 English</a> | <a href="README_spa.md">🇪🇸 Español</a> | 🇫🇷 <b>Français</b> | <a href="README_ita.md">🇮🇹 Italiano</a> | <a href="README_deu.md">🇩🇪 Deutsch</a> | <a href="README_zho.md">🇨🇳 中文</a> | <a href="README_jpn.md">🇯🇵 日本語</a> | <a href="README_por.md">🇵🇹 Português</a></p>
 
-### Le panneau de configuration du serveur EH3D : les machines et leurs stations, les travaux, les utilisateurs et les jetons des programmes, le tout structuré et dans le style de BUNGARD-GUI, en 37 langues.
+### Le panneau de configuration du serveur EH3D : les machines et leurs stations, les travaux, les utilisateurs et les jetons des programmes, le tout structuré et dans le style de BUNGARD-GUI, en 8 langues.
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
   <img src="https://img.shields.io/badge/Stack-React%20%2B%20TypeScript-00599C.svg" alt="React and TypeScript">
-  <img src="https://img.shields.io/badge/Languages-37-00E5FF.svg" alt="Languages">
+  <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
   <img src="https://img.shields.io/badge/Version-0.1.8-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-4CAF50.svg" alt="Maturity">
 </p>
 
 ---
 
-**Vérification d'honnêteté - ce qui tourne aujourd'hui :** une application web en React et TypeScript qui se connecte à EH3D-SERVER et montre et modifie ce qu'il contient : les machines avec leur station, leur nœud et leurs fichiers de configuration, les travaux, les utilisateurs et les jetons, les événements en direct. Le client de l'API, les règles des formulaires, le menu par rôle et les 37 langues sont couverts par 558 tests, et les pages ont été vues dans un navigateur contre un serveur local avec des machines simulées. **Elle n'a pas été utilisée avec des machines sur un banc**, et le serveur ne termine pas encore TLS.
+**Vérification d'honnêteté - ce qui tourne aujourd'hui :** une application web en React et TypeScript qui se connecte à EH3D-SERVER et montre et modifie ce qu'il contient : les machines avec leur station, leur nœud et leurs fichiers de configuration, les travaux, les utilisateurs et les jetons, les événements en direct. Le client de l'API, les règles des formulaires, le menu par rôle et les 8 langues sont couverts par 611 tests, et les pages ont été vues dans un navigateur contre un serveur local avec des machines simulées. **Elle n'a pas été utilisée avec des machines sur un banc**, et le serveur ne termine pas encore TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.1.8` |
 | Maturité | Fonctionnel |
-| Tests | 618 tests (`npm test`) |
+| Tests | 611 tests (`npm test`) |
 | Pile technique | React 19, TypeScript, Vite |
 | Sur du matériel réel | Pas avec des machines sur un banc : vue dans un navigateur contre un serveur local avec des machines simulées |
 
@@ -45,10 +45,10 @@ Chaque ligne est une partie de ce dépôt et le feu dit où elle en est aujourd'
 | Domaine | État | Ce que cela veut dire ici |
 |---|---|---|
 | Logiciel | 🟡 | L'application se construit sans avertissement (types, lint, build) et est servie par le serveur à la racine de son adresse ; elle a tourné dans un navigateur contre un serveur local. |
-| Tests | 🟡 | 618 tests réussissent (`npm test`) : le client de l'API avec ses erreurs, les règles des noms, mots de passe et adresses, le menu par rôle, la flotte par station, les actions d'un travail, les 37 langues et le client face à un serveur simulé qui tombe, refuse, ne dit rien, fait expirer la connexion ou échoue au hasard. |
+| Tests | 🟡 | 611 tests réussissent (`npm test`) : le client de l'API avec ses erreurs, les règles des noms, mots de passe et adresses, le menu par rôle, la flotte par station, les actions d'un travail, les 8 langues et le client face à un serveur simulé qui tombe, refuse, ne dit rien, fait expirer la connexion ou échoue au hasard. |
 | Pages | 🟡 | Aperçu, machines par station, travaux, événements en direct, machines, utilisateurs et jetons, serveur, compte, préférences et à propos sont écrits ; travaux et machines se gèrent avec la vraie API du serveur. Aucune page n'a été essayée par quelqu'un d'autre que l'auteur. |
 | Services communs | 🟠 | Projets, machines et travaux, sécurité et rapports de conception sont écrits et testés contre un serveur de substitution ; pas contre EH3D-SERVER en marche ni sur le CM5. |
-| Langues | 🟡 | 37 langues dans chaque texte, refus du serveur compris ; les textes sont lus par un test, mais seuls l'anglais et quelques phrases des autres ont été lus par une personne ; les 29 langues après les huit premières sont des traductions du modèle qui attendent une relecture par des locuteurs natifs. |
+| Langues | 🟡 | 8 langues dans chaque texte, refus du serveur compris ; les textes sont lus par un test, mais seuls l'anglais et quelques phrases des autres ont été lus par une personne. |
 | Machines réelles | 🔴 | Rien n'a été fait avec elle sur un banc : aucune machine ajoutée, aucun nœud atteint et aucun travail exécuté par elle sur une vraie machine. |
 | Documentation | 🟡 | README en huit langues, les réglages du serveur et comment mettre Studio sur la CM5. |
 
@@ -160,7 +160,7 @@ Comment s'assemblent les parties de ce dépôt : qui lui parle, ce qu'il contien
 * **La broche sur la page d'une machine :** tout le monde lit quelle broche porte la machine (l'originale ou celle avec variateur), ce qui arrive à un travail qui demande plus que ce qu'elle donne, les limites de la broche utilisée et la vitesse maximale à régler dans le nœud de la machine ; un administrateur change la broche et l'interrupteur de sécurité (refuser le travail, par défaut, ou avertir et ramener la vitesse au maximum de la broche). Quand un travail est préparé avec l'interrupteur sur `warn`, le plan liste ce qui dépasse la broche, outil par outil ; avec `reject` le serveur le refuse et Studio dit pourquoi. Non essayé sur une vraie machine.
 * **Travaux G-code libres et machines GRBL :** une machine peut être un contrôleur GRBL sur un port série du serveur (port et débit en bauds ; le serveur doit être compilé avec `--features serial`), et un administrateur l'ajoute ou la modifie dans Configuration. Dans Préparer, un programme G-code (collé ou chargé depuis un fichier) est prévisualisé et gardé prêt comme tout travail, avec un interrupteur de sécurité pour redémarrer la broche et le liquide de refroidissement à la reprise, désactivé par défaut. Un travail G-code en cours est mis en pause et repris depuis la liste, depuis sa page et depuis l'aperçu, qui disent la ligne atteinte et ce qu'il attend (une pause, ou l'attente avant le premier mouvement d'un travail qui reprend) ; un travail arrêté propose de reprendre là où il s'est arrêté : le serveur a gardé la demande, il n'est donc pas nécessaire de choisir le fichier à nouveau. Les travaux de perçage et de défonçage acceptent les outils désactivés et les trous ou trajets déjà faits, et la référence des réglages du serveur liste `gcode_finish_wait_s` et `updates_dir`. Essayé sur le simulateur et avec un substitut, jamais avec un vrai contrôleur GRBL. Un administrateur peut autoriser par machine les lignes `$` de GRBL (comme `$H`) avec un interrupteur de sécurité dans Configuration, désactivé par défaut et avec un avertissement.
 * **L'anneau de LED et le dernier contrôle de qualité sur la page d'une machine :** un opérateur allume ou éteint l'anneau et règle son niveau et sa teinte, et chacun lit le verdict du dernier contrôle du travail. Testé avec un substitut, jamais avec un vrai nœud.
-* **Une limite de temps pour chaque requête et des jetons que l'on peut auditer :** une requête sans réponse se termine en erreur après 5 à 60 secondes, une page qui redemande attend la dernière requête, la liste des jetons des programmes dit quand chacun a été utilisé pour la dernière fois et quand il expire (et marque ceux inutilisés depuis 90 jours, et permet d'indiquer les jours de validité d'un nouveau jeton), un travail dit qui l'a démarré et qui l'a arrêté, la page Serveur montre les interrupteurs que signale le serveur en marche, et chaque refus du serveur a une phrase dans les 37 langues, vérifiée contre la liste de codes que publie le serveur.
+* **Une limite de temps pour chaque requête et des jetons que l'on peut auditer :** une requête sans réponse se termine en erreur après 5 à 60 secondes, une page qui redemande attend la dernière requête, la liste des jetons des programmes dit quand chacun a été utilisé pour la dernière fois et quand il expire (et marque ceux inutilisés depuis 90 jours, et permet d'indiquer les jours de validité d'un nouveau jeton), un travail dit qui l'a démarré et qui l'a arrêté, la page Serveur montre les interrupteurs que signale le serveur en marche, et chaque refus du serveur a une phrase dans les 8 langues, vérifiée contre la liste de codes que publie le serveur.
 * **Les services communs du serveur (non essayés avec le vrai serveur) :** l'explorateur du stockage de projets (arbre, versions avec SHA-256, envoi, `.eh3dproj`, verrou d'édition, conflits de `If-Match` signalés), les machines et travaux des plugins avec le flux d'événements, les emplacements d'outils du changeur, les sessions et la politique de connexion, et les rapports de conception d'un projet. Chaque rôle ne voit et ne fait que le sien ; le serveur décide au final.
 
 ## 🔒 Sécurité et protection
@@ -209,7 +209,7 @@ Copiez `dist/` sur la CM5 (par exemple dans `/opt/eh3d-studio`), mettez `studio_
 
 ## 🧪 Tests
 
-`npm test` lance 618 tests et tous réussissent : le client de l'API (le jeton, le corps, la requête, les erreurs, un réseau qui tombe, les chemins avec des noms à échapper), les règles des noms, mots de passe et adresses de nœud, ce qui ne va pas dans une machine, le menu de chaque rôle, les machines groupées par station, les comptes et les actions d'un travail, et les 37 langues (chaque langue a chaque texte, les mêmes marqueurs partout, les deux variantes seulement avec des clés de la source, chinois et japonais dans leur écriture, aucune écrite de droite à gauche). `npm run typecheck` et `npm run lint` réussissent aussi. Il lit aussi les exemples de réponses que produisent les tests du serveur : une réponse qui change sans que Studio suive échoue ici. Il teste aussi la limite de temps de chaque requête (avec une horloge avancée à la main), l'interrogation qui attend la dernière requête, les textes face au catalogue des codes d'erreur du serveur et les règles des jetons des programmes. Il teste aussi la sécurité des machines des plugins : l'insigne d'une machine qui n'a tourné que contre un simulateur, les verrouillages en rouge, l'arrêt d'urgence sans question pour un opérateur et la levée d'un verrouillage réservée à un administrateur (demandée deux fois), l'impression d'une imprimante 3D qu'une personne lance, et les quatre interrupteurs du serveur qui sont éteints, contre le serveur simulé et, à côté du dépôt du serveur, contre son contrat. Elle teste aussi l'écran des réglages du serveur : la copie de son contrat face au fichier du serveur, les groupes, le contrôle de chaque type, le texte dans la langue de la personne, la valeur par défaut que l'on peut rétablir, la plage vérifiée avant l'envoi, le redémarrage nécessaire, le rôle qui peut modifier un réglage, le secret qui n'est jamais affiché, les refus du serveur avec leur texte et une clé que personne n'a décrite.
+`npm test` lance 611 tests et tous réussissent : le client de l'API (le jeton, le corps, la requête, les erreurs, un réseau qui tombe, les chemins avec des noms à échapper), les règles des noms, mots de passe et adresses de nœud, ce qui ne va pas dans une machine, le menu de chaque rôle, les machines groupées par station, les comptes et les actions d'un travail, et les 8 langues (chaque langue a chaque texte, les mêmes marqueurs partout, les deux variantes seulement avec des clés de la source, chinois et japonais dans leur écriture, aucune écrite de droite à gauche). `npm run typecheck` et `npm run lint` réussissent aussi. Il lit aussi les exemples de réponses que produisent les tests du serveur : une réponse qui change sans que Studio suive échoue ici. Il teste aussi la limite de temps de chaque requête (avec une horloge avancée à la main), l'interrogation qui attend la dernière requête, les textes face au catalogue des codes d'erreur du serveur et les règles des jetons des programmes. Il teste aussi la sécurité des machines des plugins : l'insigne d'une machine qui n'a tourné que contre un simulateur, les verrouillages en rouge, l'arrêt d'urgence sans question pour un opérateur et la levée d'un verrouillage réservée à un administrateur (demandée deux fois), l'impression d'une imprimante 3D qu'une personne lance, et les quatre interrupteurs du serveur qui sont éteints, contre le serveur simulé et, à côté du dépôt du serveur, contre son contrat. Elle teste aussi l'écran des réglages du serveur : la copie de son contrat face au fichier du serveur, les groupes, le contrôle de chaque type, le texte dans la langue de la personne, la valeur par défaut que l'on peut rétablir, la plage vérifiée avant l'envoi, le redémarrage nécessaire, le rôle qui peut modifier un réglage, le secret qui n'est jamais affiché, les refus du serveur avec leur texte et une clé que personne n'a décrite.
 
 ## 🏗️ Compilation et publication
 
@@ -243,7 +243,7 @@ EH3D-STUDIO/
 │   ├── model.ts                                 rôles, règles des formulaires, flotte et travaux
 │   ├── jobtools.ts attention.ts                 les outils des travaux : trous, requêtes, plan, recherche, CSV
 │   ├── tokenstore.ts                            où le jeton de connexion est gardé : cet onglet, ou le navigateur si mémorisé
-│   ├── i18n.ts texts.ts locales/                les 37 langues
+│   ├── i18n.ts texts.ts                         les 8 langues
 │   ├── pages/                                   Supervision, Services, Configuration, Compte et connexion
 │   └── styles.css                               le thème Forge et trois autres
 ├── tools/
@@ -290,25 +290,15 @@ EH3D-STUDIO/
 
 ## 🌍 Langues
 
-Les pages parlent 37 langues : les huit premières (anglais, espagnol, italien, allemand, français, portugais européen, chinois et japonais) et 29 autres. Le README existe dans les huit premières ; les mots des 29 autres sont des traductions du modèle qui attendent une relecture par des locuteurs natifs.
+Les pages parlent les huit langues officielles de l'écosystème : anglais, espagnol, italien, allemand, français, portugais européen, chinois et japonais. Le README existe dans les mêmes huit.
 
-La langue se choisit dans cet ordre : celle enregistrée dans le navigateur (le sélecteur de la page de connexion et des Préférences, une liste qui défile et montre chaque langue sous son propre nom), la langue du navigateur (le Brésil donne le portugais du Brésil, le Canada le français du Canada, `nb` et `nn` donnent le norvégien), puis l'anglais. Un texte qu'une langue n'a pas est pris dans la langue principale d'une variante, puis en anglais, puis en espagnol. Aucune des 37 ne s'écrit de droite à gauche, donc Studio n'a pas de mise en page de droite à gauche.
+La langue se choisit dans cet ordre : celle enregistrée dans le navigateur (le sélecteur de la page de connexion et des Préférences, qui montre chaque langue sous son propre nom), la langue du navigateur (toute région donne sa langue principale : le Brésil donne le portugais européen, le Canada le français), puis l'anglais ; une langue qui n'est pas l'une des huit (par exemple enregistrée par une version antérieure) retombe sur la langue du navigateur, anglais ou espagnol compris. Un texte qu'une langue n'a pas est pris de l'anglais, puis de l'espagnol. Aucune des huit ne s'écrit de droite à gauche, donc Studio n'a pas de mise en page de droite à gauche.
 
 | Code | Langue | Code | Langue | Code | Langue |
 |---|---|---|---|---|---|
 | `en` | English | `es` | Español | `it` | Italiano |
 | `de` | Deutsch | `fr` | Français | `pt` | Português (Portugal) |
-| `zh` | 中文 | `ja` | 日本語 | `bg` | Български |
-| `hr` | Hrvatski | `cs` | Čeština | `da` | Dansk |
-| `nl` | Nederlands | `et` | Eesti | `fi` | Suomi |
-| `el` | Ελληνικά | `hu` | Magyar | `ga` | Gaeilge |
-| `lv` | Latviešu | `lt` | Lietuvių | `mt` | Malti |
-| `pl` | Polski | `ro` | Română | `sk` | Slovenčina |
-| `sl` | Slovenščina | `sv` | Svenska | `no` | Norsk |
-| `is` | Íslenska | `uk` | Українська | `ru` | Русский |
-| `sr` | Српски | `sq` | Shqip | `ca` | Català |
-| `gl` | Galego | `eu` | Euskara | `pt-br` | Português (Brasil) |
-| `fr-ca` | Français (Canada) |  |  |  |  |
+| `zh` | 中文 | `ja` | 日本語 |  |  |
 
 ## 🔗 Projets liés
 
@@ -330,7 +320,7 @@ La langue se choisit dans cet ordre : celle enregistrée dans le navigateur (le 
 
 * Avant une pull request, lancez `npm run typecheck`, `npm run lint`, `npm test` et `npm run build`, et `python -I tools/ci_validate.py` : tout doit passer. Voir [CONTRIBUTING.md](CONTRIBUTING.md) et le [code de conduite](CODE_OF_CONDUCT.md).
 * Le README existe en huit langues : une modification du texte se fait dans les huit fichiers, et les deux images sont dessinées depuis `docs/architecture.json` et `docs/structure.json` par `tools/make_architecture.py` et `tools/make_structure.py`.
-* Les huit premières langues sont une ligne de huit par texte dans `src/texts.ts` ; les 29 autres sont un fichier JSON chacune dans `src/locales/` (`pt-br` et `fr-ca` ne contiennent que ce qui diffère de `pt` et `fr`) ; un test lit chaque texte de chaque langue.
+* Les huit langues sont une ligne de huit par texte dans `src/texts.ts` ; un test lit chaque texte de chaque langue.
 * Signalez une vulnérabilité en privé : [SECURITY.md](SECURITY.md). Questions, idées et signalements : electrohobby3d@gmail.com ([SUPPORT.md](SUPPORT.md)).
 
 ## 👤 AUTEUR

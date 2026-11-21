@@ -32,7 +32,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/**/*.test.{ts,tsx}", "src/services/testkit.tsx", "src/locales/**", "src/main.tsx", "src/examples/**"],
+      exclude: ["src/**/*.test.{ts,tsx}", "src/services/testkit.tsx", "src/main.tsx", "src/examples/**"],
       reporter: ["text", "json-summary"],
       // the floor: what the tests cover today, a little less; a change that leaves more code without a test than this stops the CI
       thresholds: { lines: 61, statements: 61, functions: 53, branches: 59 },

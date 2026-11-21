@@ -149,22 +149,12 @@ describe("the settings of the server, drawn from the live contract", () => {
     }
   });
 
-  it("writes the label, the help and the warning in the language of the person, and English for a language the contract lacks", async () => {
+  it("writes the label, the help and the warning in the language of the person", async () => {
     const live = { "GET /settings/contract": () => liveAnswer() };
     const es = await show(live, "admin", { lang: "es" });
     expect(es.$$("h4")[0].textContent).toBe("Red");
     expect(es.row("listen")!.textContent).toContain("Dirección de escucha");
     expect(es.text()).toContain("Contrato leído del servidor 1.2.3.");
-    await act(async () => root!.unmount());
-    root = null;
-    const bg = await show(live, "admin", { lang: "bg" });
-    expect(bg.$$("h4")[0].textContent).toBe("Network");
-    expect(bg.row("listen")!.textContent).toContain("Listen address");
-    expect(bg.text()).toContain("Договорът е прочетен от сървъра 1.2.3.");
-    await act(async () => root!.unmount());
-    root = null;
-    const ptBr = await show(live, "admin", { lang: "pt-br" });
-    expect(ptBr.row("listen")!.textContent).toContain("Endereço de escuta");
   });
 
   it("shows the value in force, the default and when a change applies", async () => {

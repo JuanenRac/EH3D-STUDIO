@@ -110,7 +110,7 @@ describe("the token of the login", () => {
 describe("the texts of the sign-in and of the new switches", () => {
   const KEYS = ["login_remember", "login_remember_hint", "srv_network_open", "srv_update_allow_unsigned", "srv_update_keep_logins", "sec_restart_needed"] as const;
 
-  it("exist in the 37 languages and warn about a shared computer", () => {
+  it("exist in the eight languages and warn about a shared computer", () => {
     for (const k of KEYS) {
       expect(ROWS).toHaveProperty(k);
       for (const l of LANGS) expect(text(l, k).trim().length, `${k} in ${l}`).toBeGreaterThan(3);

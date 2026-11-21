@@ -6,19 +6,19 @@
 
 <p align="center"><a href="README.md">🇺🇸 English</a> | <a href="README_spa.md">🇪🇸 Español</a> | <a href="README_fra.md">🇫🇷 Français</a> | <a href="README_ita.md">🇮🇹 Italiano</a> | <a href="README_deu.md">🇩🇪 Deutsch</a> | <a href="README_zho.md">🇨🇳 中文</a> | <a href="README_jpn.md">🇯🇵 日本語</a> | 🇵🇹 <b>Português</b></p>
 
-### O painel de configuração do servidor EH3D: as máquinas e as suas estações, os trabalhos, os utilizadores e os tokens dos programas, tudo estruturado e com o aspeto do BUNGARD-GUI, em 37 idiomas.
+### O painel de configuração do servidor EH3D: as máquinas e as suas estações, os trabalhos, os utilizadores e os tokens dos programas, tudo estruturado e com o aspeto do BUNGARD-GUI, em 8 idiomas.
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
   <img src="https://img.shields.io/badge/Stack-React%20%2B%20TypeScript-00599C.svg" alt="React and TypeScript">
-  <img src="https://img.shields.io/badge/Languages-37-00E5FF.svg" alt="Languages">
+  <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
   <img src="https://img.shields.io/badge/Version-0.1.8-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-4CAF50.svg" alt="Maturity">
 </p>
 
 ---
 
-**Verificação de honestidade - o que corre hoje:** uma aplicação web em React e TypeScript que entra no EH3D-SERVER e mostra e altera o que ele guarda: as máquinas com a sua estação, o seu nó e os ficheiros de configuração, os trabalhos, os utilizadores e os tokens, os eventos em direto. O cliente da API, as regras dos formulários, o menu por perfil e os 37 idiomas estão cobertos por 558 testes, e as páginas foram vistas num navegador contra um servidor local com máquinas simuladas. **Não foi usada com máquinas numa bancada**, e o servidor ainda não termina TLS.
+**Verificação de honestidade - o que corre hoje:** uma aplicação web em React e TypeScript que entra no EH3D-SERVER e mostra e altera o que ele guarda: as máquinas com a sua estação, o seu nó e os ficheiros de configuração, os trabalhos, os utilizadores e os tokens, os eventos em direto. O cliente da API, as regras dos formulários, o menu por perfil e os 8 idiomas estão cobertos por 611 testes, e as páginas foram vistas num navegador contra um servidor local com máquinas simuladas. **Não foi usada com máquinas numa bancada**, e o servidor ainda não termina TLS.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Versão | `0.1.8` |
 | Maturidade | Funcional |
-| Testes | 618 testes (`npm test`) |
+| Testes | 611 testes (`npm test`) |
 | Tecnologias | React 19, TypeScript, Vite |
 | Em hardware real | Não com máquinas numa bancada: vista num navegador contra um servidor local com máquinas simuladas |
 
@@ -45,10 +45,10 @@ Cada linha é uma parte deste repositório e a luz diz até onde chega hoje. É 
 | Área | Estado | O que significa aqui |
 |---|---|---|
 | Software | 🟡 | A aplicação compila sem avisos (tipos, lint, compilação) e é servida pelo servidor na raiz do seu endereço; já correu num navegador contra um servidor local. |
-| Testes | 🟡 | Passam 618 testes (`npm test`): o cliente da API com os seus erros, as regras de nomes, palavras-passe e endereços, o menu por perfil, a frota por estação, as ações de um trabalho, os 37 idiomas e o cliente perante um servidor simulado que cai, recusa, não diz nada, faz caducar a sessão ou falha ao acaso. |
+| Testes | 🟡 | Passam 611 testes (`npm test`): o cliente da API com os seus erros, as regras de nomes, palavras-passe e endereços, o menu por perfil, a frota por estação, as ações de um trabalho, os 8 idiomas e o cliente perante um servidor simulado que cai, recusa, não diz nada, faz caducar a sessão ou falha ao acaso. |
 | Páginas | 🟡 | Resumo, máquinas por estação, trabalhos, eventos em direto, máquinas, utilizadores e tokens, servidor, conta, preferências e acerca de estão escritos; os trabalhos e as máquinas gerem-se com a API real do servidor. Nenhuma página foi experimentada por alguém que não seja o autor. |
 | Serviços comuns | 🟠 | Projetos, máquinas e trabalhos, segurança e relatórios de projeto estão escritos e testados contra um substituto do servidor; não contra o EH3D-SERVER em funcionamento nem no CM5. |
-| Idiomas | 🟡 | 37 idiomas em cada texto, incluindo as recusas do servidor; os textos são lidos por um teste, mas só o inglês e algumas frases dos outros foram lidos por uma pessoa; os 29 idiomas a seguir aos oito primeiros são traduções do modelo à espera de revisão por falantes nativos. |
+| Idiomas | 🟡 | 8 idiomas em cada texto, incluindo as recusas do servidor; os textos são lidos por um teste, mas só o inglês e algumas frases dos outros foram lidos por uma pessoa. |
 | Máquinas reais | 🔴 | Nada se fez com ela numa bancada: nenhuma máquina adicionada, nenhum nó alcançado e nenhum trabalho executado por ela numa máquina real. |
 | Documentação | 🟡 | README em oito idiomas, as definições do servidor e como pôr o Studio na CM5. |
 
@@ -160,7 +160,7 @@ Como as partes deste repositório se encaixam: quem fala com ele, o que contém 
 * **O fuso na página de uma máquina:** todos leem que fuso a máquina leva (o original ou o do variador), o que acontece a um trabalho que pede mais do que ele dá, os limites do fuso em uso e a velocidade máxima a definir no nó da máquina; um administrador muda o fuso e o interruptor de segurança (recusar o trabalho, que é o valor por omissão, ou avisar e cortar as rotações ao máximo do fuso). Ao preparar um trabalho com o interruptor em `warn`, o plano lista o que passa do fuso, ferramenta a ferramenta; com `reject` o servidor recusa-o e o Studio diz porquê. Não testado numa máquina real.
 * **Trabalhos G-code livres e máquinas GRBL:** uma máquina pode ser um controlador GRBL numa porta série do servidor (porta e velocidade em baud; o servidor tem de ser compilado com `--features serial`), e um administrador adiciona-a ou altera-a em Configuração. Em Preparar, um programa G-code (colado ou carregado de um ficheiro) é pré-visualizado e deixado pronto como qualquer trabalho, com um interruptor de segurança para voltar a arrancar o fuso e o refrigerante ao continuar, desligado por omissão. Um trabalho G-code em curso é pausado e retomado a partir da lista, da sua página e do resumo, que dizem a linha a que chegou e o que espera (uma pausa, ou a espera antes do primeiro movimento de um trabalho que continua); um trabalho que parou oferece continuar de onde parou: o servidor guardou o pedido, por isso não é preciso escolher o ficheiro outra vez. Os trabalhos de furação e fresagem aceitam as ferramentas desligadas e os furos ou trajetos já feitos, e a referência das definições do servidor lista `gcode_finish_wait_s` e `updates_dir`. Experimentado no simulador e com um substituto, nunca com um controlador GRBL real. Um administrador pode permitir por máquina as linhas `$` do GRBL (como `$H`) com um interruptor de segurança em Configuração, desligado por omissão e com um aviso.
 * **O anel de LEDs e a última verificação de qualidade na página de uma máquina:** um operador liga ou desliga o anel e define o seu nível e tom, e todos leem o veredicto da última verificação do trabalho. Testado com um substituto, nunca com um nó real.
-* **Um tempo máximo em cada pedido e tokens que se podem auditar:** um pedido sem resposta termina como erro aos 5 a 60 segundos, uma página que volta a perguntar espera pelo último pedido, a lista de tokens dos programas diz quando cada um foi usado pela última vez e quando expira (e marca os que não se usam há 90 dias e permite indicar os dias de validade de um token novo), um trabalho diz quem o iniciou e quem o parou, a página Servidor mostra os interruptores que o servidor em execução indica, e cada recusa do servidor tem uma frase nos 37 idiomas, verificada contra a lista de códigos que o servidor publica.
+* **Um tempo máximo em cada pedido e tokens que se podem auditar:** um pedido sem resposta termina como erro aos 5 a 60 segundos, uma página que volta a perguntar espera pelo último pedido, a lista de tokens dos programas diz quando cada um foi usado pela última vez e quando expira (e marca os que não se usam há 90 dias e permite indicar os dias de validade de um token novo), um trabalho diz quem o iniciou e quem o parou, a página Servidor mostra os interruptores que o servidor em execução indica, e cada recusa do servidor tem uma frase nos 8 idiomas, verificada contra a lista de códigos que o servidor publica.
 * **Os serviços comuns do servidor (não testados com o servidor real):** o explorador do armazém de projetos (árvore, versões com SHA-256, carregamento, `.eh3dproj`, bloqueio de edição, conflitos de `If-Match` avisados), as máquinas e trabalhos dos plugins com o fluxo de eventos, as posições das ferramentas no trocador, as sessões e a política do acesso e os relatórios de projeto. Cada perfil vê e faz só o seu; no fim decide o servidor.
 
 ## 🔒 Segurança e proteção
@@ -209,7 +209,7 @@ Copie `dist/` para a CM5 (por exemplo para `/opt/eh3d-studio`), ponha `studio_di
 
 ## 🧪 Testes
 
-`npm test` executa 618 testes e passam todos: o cliente da API (o token, o corpo, a consulta, os erros, uma rede que falha, os caminhos com nomes que precisam de escape), as regras de nomes, palavras-passe e endereços de nó, o que está errado numa máquina, o menu de cada perfil, as máquinas agrupadas por estação, as contagens e as ações de um trabalho, e os 37 idiomas (cada idioma tem todos os textos, os mesmos marcadores em todo o lado, as duas variantes só com chaves da fonte, chinês e japonês na sua escrita, nenhum escrito da direita para a esquerda). `npm run typecheck` e `npm run lint` também passam. Também lê os exemplos de respostas que os testes do servidor produzem, de modo que uma resposta que muda sem que o Studio a acompanhe falha aqui. Também testa o tempo máximo de cada pedido (com um relógio movido à mão), a consulta que espera pelo último pedido, os textos contra o catálogo de códigos de erro do servidor e as regras dos tokens dos programas. Também testa a segurança das máquinas dos plugins: o distintivo de uma máquina que só correu contra um simulador, os bloqueios a vermelho, a paragem de emergência sem pergunta para um operador e a libertação de um bloqueio só para um administrador (pedida duas vezes), a impressão de uma impressora 3D que uma pessoa inicia e os quatro interruptores do servidor que estão desligados, contra o servidor simulado e, ao lado do repositório do servidor, contra o seu contrato. Também testa o ecrã das definições do servidor: a cópia do seu contrato face ao ficheiro do servidor, os grupos, o controlo de cada tipo, o texto no idioma da pessoa, o valor por omissão que se pode repor, o intervalo verificado antes de enviar, o reinício necessário, o papel que pode alterar uma definição, o segredo que nunca é mostrado, as recusas do servidor com o seu texto e uma chave que ninguém descreveu.
+`npm test` executa 611 testes e passam todos: o cliente da API (o token, o corpo, a consulta, os erros, uma rede que falha, os caminhos com nomes que precisam de escape), as regras de nomes, palavras-passe e endereços de nó, o que está errado numa máquina, o menu de cada perfil, as máquinas agrupadas por estação, as contagens e as ações de um trabalho, e os 8 idiomas (cada idioma tem todos os textos, os mesmos marcadores em todo o lado, as duas variantes só com chaves da fonte, chinês e japonês na sua escrita, nenhum escrito da direita para a esquerda). `npm run typecheck` e `npm run lint` também passam. Também lê os exemplos de respostas que os testes do servidor produzem, de modo que uma resposta que muda sem que o Studio a acompanhe falha aqui. Também testa o tempo máximo de cada pedido (com um relógio movido à mão), a consulta que espera pelo último pedido, os textos contra o catálogo de códigos de erro do servidor e as regras dos tokens dos programas. Também testa a segurança das máquinas dos plugins: o distintivo de uma máquina que só correu contra um simulador, os bloqueios a vermelho, a paragem de emergência sem pergunta para um operador e a libertação de um bloqueio só para um administrador (pedida duas vezes), a impressão de uma impressora 3D que uma pessoa inicia e os quatro interruptores do servidor que estão desligados, contra o servidor simulado e, ao lado do repositório do servidor, contra o seu contrato. Também testa o ecrã das definições do servidor: a cópia do seu contrato face ao ficheiro do servidor, os grupos, o controlo de cada tipo, o texto no idioma da pessoa, o valor por omissão que se pode repor, o intervalo verificado antes de enviar, o reinício necessário, o papel que pode alterar uma definição, o segredo que nunca é mostrado, as recusas do servidor com o seu texto e uma chave que ninguém descreveu.
 
 ## 🏗️ Compilação e publicação
 
@@ -243,7 +243,7 @@ EH3D-STUDIO/
 │   ├── model.ts                                 perfis, regras dos formulários, frota e trabalhos
 │   ├── jobtools.ts attention.ts                 as ferramentas dos trabalhos: furos, pedidos, plano, pesquisa, CSV
 │   ├── tokenstore.ts                            onde o token de sessão é guardado: este separador, ou o navegador se lembrado
-│   ├── i18n.ts texts.ts locales/                os 37 idiomas
+│   ├── i18n.ts texts.ts                         os 8 idiomas
 │   ├── pages/                                   Monitorização, Serviços, Configuração, Conta e entrada
 │   └── styles.css                               o tema Forge e mais três
 ├── tools/
@@ -290,25 +290,15 @@ EH3D-STUDIO/
 
 ## 🌍 Idiomas
 
-As páginas falam 37 idiomas: os oito primeiros (inglês, espanhol, italiano, alemão, francês, português europeu, chinês e japonês) e mais 29. O README existe nos oito primeiros; as palavras dos outros 29 são traduções do modelo à espera de revisão por falantes nativos.
+As páginas falam os oito idiomas oficiais do ecossistema: inglês, espanhol, italiano, alemão, francês, português europeu, chinês e japonês. O README existe nos mesmos oito.
 
-O idioma escolhe-se por esta ordem: o guardado no navegador (o seletor da página de entrada e das Preferências, uma lista com deslocamento que mostra cada idioma com o seu próprio nome), o idioma do navegador (o Brasil dá português do Brasil, o Canadá dá francês do Canadá, `nb` e `nn` dão norueguês) e, por fim, inglês. Um texto que um idioma não tem é tirado do idioma principal de uma variante, depois do inglês e depois do espanhol. Nenhum dos 37 se escreve da direita para a esquerda, pelo que o Studio não tem disposição da direita para a esquerda.
+O idioma escolhe-se por esta ordem: o guardado no navegador (o seletor da página de entrada e das Preferências, que mostra cada idioma com o seu próprio nome), o idioma do navegador (qualquer região dá o seu idioma principal: o Brasil dá português europeu, o Canadá dá francês) e, por fim, inglês; um idioma que não seja um dos oito (por exemplo, guardado por uma versão anterior) passa para o idioma do navegador, inglês ou espanhol incluídos. Um texto que um idioma não tem é tirado do inglês e depois do espanhol. Nenhum dos oito se escreve da direita para a esquerda, pelo que o Studio não tem disposição da direita para a esquerda.
 
 | Código | Idioma | Código | Idioma | Código | Idioma |
 |---|---|---|---|---|---|
 | `en` | English | `es` | Español | `it` | Italiano |
 | `de` | Deutsch | `fr` | Français | `pt` | Português (Portugal) |
-| `zh` | 中文 | `ja` | 日本語 | `bg` | Български |
-| `hr` | Hrvatski | `cs` | Čeština | `da` | Dansk |
-| `nl` | Nederlands | `et` | Eesti | `fi` | Suomi |
-| `el` | Ελληνικά | `hu` | Magyar | `ga` | Gaeilge |
-| `lv` | Latviešu | `lt` | Lietuvių | `mt` | Malti |
-| `pl` | Polski | `ro` | Română | `sk` | Slovenčina |
-| `sl` | Slovenščina | `sv` | Svenska | `no` | Norsk |
-| `is` | Íslenska | `uk` | Українська | `ru` | Русский |
-| `sr` | Српски | `sq` | Shqip | `ca` | Català |
-| `gl` | Galego | `eu` | Euskara | `pt-br` | Português (Brasil) |
-| `fr-ca` | Français (Canada) |  |  |  |  |
+| `zh` | 中文 | `ja` | 日本語 |  |  |
 
 ## 🔗 Projetos relacionados
 
@@ -330,7 +320,7 @@ O idioma escolhe-se por esta ordem: o guardado no navegador (o seletor da págin
 
 * Antes de um pull request execute `npm run typecheck`, `npm run lint`, `npm test` e `npm run build`, e `python -I tools/ci_validate.py`: tudo tem de passar. Veja [CONTRIBUTING.md](CONTRIBUTING.md) e o [código de conduta](CODE_OF_CONDUCT.md).
 * O README existe em oito idiomas: uma alteração do texto faz-se nos oito ficheiros, e os dois desenhos saem de `docs/architecture.json` e `docs/structure.json` com `tools/make_architecture.py` e `tools/make_structure.py`.
-* Os oito primeiros idiomas são uma linha de oito por texto em `src/texts.ts`; os outros 29 são um ficheiro JSON cada um em `src/locales/` (`pt-br` e `fr-ca` só levam o que difere de `pt` e `fr`); um teste lê cada texto de cada idioma.
+* Os oito idiomas são uma linha de oito por texto em `src/texts.ts`; um teste lê cada texto de cada idioma.
 * Comunique uma vulnerabilidade em privado: [SECURITY.md](SECURITY.md). Perguntas, ideias e relatórios: electrohobby3d@gmail.com ([SUPPORT.md](SUPPORT.md)).
 
 ## 👤 AUTOR

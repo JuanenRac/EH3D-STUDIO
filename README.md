@@ -6,19 +6,19 @@
 
 <p align="center">🇺🇸 <b>English</b> | <a href="README_spa.md">🇪🇸 Español</a> | <a href="README_fra.md">🇫🇷 Français</a> | <a href="README_ita.md">🇮🇹 Italiano</a> | <a href="README_deu.md">🇩🇪 Deutsch</a> | <a href="README_zho.md">🇨🇳 中文</a> | <a href="README_jpn.md">🇯🇵 日本語</a> | <a href="README_por.md">🇵🇹 Português</a></p>
 
-### The configuration panel of the EH3D server: the machines and their stations, the jobs, the users and the tokens of the programs, all structured and in the look of BUNGARD-GUI, in 37 languages.
+### The configuration panel of the EH3D server: the machines and their stations, the jobs, the users and the tokens of the programs, all structured and in the look of BUNGARD-GUI, in 8 languages.
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-GPL%203.0--or--later-blue.svg" alt="GPL 3.0 or later">
   <img src="https://img.shields.io/badge/Stack-React%20%2B%20TypeScript-00599C.svg" alt="React and TypeScript">
-  <img src="https://img.shields.io/badge/Languages-37-00E5FF.svg" alt="Languages">
+  <img src="https://img.shields.io/badge/Languages-8-00E5FF.svg" alt="Languages">
   <img src="https://img.shields.io/badge/Version-0.1.8-0f6cbd.svg" alt="Version">
   <img src="https://img.shields.io/badge/Maturity-functional-4CAF50.svg" alt="Maturity">
 </p>
 
 ---
 
-**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the 37 languages are covered by 558 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
+**Honesty check - what actually runs today:** a web application in React and TypeScript that signs in to EH3D-SERVER and shows and changes what it holds: the machines with their station, their node and their configuration files, the jobs, the users and the tokens, the live events. The client of the API, the rules of the forms, the menu by role and the 8 languages are covered by 611 tests, and the pages have been looked at in a browser against a local server with simulated machines. **It has not been used against machines on a bench**, and the server does not terminate TLS yet.
 
 ---
 
@@ -30,7 +30,7 @@
 |---|---|
 | Version | `0.1.8` |
 | Maturity | Functional |
-| Tests | 618 tests (`npm test`) |
+| Tests | 611 tests (`npm test`) |
 | Stack | React 19, TypeScript, Vite |
 | On real hardware | Not against machines on a bench: looked at in a browser against a local server with simulated machines |
 
@@ -45,10 +45,10 @@ Each line is one part of this repository and the light says how far it is today.
 | Area | State | What it means here |
 |---|---|---|
 | Software | 🟡 | The application builds without warnings (typecheck, lint, build) and is served by the server at the root of its address; it has been run in a browser against a local server. |
-| Tests | 🟡 | 618 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job, the 37 languages, and the client against a simulated server that goes down, refuses, says nothing, expires the login or fails by chance. |
+| Tests | 🟡 | 611 tests pass (`npm test`): the client of the API with its errors, the rules of names, passwords and addresses, the menu by role, the fleet by station, the actions of a job, the 8 languages, and the client against a simulated server that goes down, refuses, says nothing, expires the login or fails by chance. |
 | Pages | 🟡 | Overview, machines by station, jobs, live events, machines, users and tokens, server, account, preferences and about are written; the jobs and the machines are managed against the real API of the server. No page has been tried by someone who is not the author. |
 | Common services | 🟠 | Projects, machines and jobs, security and design reports are written and tested against a stand-in of the server; not against EH3D-SERVER running or on the CM5. |
-| Languages | 🟡 | 37 languages in every text, the refusals of the server included; the texts are read by a test, but only English and a few phrases of the others have been read by a person; the 29 languages beyond the first eight are translations by the model that wait for a review by native speakers. |
+| Languages | 🟡 | 8 languages in every text, the refusals of the server included; the texts are read by a test, but only English and a few phrases of the others have been read by a person. |
 | Real machines | 🔴 | Nothing has been done with it on a bench: no machine has been added, no node reached and no job run through it on a real machine. |
 | Documentation | 🟡 | README in eight languages, the settings of the server and how to put Studio on the CM5. |
 
@@ -160,7 +160,7 @@ How the parts of this repository fit together: who talks to it, what it holds an
 * **The spindle on the page of a machine:** everybody reads which spindle the machine carries (the original or the one with a drive), what happens to a job that asks for more than it gives, the limits of the spindle in use and the top speed to set in the node of the machine; an administrator changes the spindle and the safety switch (refuse the job, which is the default, or warn and cut the turns to the top of the spindle). When a job is prepared with the switch on `warn`, the plan lists what goes beyond the spindle, tool by tool; with `reject` the server refuses it and Studio says why. Not tried against a real machine.
 * **Free G-code jobs and GRBL machines:** a machine can be a GRBL controller on a serial port of the server (port and baud rate; the server must be built with `--features serial`), and an administrator adds or changes it in Configure. In Prepare, a G-code program (pasted or loaded from a file) is previewed and kept ready like any job, with a safety switch to start the spindle and the coolant again when it goes on, off by default. A running G-code job is held and resumed from the list, from its own page and from the overview, which say the line it has got to and what it waits for (a hold, or the wait before the first move of a job that goes on); a job that stopped offers to go on from where it stopped: the server kept what was asked, so the file is not picked again. Drilling and routing jobs take the tools that are switched off and the holes or paths already done, and the reference of the settings of the server lists `gcode_finish_wait_s` and `updates_dir`. Tried on the simulator and against a stand-in only, never against a real GRBL controller. An administrator can allow the `$` lines of GRBL (such as `$H`) per machine with a safety switch in Configure, off by default and with a warning.
 * **The ring of LEDs and the last quality check on the page of a machine:** an operator turns the ring on or off and sets its level and tone, and everybody reads the verdict of the last check of the work. Tested against a stand-in, never against a real node.
-* **A time limit on every request, and tokens you can audit:** a request that gets no answer ends as an error after 5 to 60 seconds, a page that asks again waits for the last request, the list of tokens of the programs says when each was last used and when it expires (and marks the ones not used for 90 days, and lets you give the days a new token lasts), a job says who started and who stopped it, the Server page shows the switches the running server reports, and every refusal of the server has a sentence in the 37 languages, checked against the list of codes the server publishes.
+* **A time limit on every request, and tokens you can audit:** a request that gets no answer ends as an error after 5 to 60 seconds, a page that asks again waits for the last request, the list of tokens of the programs says when each was last used and when it expires (and marks the ones not used for 90 days, and lets you give the days a new token lasts), a job says who started and who stopped it, the Server page shows the switches the running server reports, and every refusal of the server has a sentence in the 8 languages, checked against the list of codes the server publishes.
 * **The common services of the server (not tried against the real server):** the explorer of the project store (tree, versions with SHA-256, upload, `.eh3dproj`, edit lock, conflicts of `If-Match` told as a warning), the machines and jobs of the plugins with the stream of events, the places of the tools in the changer, the sessions and the policy of the login, and the design reports of a project. Each role sees and can do only its own; the server decides in the end.
 
 ## 🔒 Security & Safety
@@ -209,7 +209,7 @@ Copy `dist/` to the CM5 (for example to `/opt/eh3d-studio`), put `studio_dir = /
 
 ## 🧪 Testing
 
-`npm test` runs 618 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the 37 languages (every language has every text, the same placeholders everywhere, the two variants only with keys of the source, Chinese and Japanese in their own scripts, none written right to left). `npm run typecheck` and `npm run lint` pass as well. It also reads the examples of the answers that the tests of the server make, so an answer that changes without Studio following fails here. It also tests the time limit of every request (with a clock that is moved by hand), the polling that waits for the last request, the texts against the catalog of the error codes of the server, and the rules for the tokens of the programs. It also tests the safety of the machines of the plugins: the badge of a machine that has only run against a simulator, the interlocks in red, the emergency stop with no question for an operator and the release of a latch for an administrator only (asked twice), the print of a 3D printer that a person starts, and the four switches of the server that are off, against the simulated server and, next to the repository of the server, against its contract. It also tests the page of the settings of the server: the copy of its contract against the file of the server, the groups, the control of each type, the text in the language of the person, the default that can be restored, the range checked before sending, the restart that is needed, the role that may change a setting, the secret that is never shown, the refusals of the server with their text, and a key that nobody described.
+`npm test` runs 611 tests and all pass: the client of the API (the token, the body, the query, the errors, a network that fails, the paths with names that need escaping), the rules of names, passwords and node addresses, what is wrong with a machine, the menu of each role, the machines grouped by station, the counts and the actions of a job, and the 8 languages (every language has every text, the same placeholders everywhere, the two variants only with keys of the source, Chinese and Japanese in their own scripts, none written right to left). `npm run typecheck` and `npm run lint` pass as well. It also reads the examples of the answers that the tests of the server make, so an answer that changes without Studio following fails here. It also tests the time limit of every request (with a clock that is moved by hand), the polling that waits for the last request, the texts against the catalog of the error codes of the server, and the rules for the tokens of the programs. It also tests the safety of the machines of the plugins: the badge of a machine that has only run against a simulator, the interlocks in red, the emergency stop with no question for an operator and the release of a latch for an administrator only (asked twice), the print of a 3D printer that a person starts, and the four switches of the server that are off, against the simulated server and, next to the repository of the server, against its contract. It also tests the page of the settings of the server: the copy of its contract against the file of the server, the groups, the control of each type, the text in the language of the person, the default that can be restored, the range checked before sending, the restart that is needed, the role that may change a setting, the secret that is never shown, the refusals of the server with their text, and a key that nobody described.
 
 ## 🏗️ Build & Release
 
@@ -243,7 +243,7 @@ EH3D-STUDIO/
 │   ├── model.ts                                 roles, rules of the forms, fleet and jobs
 │   ├── jobtools.ts attention.ts                 the job tools: holes, requests, plan, search, CSV
 │   ├── tokenstore.ts                            where the login token is kept: this tab, or the browser if remembered
-│   ├── i18n.ts texts.ts locales/                the 37 languages
+│   ├── i18n.ts texts.ts                         the 8 languages
 │   ├── pages/                                   Monitor, Services, Configure, Account and the sign-in
 │   └── styles.css                               the Forge theme and three more
 ├── tools/
@@ -290,25 +290,15 @@ EH3D-STUDIO/
 
 ## 🌍 Languages
 
-The pages speak 37 languages: the first eight (English, Spanish, Italian, German, French, European Portuguese, Chinese and Japanese) and 29 more. The README exists in the first eight; the words of the 29 others are translations by the model that wait for a review by native speakers.
+The pages speak the eight official languages of the ecosystem: English, Spanish, Italian, German, French, European Portuguese, Chinese and Japanese. The README exists in the same eight.
 
-The language is chosen in this order: the one saved in the browser (the selector of the sign-in page and of Preferences, a list that scrolls and shows each language in its own name), the language of the browser (Brazil gives Brazilian Portuguese, Canada gives Canadian French, `nb` and `nn` give Norwegian), then English. A text that a language does not have is taken from the main language of a variant, then English, then Spanish. None of the 37 is written from right to left, so Studio has no right-to-left layout.
+The language is chosen in this order: the one saved in the browser (the selector of the sign-in page and of Preferences, which shows each language in its own name), the language of the browser (any region gives its main language: Brazil gives European Portuguese, Canada gives French), then English; a language that is not one of the eight (for example one saved by an earlier version) falls to the language of the browser, English or Spanish included. A text that a language does not have is taken from English, then Spanish. None of the eight is written from right to left, so Studio has no right-to-left layout.
 
 | Code | Language | Code | Language | Code | Language |
 |---|---|---|---|---|---|
 | `en` | English | `es` | Español | `it` | Italiano |
 | `de` | Deutsch | `fr` | Français | `pt` | Português (Portugal) |
-| `zh` | 中文 | `ja` | 日本語 | `bg` | Български |
-| `hr` | Hrvatski | `cs` | Čeština | `da` | Dansk |
-| `nl` | Nederlands | `et` | Eesti | `fi` | Suomi |
-| `el` | Ελληνικά | `hu` | Magyar | `ga` | Gaeilge |
-| `lv` | Latviešu | `lt` | Lietuvių | `mt` | Malti |
-| `pl` | Polski | `ro` | Română | `sk` | Slovenčina |
-| `sl` | Slovenščina | `sv` | Svenska | `no` | Norsk |
-| `is` | Íslenska | `uk` | Українська | `ru` | Русский |
-| `sr` | Српски | `sq` | Shqip | `ca` | Català |
-| `gl` | Galego | `eu` | Euskara | `pt-br` | Português (Brasil) |
-| `fr-ca` | Français (Canada) |  |  |  |  |
+| `zh` | 中文 | `ja` | 日本語 |  |  |
 
 ## 🔗 Related Projects
 
@@ -330,7 +320,7 @@ The language is chosen in this order: the one saved in the browser (the selector
 
 * Before a pull request run `npm run typecheck`, `npm run lint`, `npm test` and `npm run build`, and `python -I tools/ci_validate.py`: all must pass. See [CONTRIBUTING.md](CONTRIBUTING.md) and the [code of conduct](CODE_OF_CONDUCT.md).
 * The README exists in eight languages: a change to the text is made in all eight files, and the two pictures are drawn from `docs/architecture.json` and `docs/structure.json` by `tools/make_architecture.py` and `tools/make_structure.py`.
-* The first eight languages are one row of eight per text in `src/texts.ts`; the other 29 are one JSON file each in `src/locales/` (`pt-br` and `fr-ca` only hold what differs from `pt` and `fr`); a test reads every text of every language.
+* The eight languages are one row of eight per text in `src/texts.ts`; a test reads every text of every language.
 * Report a vulnerability privately: [SECURITY.md](SECURITY.md). Questions, ideas and reports: electrohobby3d@gmail.com ([SUPPORT.md](SUPPORT.md)).
 
 ## 👤 AUTHOR

@@ -123,17 +123,17 @@
         },
         {
           "desc": {
-            "en": "the 37 languages",
-            "es": "los 37 idiomas",
-            "it": "le 37 lingue",
-            "de": "die 37 Sprachen",
-            "fr": "les 37 langues",
-            "pt": "os 37 idiomas",
-            "zh": "37 种语言",
-            "ja": "37 言語"
+            "en": "the 8 languages",
+            "es": "los 8 idiomas",
+            "it": "le 8 lingue",
+            "de": "die 8 Sprachen",
+            "fr": "les 8 langues",
+            "pt": "os 8 idiomas",
+            "zh": "8 种语言",
+            "ja": "8 言語"
           },
-          "name": "i18n.ts  texts.ts  locales/",
-          "tree_name": "i18n.ts texts.ts locales/"
+          "name": "i18n.ts  texts.ts",
+          "tree_name": "i18n.ts texts.ts"
         },
         {
           "desc": {

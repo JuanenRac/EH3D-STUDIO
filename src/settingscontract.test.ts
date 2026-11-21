@@ -152,10 +152,9 @@ describe("the text of a field of the contract", () => {
     expect(contractText(map, "pt")).toBe("Rede");
   });
 
-  it("is English for a language the contract does not have, and the main language for a variant", () => {
-    expect(contractText(map, "bg")).toBe("Network");
-    expect(contractText(map, "pt-br")).toBe("Rede");
-    expect(contractText(map, "fr-ca")).toBe("Réseau");
+  it("is English for a language the contract does not have", () => {
+    expect(contractText(map, "ja")).toBe("Network");
+    expect(contractText(map, "de")).toBe("Network");
     expect(contractText({ es: "Red" }, "de")).toBe("Red");
     expect(contractText(undefined, "en")).toBe("");
     expect(contractText({}, "en")).toBe("");

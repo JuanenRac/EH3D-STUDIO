@@ -2,7 +2,6 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { CORE_LANGS, LANGS, errorText, text } from "../i18n";
 import type { TextKey } from "../i18n";
-import { LOCALES } from "../locales";
 import { PAGES, pagesFor, parseRoute } from "../model";
 import { ROWS } from "../texts";
 import { ApiError } from "../api";
@@ -45,7 +44,7 @@ describe("the texts of the pages of the common services", () => {
     for (const g of ["group_services", "nav_projects", "nav_work", "nav_factory", "nav_security"]) expect(ROWS).toHaveProperty(g);
   });
 
-  it("exist in the 37 languages with the same markers, and the variants fall back to their main language", () => {
+  it("exist in the eight languages with the same markers", () => {
     const own = Object.keys(ROWS).filter((k) => /^(pj|wk|sec|fx|atc|svc|perm)_/.test(k) || /^(nav_(projects|work|factory|security)|group_services|act_(refresh|retry|upload|download))$/.test(k));
     expect(own.length).toBeGreaterThan(140);
     const marks = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join();
@@ -56,7 +55,6 @@ describe("the texts of the pages of the common services", () => {
         expect(s.trim().length, `${k}/${lang}`).toBeGreaterThan(0);
         expect(marks(s), `${k}/${lang}`).toBe(marks(english));
       }
-      for (const lang of Object.keys(LOCALES).filter((l) => !["pt-br", "fr-ca"].includes(l))) expect(LOCALES[lang][k], `${k}/${lang}`).toBeTypeOf("string");
     }
     expect(CORE_LANGS).toHaveLength(8);
   });

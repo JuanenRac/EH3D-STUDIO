@@ -4,7 +4,7 @@ import { Api, ApiError } from "./api";
 import { AppContext, THEMES, Toast, makeErr, makeText } from "./context";
 import type { AppState, ThemeId } from "./context";
 import { useAttention, useReachable } from "./attention";
-import { browserLang, isLang, text } from "./i18n";
+import { startLang, text } from "./i18n";
 import type { Lang, TextKey } from "./i18n";
 import { forgetPrograms } from "./jobtools";
 import { browserStores, clearToken, isRemembered, readToken, saveToken } from "./tokenstore";
@@ -56,7 +56,7 @@ const GROUPS = ["monitor", "services", "configure", "account"] as const;
 export default function App() {
   const [lang, setLang] = useState<Lang>(() => {
     const saved = read("lang");
-    return isLang(saved) ? saved : browserLang(navigator.languages ?? [navigator.language]);
+    return startLang(saved, navigator.languages ?? [navigator.language]);
   });
   const [theme, setTheme] = useState<ThemeId>(() => {
     const saved = read("theme");

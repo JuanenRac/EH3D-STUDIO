@@ -251,8 +251,8 @@ describe("the eight languages", () => {
   it("fills the values in, picks the language of the browser and says a refusal in the language of the person", () => {
     expect(text("de", "fleet_ready", { n: 3 })).toBe("3 Aufträge bereit");
     expect(browserLang(["xx", "pt-PT", "en"])).toBe("pt");
-    expect(browserLang(["fr-CA"])).toBe("fr-ca");
-    expect(browserLang(["pt-BR"])).toBe("pt-br");
+    expect(browserLang(["fr-CA"])).toBe("fr");
+    expect(browserLang(["pt-BR"])).toBe("pt");
     expect(browserLang(["ko"])).toBe("en");
     expect(errorText("es", new ApiError(409, "machine_busy", ""))).toBe(text("es", "err_machine_busy"));
     expect(errorText("en", new ApiError(400, "weird_code", "why"))).toBe("weird_code: why");
