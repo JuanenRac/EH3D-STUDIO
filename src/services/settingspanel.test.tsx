@@ -13,9 +13,9 @@ import { makeErr, makeText } from "../context";
 import type { Lang } from "../i18n";
 import type { Role } from "../types";
 import { EMBEDDED_CONTRACT } from "./embeddedcontract";
-import { CONTRACT_SCHEMA } from "./settingscontract";
+import { CONTRACT_SCHEMA, COPY_HASH } from "./settingscontract";
 import type { Setting, SettingsContract } from "./settingscontract";
-import { Providers, fakeServer, makeApp, makeServices, refusal } from "./testkit";
+import { Providers, fakeServer, json, makeApp, makeServices, refusal } from "./testkit";
 import type { Call, Handler } from "./testkit";
 import type { AuthClaims } from "./types";
 
@@ -49,6 +49,18 @@ function defaults(contract: SettingsContract = EMBEDDED_CONTRACT): Record<string
   const values: Record<string, unknown> = {};
   for (const s of contract.settings) if (!s.secret) values[s.key] = s.default;
   return values;
+}
+
+/** The answer of `GET /settings/values`: the default of every key, a path of the computer kept back, a secret as the mark. */
+function lightFor(over: Record<string, unknown> = {}, extra: Record<string, unknown> = {}, hash: string = COPY_HASH) {
+  const settings: Record<string, unknown> = {};
+  for (const s of EMBEDDED_CONTRACT.settings) {
+    if (s.secret) settings[s.key] = { v: "***", secret: true, editable: false };
+    else if (s.format === "path") settings[s.key] = { hidden: true, origin: "file", editable: false };
+    else settings[s.key] = { v: s.key in over ? over[s.key] : s.default, origin: s.key in over ? "override" : "file", editable: s.write.via === "policy" };
+  }
+  Object.assign(settings, extra);
+  return { schema: "eh3d.settings.values/1", server_version: "1.2.3", contract_hash: hash, count: Object.keys(settings).length, settings };
 }
 
 /** The answer of `GET /settings/contract`. */
@@ -346,9 +358,9 @@ describe("changing a setting", () => {
 });
 
 describe("who may change the settings", () => {
-  it("shows an operator every value with no control, and says only an administrator changes them", async () => {
-    const p = await show({ "GET /settings/contract": () => liveAnswer({ login_ip_limit: 5 }) }, "operator");
-    expect(p.text()).toContain("Only an administrator can change the settings.");
+  it("shows an operator every value in force with no control, read from the light view", async () => {
+    const p = await show({ "GET /settings/values": () => json(lightFor({ login_ip_limit: 5 }), 200, { etag: '"a"' }) }, "operator");
+    expect(p.text()).toContain("(light view)");
     expect(p.$$("input, select")).toHaveLength(0);
     expect(p.row("login_ip_limit")!.textContent).toContain("5");
     expect(button("Save")).toBeUndefined();
@@ -372,8 +384,8 @@ describe("who may change the settings", () => {
 });
 
 describe("the copy of the contract kept in Studio", () => {
-  it("is shown read-only, with the reason and no values, when the server does not give its contract", async () => {
-    const p = await show({ "GET /settings/contract": () => refusal(403, "forbidden") });
+  it("is shown read-only, with the reason and no values, when the server gives neither its contract nor the light view", async () => {
+    const p = await show({ "GET /settings/contract": () => refusal(403, "forbidden"), "GET /settings/values": () => refusal(403, "forbidden") });
     expect(p.text()).toContain("The server did not give its contract (forbidden)");
     expect(p.text()).not.toContain("Contract read from the server");
     expect(p.$$("tr[data-setting]")).toHaveLength(EMBEDDED_CONTRACT.settings.length);
@@ -387,7 +399,7 @@ describe("the copy of the contract kept in Studio", () => {
     expect(down.text()).toContain("The server did not give its contract (unknown_route)");
     await act(async () => root!.unmount());
     root = null;
-    const other = await show({ "GET /settings/contract": () => ({ ...liveAnswer(), schema: "eh3d.settings.contract/2" }) });
+    const other = await show({ "GET /settings/contract": () => ({ ...liveAnswer(), schema: "eh3d.settings.contract/2" }), "GET /settings/values": () => new Response("x", { status: 200 }) });
     expect(other.text()).toContain("(shape)");
     expect(other.$$("input, select")).toHaveLength(0);
   });
@@ -426,6 +438,110 @@ describe("a key that nobody described", () => {
     const contract = contractOf([bare]);
     const p = await show({ "GET /settings/contract": () => liveAnswer({}, contract) }, "admin", { embedded: contract, lang: "de" });
     expect(p.row("nameless")!.querySelector("strong")!.textContent).toBe("nameless");
+  });
+});
+
+describe("the settings of the server for a login that is not an administrator", () => {
+  const tagged = (body: unknown, tag = '"t1"') => json(body, 200, { etag: tag });
+  const valuesCalls = (p: { server: { calls: Call[] } }) => p.server.calls.filter((c) => c.path === "/settings/values");
+
+  it("shows the values in force from the light view, with the texts of the copy, and never asks for the full contract", async () => {
+    for (const role of ["operator", "viewer"] as const) {
+      const p = await show({ "GET /settings/values": () => tagged(lightFor({ login_ip_limit: 77 })) }, role);
+      expect(p.text(), role).toContain("Values in force read from the server 1.2.3 (light view)");
+      expect(p.text()).not.toContain("the copy kept in Studio, read-only: the values in force are not shown");
+      expect(p.server.calls.some((c) => c.path === "/settings/contract"), role).toBe(false);
+      expect(p.$$("tr[data-setting]")).toHaveLength(EMBEDDED_CONTRACT.settings.length);
+      expect(p.row("login_ip_limit")!.textContent).toContain("77");
+      expect(p.row("listen")!.textContent).toContain("127.0.0.1:18200");
+      expect(p.row("listen")!.textContent).toContain("Listen address");
+      // read only: no control in any row, for any key
+      expect(p.$$("tr[data-setting] input, tr[data-setting] select, tr[data-setting] button")).toHaveLength(0);
+      expect(p.text()).not.toContain("The contract of the server is not the copy kept in Studio");
+      await act(async () => root!.unmount());
+      root = null;
+    }
+  });
+
+  it("says that a path of the computer is not shown, and keeps a secret hidden whatever the server sent in its place", async () => {
+    const extra = { future_secret: { v: "hunter2-in-clear", secret: true, editable: false }, other_secret: { v: "***" }, future_path: { hidden: true, origin: "file", editable: false } };
+    const p = await show({ "GET /settings/values": () => tagged(lightFor({}, extra)) }, "operator");
+    expect(p.row("data_dir")!.textContent).toContain("Not shown by the server");
+    expect(p.row("data_dir")!.textContent).not.toContain("/");
+    // keys the copy does not know are drawn read-only, with no value
+    for (const key of ["future_secret", "other_secret", "future_path"]) {
+      const row = p.row(key);
+      expect(row, key).toBeTruthy();
+      expect(row!.querySelector("input, select, button")).toBeNull();
+    }
+    expect(p.row("future_secret")!.textContent).toContain("●●●");
+    expect(p.row("other_secret")!.textContent).toContain("●●●");
+    expect(p.row("future_path")!.textContent).toContain("Not shown by the server");
+    expect(p.text()).not.toContain("hunter2-in-clear");
+  });
+
+  it("cuts nothing it was not told to cut and marks a value the server cut", async () => {
+    const p = await show({ "GET /settings/values": () => tagged(lightFor({}, { zone_names: { v: ["a", "b"], truncated: true, origin: "file", editable: false } })) }, "viewer");
+    expect(p.row("zone_names")!.textContent).toContain("a, b…");
+  });
+
+  it("warns when the contract of the server is not the copy kept in Studio", async () => {
+    const p = await show({ "GET /settings/values": () => tagged(lightFor({}, {}, "0".repeat(64))) }, "operator");
+    expect(p.text()).toContain("The contract of the server is not the copy kept in Studio: texts and keys may be out of date.");
+    expect(p.$$('[role="alert"]').some((a) => a.textContent!.includes("may be out of date"))).toBe(true);
+    await act(async () => root!.unmount());
+    root = null;
+    const es = await show({ "GET /settings/values": () => tagged(lightFor({}, {}, "0".repeat(64))) }, "operator", { lang: "es" });
+    expect(es.text()).toContain("El contrato del servidor no es la copia guardada en Studio");
+    expect(es.text()).toContain("Valores en vigor leídos del servidor 1.2.3 (vista ligera)");
+    expect(es.row("data_dir")!.textContent).toContain("El servidor no lo muestra");
+  });
+
+  it("asks again with the ETag when refreshed and keeps the page when the server says 304", async () => {
+    let tag = '"t1"';
+    const p = await show(
+      {
+        "GET /settings/values": (call) => (call.headers["if-none-match"] === tag ? new Response(null, { status: 304, headers: { etag: tag } }) : tagged(lightFor({ login_ip_limit: 41 }), tag)),
+      },
+      "operator",
+    );
+    expect(valuesCalls(p)).toHaveLength(1);
+    expect(valuesCalls(p)[0].headers["if-none-match"]).toBeUndefined();
+    await click(button("Refresh"));
+    expect(valuesCalls(p)).toHaveLength(2);
+    expect(valuesCalls(p)[1].headers["if-none-match"]).toBe('"t1"');
+    expect(p.row("login_ip_limit")!.textContent).toContain("41");
+    expect(p.text()).toContain("(light view)");
+    // a change on the server is a new tag and a new answer
+    tag = '"t2"';
+    await click(button("Refresh"));
+    expect(valuesCalls(p)[2].headers["if-none-match"]).toBe('"t1"');
+    expect(p.row("login_ip_limit")!.textContent).toContain("41");
+    await click(button("Refresh"));
+    expect(valuesCalls(p)[3].headers["if-none-match"]).toBe('"t2"');
+  });
+
+  it("uses the light view for an administrator whose token cannot read the full contract, and changes nothing from it", async () => {
+    const p = await show({ "GET /settings/contract": () => refusal(403, "forbidden_scope", "needs admin:policy"), "GET /settings/values": () => tagged(lightFor()) }, "admin");
+    expect(p.text()).toContain("(light view)");
+    expect(p.text()).not.toContain("The server did not give its contract");
+    expect(p.server.calls.map((c) => c.path).filter((x) => x.startsWith("/settings"))).toEqual(["/settings/contract", "/settings/values"]);
+    expect(p.$$("tr[data-setting] input, tr[data-setting] select, tr[data-setting] button")).toHaveLength(0);
+  });
+
+  it("shows the copy, read-only and with the reason, when the light view cannot be read", async () => {
+    const down = await show({ "GET /settings/values": () => refusal(404, "not_found", "no such route") }, "operator");
+    expect(down.text()).toContain("The server did not give its contract (not_found)");
+    expect(down.$$("tr[data-setting]")).toHaveLength(EMBEDDED_CONTRACT.settings.length);
+    expect(down.row("listen")!.textContent).toContain("Listen address");
+    await act(async () => root!.unmount());
+    root = null;
+    const junk = await show({ "GET /settings/values": () => new Response("<html>proxy</html>", { status: 200 }) }, "viewer");
+    expect(junk.text()).toContain("The server did not give its contract (shape)");
+    await act(async () => root!.unmount());
+    root = null;
+    const newer = await show({ "GET /settings/values": () => tagged({ ...lightFor(), schema: "eh3d.settings.values/2" }) }, "viewer");
+    expect(newer.text()).toContain("The server did not give its contract (newer)");
   });
 });
 

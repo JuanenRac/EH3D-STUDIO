@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The settings page works for every login, not only for an administrator:** a login that is not an administrator no longer sees only the copy kept in Studio with no values. The page reads the light, read-only view of the values in force (`GET /api/v1/settings/values`, open to any login, a few kilobytes) and draws them with the texts of the copy of the contract that Studio keeps. An administrator still reads the full contract; one whose token cannot read it (it lacks the scope of the policy) falls back to the light view without a complaint. Nothing can be changed from the light view.
+
+- **ETag and 304:** the page sends the tag of the last light answer in `If-None-Match`, keeps what it shows when the server answers `304`, forgets the answer when the login changes or a read fails, and asks again by itself every 30 seconds while it shows the light view. An answer longer than 16 KiB, a document of another or a newer schema, a malformed one or a server that does not answer ends as the copy kept in Studio, read-only, with the reason.
+
+- **A secret or a path of the computer is never shown:** a key the server marks secret (or whose value is the mark `***`) shows no value, whatever the server sent in its place; a key whose value the server keeps back says so; a value the server cut ends with an ellipsis; a key neither contract describes is drawn read-only, and the keys `__proto__`, `constructor` and `prototype` are refused so that an answer cannot touch the prototype.
+
+- **The page says when its copy of the contract is out of date:** the hash of the copy (`src/services/contracthash.ts`, the SHA-256 of the file with LF line ends, written and checked by `tools/sync_settings_contract.py`, also without the server next to it) is compared with the `contract_hash` of the server, in the full contract and in the light view, and a warning is shown when they differ. The copy of the contract is refreshed from the server (it now carries the description of the light view), and the three new texts are in all 37 languages.
+
+- **The simulated server speaks the light view:** `GET /settings/values` with its `ETag`, `If-None-Match` and `304`, a role for the login, the full contract refused to anyone but an administrator with the scope of the policy, and the hash of the contract it claims, so the whole flow is tried with no server and no machine.
+
+- **28 more tests:** the hash of the copy against the file, the parser of the light answer with hostile documents, who reads what, the ETag and the 304 against the simulated server, a seeded storm of roles, failures and changes, and the page for an operator, a viewer, an administrator without the scope and a server that fails.
+
 ## [0.1.8] - Settings panel drawn from the contract of the server, a new login after a change of policy and the pages package of the update helper
 
 - **55 more tests:** the copy of the contract against the file of the server, every key with a control and a text in the eight languages of the contract, the groups, the text by language, the control by type, who may write, the range, the restore of the default, the restart, the secret, the refusals by their code, the live contract against the copy, and a key nobody described.

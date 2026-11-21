@@ -1,8 +1,10 @@
 /* The settings of the server, drawn from its contract: the groups in the order of the contract, and for each setting its label, help and warning in the language of the person, the value
  * in force, the default, whether a change applies at once or needs a restart, and the control of its type. A setting the server changes while it runs (`PUT /auth/policy`) is edited
- * here by an administrator; one that is set in `server.cfg` is shown with its value and says so; a secret never shows its value. When the live contract cannot be read the copy kept in
- * Studio is shown, read-only, with the reason. A key the copy does not know is drawn too, with the generic control. GPL-3.0-or-later. */
-import { useState } from "react";
+ * here by an administrator; one that is set in `server.cfg` is shown with its value and says so; a secret never shows its value. A login that is not an administrator reads the light view of
+ * the values in force (`GET /settings/values`, any login, a few KB, with an ETag) and draws them with the texts of the copy kept in Studio, read-only; the page says when the contract
+ * hash of the server is not the one of the copy. When neither can be read the copy is shown, read-only, with the reason. A key the copy does not know is drawn too, with the generic
+ * control. GPL-3.0-or-later. */
+import { useRef, useState } from "react";
 import { useApp, usePolled } from "../context";
 import { useServices } from "../services/context";
 import { ApiError } from "../api";
@@ -10,14 +12,17 @@ import type { TextKey } from "../i18n";
 import { EMBEDDED_CONTRACT } from "../services/embeddedcontract";
 import { PERSISTENCE_NOTES, SWITCH_NOTES } from "../services/safety";
 import {
+  LIGHT_POLL_S,
+  LightCache,
   canWrite,
   contractText,
   controlKind,
   groupSettings,
   isHighRisk,
-  loadContract,
+  loadSettings,
   parseTyped,
   readContract,
+  readLight,
   sameValue,
   shownValue,
   unlistedSettings,
@@ -43,7 +48,23 @@ interface Pending {
 export function ServerSettings({ embedded = EMBEDDED_CONTRACT }: { embedded?: SettingsContract }) {
   const { t, err, say, lang } = useApp();
   const sv = useServices();
-  const loaded = usePolled<LoadedContract>(() => loadContract(() => readContract(sv.http), embedded), 0, []);
+  // the last light answer and its ETag, kept between the rounds; another login forgets it
+  const cache = useRef(new LightCache());
+  const role = useRef<string>(sv.who.role);
+  // the full contract (an administrator) is read once and when asked; the light view is cheap (an answer with the same ETag is a few bytes), so a login that reads it asks again by itself
+  const pollS = sv.who.role === "admin" ? 0 : LIGHT_POLL_S;
+  const loaded = usePolled<LoadedContract>(
+    async () => {
+      if (role.current !== sv.who.role) {
+        role.current = sv.who.role;
+        cache.current.clear();
+      }
+      const read = await loadSettings(sv.who.role, { full: () => readContract(sv.http), light: (etag) => readLight(sv.http, etag) }, embedded, cache.current);
+      return read.loaded;
+    },
+    pollS,
+    [sv.who.role],
+  );
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [notices, setNotices] = useState<Record<string, Notice>>({});
   const [pending, setPending] = useState<Pending | null>(null);
@@ -51,6 +72,10 @@ export function ServerSettings({ embedded = EMBEDDED_CONTRACT }: { embedded?: Se
 
   const data = loaded.data;
   const live = data?.source === "live";
+  const shows = data?.source === "live" || data?.source === "light"; // the values in force are there
+  const secretKeys = new Set(data?.secretKeys ?? []);
+  const hiddenKeys = new Set(data?.hidden ?? []);
+  const truncatedKeys = new Set(data?.truncated ?? []);
   const known = new Set(embedded.settings.map((s) => s.key));
   const label = (s: Setting) => contractText(s.label, lang) || s.key;
 
@@ -204,14 +229,16 @@ export function ServerSettings({ embedded = EMBEDDED_CONTRACT }: { embedded?: Se
           )}
         </td>
         <td>
-          {s.secret ? (
+          {s.secret || secretKeys.has(s.key) ? (
             <span className="muted">●●●</span>
+          ) : hiddenKeys.has(s.key) ? (
+            <span className="muted">{t("ssc_hidden")}</span>
           ) : current === undefined ? (
             <span className="muted">-</span>
           ) : typeof current === "boolean" ? (
             <Badge tone={current ? "ok" : "dim"}>{t(current ? "srv_on" : "srv_off")}</Badge>
           ) : (
-            <code>{shownValue(current) || "-"}</code>
+            <code>{(shownValue(current) || "-") + (truncatedKeys.has(s.key) ? "…" : "")}</code>
           )}
           {!s.secret && s.default !== null && (
             <div className="hint">
@@ -222,7 +249,7 @@ export function ServerSettings({ embedded = EMBEDDED_CONTRACT }: { embedded?: Se
         <td>
           {s.write.via !== "none" && <Badge tone={s.apply === "restart" ? "wait" : "ok"}>{t(s.apply === "restart" ? "ssc_apply_restart" : "ssc_apply_now")}</Badge>}
           {isHighRisk(s) && <Badge tone="bad">▲ {t("ssc_risk_high")}</Badge>}
-          {live && !known.has(s.key) && <Badge tone="dim">{t("ssc_unknown")}</Badge>}
+          {shows && !known.has(s.key) && <Badge tone="dim">{t("ssc_unknown")}</Badge>}
         </td>
         <td>{control(s)}</td>
       </tr>
@@ -230,7 +257,7 @@ export function ServerSettings({ embedded = EMBEDDED_CONTRACT }: { embedded?: Se
   };
 
   const groups = data ? groupSettings(data.contract) : [];
-  const unlisted = data && live ? unlistedSettings(data.contract, data.values) : [];
+  const unlisted = data && shows ? unlistedSettings(data.contract, data.values, [...(data.secretKeys ?? []), ...(data.hidden ?? [])]) : [];
   const confirmText = pending ? (pending.why === "weak" ? t("sec_weak_confirm") : t("ssc_confirm_risk", { key: pending.setting.key, warning: contractText(pending.setting.warning, lang) })) : "";
 
   return (
@@ -238,9 +265,15 @@ export function ServerSettings({ embedded = EMBEDDED_CONTRACT }: { embedded?: Se
       <p className="hint">{t("ssc_help")}</p>
       {data === null && <p className="muted">{t("svc_loading")}</p>}
       {data && live && <p className="hint">{t("ssc_live", { v: data.serverVersion ?? "-" })}</p>}
-      {data && !live && (
+      {data && data.source === "light" && <p className="hint">{t("ssc_light", { v: data.serverVersion ?? "-" })}</p>}
+      {data && data.source === "embedded" && (
         <p role="alert" className="warn">
           {t("ssc_embedded", { why: data.why ?? "" })}
+        </p>
+      )}
+      {data && shows && data.hash === "differs" && (
+        <p role="alert" className="warn">
+          {t("ssc_hash_differs")}
         </p>
       )}
       {data && live && sv.who.role !== "admin" && <p className="hint">{t("ssc_readonly_role")}</p>}

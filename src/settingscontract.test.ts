@@ -1,6 +1,7 @@
 /* The settings of the server drawn from its contract: the copy kept in Studio is a contract Studio understands (and, next to the repository of the server, is its file), every key of it
  * has a control and a text in the eight languages, a key nobody described gets the generic control, and the rules of reading, grouping, checking and writing a setting. The page that draws
  * them is tested in services/settingspanel.test.tsx. GPL-3.0-or-later. */
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { Api, ApiError } from "./api";
@@ -10,15 +11,29 @@ import { ServiceHttp } from "./services/http";
 import {
   CONTRACT_LANGS,
   CONTRACT_SCHEMA,
+  COPY_HASH,
+  LIGHT_MAX_BYTES,
+  LIGHT_MAX_ITEMS,
+  LIGHT_MAX_KEYS,
+  LIGHT_MAX_TEXT,
+  LIGHT_SCHEMA,
+  LightCache,
   canWrite,
+  compareHash,
   contractText,
   controlKind,
   genericSetting,
   groupSettings,
   isContract,
   isHighRisk,
+  isSha256,
   loadContract,
+  loadSettings,
+  loadedFromLight,
+  parseLight,
   parseTyped,
+  readContract,
+  readLight,
   sameValue,
   shownValue,
   unlistedSettings,
@@ -26,9 +41,9 @@ import {
   writePath,
   writeSetting,
 } from "./services/settingscontract";
-import type { Setting, SettingsContract } from "./services/settingscontract";
+import type { LightReply, Setting, SettingsContract } from "./services/settingscontract";
 import { EMBEDDED_CONTRACT } from "./services/embeddedcontract";
-import { SIM_PASSWORD, SimServer } from "./simserver";
+import { SIM_PASSWORD, SimRng, SimServer } from "./simserver";
 import { ROWS } from "./texts";
 
 const COPY = EMBEDDED_CONTRACT;
@@ -116,7 +131,7 @@ describe("the texts of the screen of the settings", () => {
   const KEYS = Object.keys(ROWS).filter((k) => k.startsWith("ssc_"));
 
   it("exist in every language of Studio, with the same markers as English", () => {
-    expect(KEYS.length).toBe(19);
+    expect(KEYS.length).toBe(22);
     const markers = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
     for (const k of KEYS) {
       const english = text("en", k as keyof typeof ROWS);
@@ -371,5 +386,334 @@ describe("the simulated server", () => {
     expect(got.values.compat_api).toBe(false);
     expect(got.values.listen).toBe("127.0.0.1:18200");
     for (const s of COPY.settings) if (s.secret) expect(s.key in got.values).toBe(false);
+  });
+});
+
+// ---- the light view of the values in force --------------------------------------------------------------------------------------------------
+
+/** The light answer of the server for the examples of its documentation, with the hash of the copy unless another is given. */
+function lightAnswer(over: Record<string, unknown> = {}, settings?: Record<string, unknown>): Record<string, unknown> {
+  const s = settings ?? {
+    session_hours: { v: 12, origin: "file", editable: false },
+    slice_enabled: { v: true, origin: "override", editable: true },
+    data_dir: { hidden: true, origin: "file", editable: false },
+    listen: { v: "127.0.0.1:18200", origin: "file", editable: false },
+    allowed_hosts: { v: ["a.example", "b.example"], origin: "file", editable: false, truncated: true },
+    future_secret: { v: "***", secret: true, editable: false },
+  };
+  return { schema: LIGHT_SCHEMA, server_version: "0.2.0", contract_hash: COPY_HASH, count: Object.keys(s).length, settings: s, ...over };
+}
+
+describe("the hash of the copy of the contract", () => {
+  it("is the SHA-256 of the file with LF line ends, the way the server hashes its document", () => {
+    const file = new URL("./data/settings-contract.json", import.meta.url);
+    const digest = createHash("sha256").update(readFileSync(file, "utf8").replace(/\r\n/g, "\n")).digest("hex");
+    expect(COPY_HASH).toBe(digest);
+    expect(isSha256(COPY_HASH)).toBe(true);
+  });
+
+  it("is compared with the hash the server gives: same, another one, or nothing it can judge", () => {
+    expect(compareHash(COPY_HASH)).toBe("same");
+    expect(compareHash("0".repeat(64))).toBe("differs");
+    for (const bad of [undefined, null, 5, "", "xyz", "A".repeat(64), "g".repeat(64), COPY_HASH.slice(1), `${COPY_HASH}0`, { x: 1 }]) expect(compareHash(bad), String(bad)).toBe("unknown");
+  });
+
+  it("is the one the server has when its repository is next to this one", () => {
+    const file = new URL("../../EH3D-SERVER/docs/settings-contract.json", import.meta.url);
+    if (!existsSync(file)) return;
+    expect(createHash("sha256").update(readFileSync(file, "utf8").replace(/\r\n/g, "\n")).digest("hex")).toBe(COPY_HASH);
+  });
+});
+
+describe("reading the light answer", () => {
+  it("keeps the value in force, where it comes from and whether the security page changes it", () => {
+    const got = parseLight(lightAnswer());
+    expect(typeof got).toBe("object");
+    const light = got as Exclude<typeof got, string>;
+    expect(light.serverVersion).toBe("0.2.0");
+    expect(light.contractHash).toBe(COPY_HASH);
+    expect(Object.keys(light.entries)).toHaveLength(6);
+    expect(light.entries.session_hours).toMatchObject({ value: 12, overridden: false, editable: false, secret: false, hidden: false });
+    expect(light.entries.slice_enabled).toMatchObject({ value: true, overridden: true, editable: true });
+    expect(light.entries.data_dir).toMatchObject({ hidden: true });
+    expect(light.entries.data_dir.value).toBeUndefined();
+    expect(light.entries.future_secret).toMatchObject({ secret: true });
+    expect(light.entries.future_secret.value).toBeUndefined();
+    expect(light.entries.allowed_hosts).toMatchObject({ value: ["a.example", "b.example"], truncated: true });
+  });
+
+  it("turns into the page's data: the copy for the texts, the values of the answer, and the keys it keeps back", () => {
+    const light = parseLight(lightAnswer()) as Exclude<ReturnType<typeof parseLight>, string>;
+    const got = loadedFromLight(light, COPY);
+    expect(got.source).toBe("light");
+    expect(got.contract).toBe(COPY);
+    expect(got.hash).toBe("same");
+    expect(got.values).toEqual({ allowed_hosts: ["a.example", "b.example"], listen: "127.0.0.1:18200", session_hours: 12, slice_enabled: true });
+    expect(got.secretKeys).toEqual(["future_secret"]);
+    expect(got.hidden).toEqual(["data_dir"]);
+    expect(got.truncated).toEqual(["allowed_hosts"]);
+    expect(got.overridden).toEqual(["slice_enabled"]);
+    expect(loadedFromLight(parseLight(lightAnswer({ contract_hash: "0".repeat(64) })) as Exclude<ReturnType<typeof parseLight>, string>, COPY).hash).toBe("differs");
+    expect(loadedFromLight(parseLight(lightAnswer({ contract_hash: undefined })) as Exclude<ReturnType<typeof parseLight>, string>, COPY).hash).toBe("unknown");
+  });
+
+  it("never keeps a secret: whatever the server sent in its place, and the mark with no flag", () => {
+    const light = parseLight(lightAnswer({}, { pw: { v: "hunter2", secret: true }, tok: { v: "***" }, path: { v: "/home/me", hidden: true } })) as Exclude<ReturnType<typeof parseLight>, string>;
+    expect(light.entries.pw).toMatchObject({ secret: true });
+    expect(light.entries.tok).toMatchObject({ secret: true });
+    expect(light.entries.path).toMatchObject({ hidden: true });
+    for (const e of Object.values(light.entries)) expect(e.value).toBeUndefined();
+    const loaded = loadedFromLight(light, COPY);
+    expect(loaded.values).toEqual({});
+    expect(JSON.stringify(loaded.values)).not.toContain("hunter2");
+    expect(JSON.stringify(loaded.values)).not.toContain("/home/me");
+  });
+
+  it("refuses whole an answer it cannot trust: nothing half-understood is kept", () => {
+    const bad: [string, unknown][] = [
+      ["not an object", [1, 2]],
+      ["a string", "<html>"],
+      ["null", null],
+      ["no settings", lightAnswer({ settings: undefined })],
+      ["settings is a list", lightAnswer({ settings: [] })],
+      ["a count that is not the number of keys", lightAnswer({ count: 99 })],
+      ["a count that is a text", lightAnswer({ count: "6" })],
+      ["a key that is not a name", lightAnswer({}, { "A b": { v: 1 } })],
+      ["a key that is empty", lightAnswer({}, { "": { v: 1 } })],
+      ["a key that is too long", lightAnswer({}, { [`k${"a".repeat(48)}`]: { v: 1 } })],
+      ["an entry that is a number", lightAnswer({}, { a: 5 })],
+      ["a value that is an object", lightAnswer({}, { a: { v: { x: 1 } } })],
+      ["a list with an object", lightAnswer({}, { a: { v: [{ x: 1 }] } })],
+      ["a list in a list", lightAnswer({}, { a: { v: [["x"]] } })],
+      ["a text that is too long", lightAnswer({}, { a: { v: "x".repeat(LIGHT_MAX_TEXT + 1) } })],
+      ["a list that is too long", lightAnswer({}, { a: { v: Array.from({ length: LIGHT_MAX_ITEMS + 1 }, () => "x") } })],
+      ["an item that is too long", lightAnswer({}, { a: { v: ["x".repeat(LIGHT_MAX_TEXT + 1)] } })],
+      ["a value that is not a JSON number", lightAnswer({}, { a: { v: Number.NaN } })],
+    ];
+    for (const [name, doc] of bad) expect(parseLight(doc), name).toBe("shape");
+    const many: Record<string, unknown> = {};
+    for (let i = 0; i <= LIGHT_MAX_KEYS; i++) many[`k${i}`] = { v: i };
+    expect(parseLight(lightAnswer({}, many))).toBe("shape");
+    // a newer or another schema
+    expect(parseLight(lightAnswer({ schema: "eh3d.settings.values/2" }))).toBe("newer");
+    expect(parseLight(lightAnswer({ schema: "eh3d.settings.contract/1" }))).toBe("shape");
+    expect(parseLight(lightAnswer({ schema: 7 }))).toBe("shape");
+  });
+
+  it("does not let a key touch the prototype", () => {
+    const hostile = JSON.parse(`{"schema":"${LIGHT_SCHEMA}","settings":{"__proto__":{"v":1},"a":{"v":2}}}`) as unknown;
+    expect(parseLight(hostile)).toBe("shape");
+    expect(parseLight(JSON.parse(`{"schema":"${LIGHT_SCHEMA}","settings":{"constructor":{"v":1}}}`))).toBe("shape");
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+  });
+
+  it("accepts what is odd but harmless: no value, a null, a fraction, a hash that is not one, a long version", () => {
+    const light = parseLight(lightAnswer({ contract_hash: "nope", server_version: "9".repeat(40) }, { a: { origin: "file" }, b: { v: null }, c: { v: 1.5 } })) as Exclude<ReturnType<typeof parseLight>, string>;
+    expect(light.contractHash).toBeNull();
+    expect(light.serverVersion).toBeNull();
+    expect(light.entries.a.value).toBeUndefined();
+    expect(light.entries.b.value).toBeUndefined();
+    expect(light.entries.c.value).toBe(1.5);
+  });
+});
+
+describe("who reads what", () => {
+  const embedded = COPY;
+  const full = () => Promise.resolve({ ...COPY, values: { max_body_mb: 8 }, server_version: "0.2.0", contract_hash: COPY_HASH });
+  const light = (etag: string | null): Promise<LightReply> => Promise.resolve(etag === '"t1"' ? { status: 304 } : { status: 200, body: lightAnswer(), etag: '"t1"' });
+
+  it("sends an administrator to the full contract and never asks for the light view", async () => {
+    const calls: string[] = [];
+    const cache = new LightCache();
+    const read = await loadSettings("admin", { full: () => (calls.push("full"), full()), light: (e) => (calls.push("light"), light(e)) }, embedded, cache);
+    expect(read.loaded).toMatchObject({ source: "live", hash: "same" });
+    expect(read.changed).toBe(true);
+    expect(calls).toEqual(["full"]);
+  });
+
+  it("sends an operator, a viewer and a login of unknown role to the light view only", async () => {
+    for (const role of ["operator", "viewer", null, undefined, ""]) {
+      const calls: string[] = [];
+      const read = await loadSettings(role, { full: () => (calls.push("full"), full()), light: (e) => (calls.push("light"), light(e)) }, embedded, new LightCache());
+      expect(read.loaded.source, String(role)).toBe("light");
+      expect(calls, String(role)).toEqual(["light"]);
+      expect(read.loaded.why).toBeNull();
+    }
+  });
+
+  it("falls back to the light view, with no complaint, for an administrator whose full contract is refused", async () => {
+    const calls: string[] = [];
+    const read = await loadSettings(
+      "admin",
+      { full: () => (calls.push("full"), Promise.reject(new ApiError(403, "forbidden_scope", ""))), light: (e) => (calls.push("light"), light(e)) },
+      embedded,
+      new LightCache(),
+    );
+    expect(read.loaded).toMatchObject({ source: "light", why: null });
+    expect(calls).toEqual(["full", "light"]);
+  });
+
+  it("sends the tag back and keeps the page when the server says 304", async () => {
+    const cache = new LightCache();
+    const readers = { full, light };
+    const first = await loadSettings("operator", readers, embedded, cache);
+    expect(first.changed).toBe(true);
+    expect(cache.etag).toBe('"t1"');
+    const second = await loadSettings("operator", readers, embedded, cache);
+    expect(second.changed).toBe(false);
+    expect(second.loaded).toBe(first.loaded);
+    // an answer with no valid tag cannot be asked for again by tag
+    const plain = new LightCache();
+    await loadSettings("viewer", { full, light: () => Promise.resolve({ status: 200, body: lightAnswer(), etag: null }) }, embedded, plain);
+    expect(plain.etag).toBeNull();
+    expect(plain.last).toBeNull();
+  });
+
+  it("ends as the copy, with the reason, when the light view fails, and forgets the answer it held", async () => {
+    const cache = new LightCache();
+    await loadSettings("operator", { full, light }, embedded, cache);
+    expect(cache.last).not.toBeNull();
+    const refused = await loadSettings("operator", { full, light: () => Promise.reject(new ApiError(401, "unauthorized", "")) }, embedded, cache);
+    expect(refused.loaded).toMatchObject({ source: "embedded", why: "unauthorized", values: {} });
+    expect(refused.loaded.contract).toBe(COPY);
+    expect(cache.etag).toBeNull();
+    expect(cache.last).toBeNull();
+    expect((await loadSettings("operator", { full, light: () => Promise.reject(new Error("offline")) }, embedded, cache)).loaded.why).toBe("unreachable");
+    expect((await loadSettings("operator", { full, light: () => Promise.reject(new ApiError(0, "download_too_big", "16384")) }, embedded, cache)).loaded.why).toBe("download_too_big");
+    expect((await loadSettings("operator", { full, light: () => Promise.resolve({ status: 200, body: "<html>", etag: null }) }, embedded, cache)).loaded.why).toBe("shape");
+    expect((await loadSettings("operator", { full, light: () => Promise.resolve({ status: 200, body: lightAnswer({ schema: "eh3d.settings.values/2" }), etag: '"x"' }) }, embedded, cache)).loaded.why).toBe("newer");
+    // a 304 for a tag nobody sent
+    expect((await loadSettings("operator", { full, light: () => Promise.resolve({ status: 304 }) }, embedded, new LightCache())).loaded.why).toBe("shape");
+  });
+});
+
+describe("the light view against the simulated server", () => {
+  async function connect(role: "admin" | "operator" | "viewer" = "operator", over: Partial<SimServer> = {}) {
+    const server = Object.assign(new SimServer(5), over);
+    server.role = role;
+    const api = new Api(null, server.fetcher);
+    await api.login("ana", SIM_PASSWORD);
+    const http = new ServiceHttp(() => api.token, server.fetcher, { retries: 0 }, async () => undefined);
+    const readers = { full: () => readContract(http), light: (etag: string | null) => readLight(http, etag) };
+    return { server, http, readers };
+  }
+
+  it("gives an operator the values in force, with the ETag and no read of the full contract", async () => {
+    const { server, readers } = await connect("operator");
+    const cache = new LightCache();
+    const read = await loadSettings("operator", readers, COPY, cache);
+    expect(read.loaded.source).toBe("light");
+    expect(read.loaded.serverVersion).toBe("0.0.0-sim");
+    expect(read.loaded.hash).toBe("same");
+    expect(read.loaded.values.session_hours).toBe(12);
+    expect(read.loaded.values.slice_enabled).toBe(false);
+    expect(read.loaded.hidden).toEqual(expect.arrayContaining(["data_dir", "studio_dir"]));
+    expect(read.loaded.hidden?.every((k) => !(k in read.loaded.values))).toBe(true);
+    expect(cache.etag).toMatch(/^"[0-9a-f]+"$/);
+    expect(server.requests.map((r) => `${r.method} ${r.path}`)).toEqual(["POST /auth/login", "GET /settings/values"]);
+    expect(server.conditional).toEqual([null]);
+  });
+
+  it("asks again with the tag and gets a 304 while nothing changes, and a new answer when a switch changes", async () => {
+    const { server, readers } = await connect("viewer");
+    const cache = new LightCache();
+    const first = await loadSettings("viewer", readers, COPY, cache);
+    const again = await loadSettings("viewer", readers, COPY, cache);
+    const third = await loadSettings("viewer", readers, COPY, cache);
+    expect([first.changed, again.changed, third.changed]).toEqual([true, false, false]);
+    expect(server.lightRequests).toBe(3);
+    expect(server.notModified).toBe(2);
+    expect(server.conditional[1]).toBe(cache.etag);
+    server.policy.slice_enabled = true;
+    const changed = await loadSettings("viewer", readers, COPY, cache);
+    expect(changed.changed).toBe(true);
+    expect(changed.loaded.values.slice_enabled).toBe(true);
+    expect(changed.loaded.overridden).toEqual(["slice_enabled"]);
+    expect(server.notModified).toBe(2);
+  });
+
+  it("tells when the contract of the server is not the copy", async () => {
+    const { readers } = await connect("operator", { contractHash: "1".repeat(64) });
+    const read = await loadSettings("operator", readers, COPY, new LightCache());
+    expect(read.loaded).toMatchObject({ source: "light", hash: "differs" });
+  });
+
+  it("keeps the full contract for an administrator and refuses it to anyone else", async () => {
+    const admin = await connect("admin");
+    const a = await loadSettings("admin", admin.readers, COPY, new LightCache());
+    expect(a.loaded).toMatchObject({ source: "live", hash: "same" });
+    expect(admin.server.lightRequests).toBe(0);
+    const operator = await connect("operator");
+    expect(await operator.http.json("GET", "/settings/values")).toBeTypeOf("object");
+    const refused = await operator.http.json("GET", "/settings/contract").then(
+      () => null,
+      (e: unknown) => e,
+    );
+    expect(refused).toMatchObject({ status: 403, code: "forbidden" });
+    const scoped = await connect("admin", { noPolicyScope: true });
+    const s = await loadSettings("admin", scoped.readers, COPY, new LightCache());
+    expect(s.loaded.source).toBe("light");
+    expect(scoped.server.lightRequests).toBe(1);
+  });
+
+  it("refuses an answer bigger than the 16 KiB the server promises, and a server that is down, with the copy and the reason", async () => {
+    const { server, http } = await connect("operator");
+    const big = async (): Promise<Response> => new Response(JSON.stringify(lightAnswer({ pad: "x".repeat(LIGHT_MAX_BYTES) })), { status: 200, headers: { "content-type": "application/json" } });
+    const bigHttp = new ServiceHttp(() => "t", big, { retries: 0 }, async () => undefined);
+    const readers = { full: () => readContract(bigHttp), light: (etag: string | null) => readLight(bigHttp, etag) };
+    expect((await loadSettings("operator", readers, COPY, new LightCache())).loaded).toMatchObject({ source: "embedded", why: "download_too_big" });
+    server.mode = "down";
+    const down = await loadSettings("operator", { full: () => readContract(http), light: (e) => readLight(http, e) }, COPY, new LightCache());
+    expect(down.loaded).toMatchObject({ source: "embedded", why: "unreachable" });
+    server.mode = "html";
+    const html = await loadSettings("operator", { full: () => readContract(http), light: (e) => readLight(http, e) }, COPY, new LightCache());
+    expect(html.loaded.source).toBe("embedded");
+    expect(html.loaded.why).toBe("http_500");
+  });
+
+  it("reads an ETag only when it is a tag", async () => {
+    const answers: Response[] = [
+      new Response(JSON.stringify(lightAnswer()), { status: 200, headers: { etag: '"abc"' } }),
+      new Response(JSON.stringify(lightAnswer()), { status: 200, headers: { etag: 'W/"weak"' } }),
+      new Response(JSON.stringify(lightAnswer()), { status: 200, headers: { etag: "bare" } }),
+      new Response(JSON.stringify(lightAnswer()), { status: 200, headers: { etag: `"${"a".repeat(200)}"` } }),
+      new Response(JSON.stringify(lightAnswer()), { status: 200 }),
+    ];
+    const http = new ServiceHttp(() => "t", async () => answers.shift() as Response, { retries: 0 }, async () => undefined);
+    const tags: (string | null)[] = [];
+    for (let i = 0; i < 5; i++) {
+      const r = await readLight(http, null);
+      tags.push(r.status === 200 ? r.etag : "304");
+    }
+    expect(tags).toEqual(['"abc"', 'W/"weak"', null, null, null]);
+  });
+
+  it("survives a seeded storm of roles, failures and changes: always something to show, never a secret, the same run for the same seed", async () => {
+    const run = async (seed: number) => {
+      const { server, readers } = await connect("operator");
+      const rng = new SimRng(seed);
+      const cache = new LightCache();
+      const roles = ["admin", "operator", "viewer", null] as const;
+      const trace: string[] = [];
+      for (let i = 0; i < 120; i++) {
+        const what = rng.below(8);
+        if (what === 0) server.mode = server.mode === "up" ? "unavailable" : "up";
+        else if (what === 1) server.policy.slice_enabled = !server.policy.slice_enabled;
+        else if (what === 2) cache.clear();
+        else if (what === 3) server.noPolicyScope = !server.noPolicyScope;
+        else if (what === 4) server.role = rng.below(2) === 0 ? "admin" : "operator";
+        const role = roles[rng.below(4)];
+        const read = await loadSettings(role, readers, COPY, cache);
+        expect(read.loaded.contract.settings.length).toBeGreaterThan(0);
+        expect(read.loaded.source === "embedded" ? read.loaded.why !== null : true).toBe(true);
+        expect(JSON.stringify(read.loaded.values)).not.toContain("hunter2");
+        trace.push(`${read.loaded.source}:${read.changed ? 1 : 0}:${read.loaded.why ?? ""}:${String(read.loaded.values.slice_enabled)}`);
+      }
+      return trace.join("|");
+    };
+    const a = await run(20261121);
+    expect(await run(20261121)).toBe(a);
+    expect(await run(7)).not.toBe(a);
+    expect(a).toContain("light:0");
   });
 });

@@ -9,6 +9,7 @@ import healthExample from "./examples/health.json";
 import jobsExample from "./examples/jobs.json";
 import sessionExample from "./examples/session.json";
 import contractExample from "./data/settings-contract.json";
+import { CONTRACT_COPY_HASH } from "./services/contracthash";
 
 /** What the simulated server does with every request. */
 export type SimMode =
@@ -58,8 +59,15 @@ export class SimRng {
   }
 }
 
-function json(status: number, body: unknown): Response {
-  return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+function json(status: number, body: unknown, extra: Record<string, string> = {}): Response {
+  return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", ...extra } });
+}
+
+/** The tag of a text, as the server makes it: the same text is the same tag (a hash in quotes). */
+function tagOf(text: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193) >>> 0;
+  return `"${h.toString(16).padStart(8, "0")}${text.length.toString(16)}"`;
 }
 
 export class SimServer {
@@ -78,6 +86,16 @@ export class SimServer {
     { id: "cnc-1", name: "Router", plugin: "cnc", state: "idle", job: null, capabilities: { evidence: "simulator", requests: ["gcode"] }, detail: { evidence: "simulator", simulator_only: true, latched: false, state_word: "Idle" } },
     { id: "print-1", name: "Printer", plugin: "printer3d", state: "idle", job: null, capabilities: { evidence: "simulator", requests: ["print", "preheat"] }, detail: { evidence: "simulator", simulator_only: true, latched: true, auto_start_queue: false } },
   ];
+  /** The role the simulated server gives a login. The full contract is for an administrator; the light view of the values is for any login. */
+  role: "admin" | "operator" | "viewer" = "admin";
+  /** The `contract_hash` the server says it has (the hash of the copy by default; set another to simulate a server whose contract is newer or older than the copy). */
+  contractHash: string = CONTRACT_COPY_HASH;
+  /** An administrator token without the scope of the policy: the full contract is refused, the light view is not. */
+  noPolicyScope = false;
+  /** How many times the light view was asked for, how many answers were `304`, and the `If-None-Match` of each request (null: none). */
+  lightRequests = 0;
+  notModified = 0;
+  conditional: (string | null)[] = [];
   /** The value of each switch of security the simulated server lets change. All off, as a server starts. */
   policy: Record<string, boolean> = { mdns_announce: false, compat_api: false, compat_write: false, slice_enabled: false };
   private rng: SimRng;
@@ -112,7 +130,7 @@ export class SimServer {
     this.bodies.push(typeof init?.body === "string" ? (JSON.parse(init.body) as unknown) : null);
     if (this.mode === "unavailable") return Promise.resolve(json(503, { error: "unavailable", detail: "the server is starting" }));
     if (this.mode === "html") return Promise.resolve(new Response("<html><body>Bad gateway</body></html>", { status: 500 }));
-    return Promise.resolve(this.answer(method, path, authorization, init?.body));
+    return Promise.resolve(this.answer(method, path, authorization, init?.body, headers["if-none-match"] ?? null));
   };
 
   /** The emergency stop and the releases, as the plugins answer them: the stop latches a CNC machine or a 3D printer (a laser stops by cancelling its job), the release lets go of a latch. */
@@ -150,7 +168,23 @@ export class SimServer {
     const doc = contractExample as unknown as { settings: { key: string; default: unknown; secret: boolean }[] };
     const values: Record<string, unknown> = {};
     for (const s of doc.settings) if (!s.secret) values[s.key] = s.key in this.policy ? this.policy[s.key] : s.default;
-    return { ...contractExample, values, server_version: "0.0.0-sim" };
+    return { ...contractExample, values, server_version: "0.0.0-sim", contract_hash: this.contractHash };
+  }
+
+  /** `GET /settings/values`: the light view, the way the server builds it: the value in force and its origin for each key, a secret as `***`, a path of the computer kept back. */
+  private lightView(): unknown {
+    const doc = contractExample as unknown as { settings: { key: string; default: unknown; secret: boolean; format?: string }[] };
+    const settings: Record<string, unknown> = {};
+    for (const s of doc.settings) {
+      const editable = (SIM_POLICY_KEYS as readonly string[]).includes(s.key);
+      if (s.secret) settings[s.key] = { v: "***", secret: true, editable };
+      else if (s.format === "path") settings[s.key] = { hidden: true, origin: "file", editable };
+      else {
+        const v = s.key in this.policy ? this.policy[s.key] : s.default;
+        settings[s.key] = { v, origin: s.key in this.policy && v !== s.default ? "override" : "file", editable };
+      }
+    }
+    return { schema: "eh3d.settings.values/1", server_version: "0.0.0-sim", contract_hash: this.contractHash, count: Object.keys(settings).length, settings };
   }
 
   private signedIn(authorization: string | null): boolean {
@@ -158,7 +192,7 @@ export class SimServer {
     return m !== null && this.tokens.has(m[1]);
   }
 
-  private answer(method: string, path: string, authorization: string | null, body: BodyInit | null | undefined): Response {
+  private answer(method: string, path: string, authorization: string | null, body: BodyInit | null | undefined, ifNoneMatch: string | null = null): Response {
     if (method === "GET" && path === "/health") return json(200, healthExample);
     if (method === "POST" && path === "/auth/login") {
       const sent = JSON.parse(typeof body === "string" ? body : "{}") as { name?: string; password?: string };
@@ -166,7 +200,7 @@ export class SimServer {
       this.issued += 1;
       const token = `sim-token-${this.issued}`;
       this.tokens.add(token);
-      return json(200, { token, name: sent.name ?? "", role: "admin", expires_s: 3600, app: "studio" });
+      return json(200, { token, name: sent.name ?? "", role: this.role, expires_s: 3600, app: "studio" });
     }
     if (!this.signedIn(authorization)) return json(401, { error: "unauthorized", detail: "log in first" });
     if (method === "GET" && path === "/session") return json(200, sessionExample);
@@ -175,7 +209,21 @@ export class SimServer {
     if (method === "GET" && path === "/work/machines") return json(200, { machines: this.workMachines });
     const act = /^\/work\/machines\/([^/]+)\/(emergency-stop|release|laser\/release)$/.exec(path);
     if (method === "POST" && act) return this.operate(decodeURIComponent(act[1]), act[2]);
-    if (method === "GET" && path === "/settings/contract") return json(200, this.contractView());
+    if (method === "GET" && path === "/settings/contract") {
+      if (this.role !== "admin" || this.noPolicyScope) return json(403, { error: this.role !== "admin" ? "forbidden" : "forbidden_scope", detail: "the contract is for an administrator with admin:policy" });
+      return json(200, this.contractView());
+    }
+    if (method === "GET" && path === "/settings/values") {
+      this.lightRequests += 1;
+      this.conditional.push(ifNoneMatch);
+      const view = this.lightView();
+      const tag = tagOf(JSON.stringify(view));
+      if (ifNoneMatch !== null && ifNoneMatch.split(",").some((t) => t.trim() === "*" || t.trim() === tag)) {
+        this.notModified += 1;
+        return new Response(null, { status: 304, headers: { etag: tag, "cache-control": "private, no-cache" } });
+      }
+      return json(200, view, { etag: tag, "cache-control": "private, no-cache" });
+    }
     if (method === "GET" && path === "/auth/policy") {
       return json(200, this.policyView());
     }
