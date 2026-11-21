@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.1.9] - Eight official languages, PNP nodes panel and job authorization
+
 - **Studio speaks the eight official languages of the ecosystem:** English, Spanish, Italian, German, French, European Portuguese, Chinese and Japanese. The 27 extra languages and the two regional variants (Bulgarian, Croatian, Czech, Danish, Dutch, Estonian, Finnish, Greek, Hungarian, Irish, Latvian, Lithuanian, Maltese, Polish, Romanian, Slovak, Slovenian, Swedish, Norwegian, Icelandic, Ukrainian, Russian, Serbian, Albanian, Catalan, Galician, Basque, Brazilian Portuguese and Canadian French) are gone, with their files, their entries in the selector and the tests that read them. A person whose saved language was one of them, or whose browser asks for one, now gets the language of the browser if it is one of the eight and English otherwise (a test covers it); a region reads its main language. A text a language lacks is taken from English, then Spanish. 7 tests less (611 in all).
 
 - **The settings page has the six new keys and their group:** the copy of the contract holds 95 keys in 16 groups: the group `pnp_nodes` with `pnp_nodes_enabled`, `pnp_nodes_max`, `pnp_node_poll_s`, `pnp_node_silence_s` and `pnp_node_timeout_s`, and `work_require_authorization`. All six are set in `server.cfg`, so Studio shows each one with its control, its text in eight languages and the place where it is set; the hash of the copy follows the new file.
