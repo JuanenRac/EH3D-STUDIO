@@ -5,7 +5,8 @@ import { DEFAULT_LIMITS } from "./http";
 
 /** A time in seconds since 1970 as the person's computer writes it; `-` when there is none. */
 export function whenText(seconds: number | null | undefined): string {
-  return seconds == null || seconds <= 0 ? "-" : new Date(seconds * 1000).toLocaleString();
+  // a number that is not one, or one beyond the dates a computer can write, is no time (`Invalid Date` is not shown)
+  return seconds == null || !(seconds > 0) || seconds * 1000 > 8.64e15 ? "-" : new Date(seconds * 1000).toLocaleString();
 }
 
 /** The bytes of a file chosen on the computer. A file over the limit of an upload is refused before it is read. */

@@ -4,6 +4,17 @@ import type { JobState, JobSummary, JobView } from "./types";
 
 // ---- a job typed by hand
 
+/** A number typed as plain decimal text. `Number()` alone also takes `0x10`, `0b11` and `0o7`; this takes only digits, a sign, a point and an exponent, and gives NaN for the rest. */
+function decimal(text: string): number {
+  return /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(text) ? Number(text) : NaN;
+}
+
+/** The first `max` characters of a text, cut between characters and never inside a pair of a picture or a rare letter. */
+function clip(text: string, max: number): string {
+  const chars = Array.from(text);
+  return chars.length <= max ? text : chars.slice(0, max).join("");
+}
+
 export interface TypedHole {
   tool: number;
   x_mm: number;
@@ -24,7 +35,7 @@ export function parseHoles(text: string): TypedHoles {
     const line = raw.replace(/#.*/, "").trim();
     if (line === "") return;
     const parts = line.split(/[\s,;]+/).filter((p) => p !== "");
-    const nums = parts.map(Number);
+    const nums = parts.map(decimal);
     if (nums.some((n) => !isFinite(n)) || (parts.length !== 2 && parts.length !== 3)) {
       bad.push(i + 1);
       return;
@@ -62,7 +73,7 @@ export function parseToolList(text: string): { tools: number[]; bad: string[] } 
   const tools: number[] = [];
   const bad: string[] = [];
   for (const word of text.split(/[\s,;]+/).filter((w) => w !== "")) {
-    const n = Number(word.replace(/^T/i, ""));
+    const n = decimal(word.replace(/^T/i, ""));
     if (!Number.isInteger(n) || n < 1 || n > 99) bad.push(word);
     else if (!tools.includes(n)) tools.push(n);
   }
@@ -135,7 +146,8 @@ export function isWebLink(address: string | null | undefined): address is string
   if (typeof address !== "string") return false;
   try {
     const u = new URL(address);
-    return u.protocol === "https:" || u.protocol === "http:";
+    // a link with a name and a password in front of the host (https://good.example@evil.example) shows one address and goes to another
+    return (u.protocol === "https:" || u.protocol === "http:") && u.username === "" && u.password === "";
   } catch {
     return false;
   }
@@ -170,7 +182,7 @@ export function resumeHref(machine: string, line: number, jobId: string): string
 /** The machine, the line to start from and the job whose program was kept, from the part of the address after `prepare/`. */
 export function prepareRoute(param: string): { machine: string; skip: number; job: string } {
   const [machine = "", skip = "", job = ""] = param.split("/");
-  const n = Number(skip);
+  const n = decimal(skip);
   return { machine, skip: Number.isInteger(n) && n > 0 ? n : 0, job };
 }
 
@@ -204,7 +216,7 @@ export function kindOfFiles(files: SourceFiles): "drill" | "route" | null {
 
 /** A name for the job from the name of its first file, without the extension. */
 export function nameFromFile(name: string): string {
-  return name.replace(/^.*[\\/]/, "").replace(/\.[^.]*$/, "").slice(0, 60);
+  return clip(name.replace(/^.*[\\/]/, "").replace(/\.[^.]*$/, ""), 60);
 }
 
 // ---- the plan: where each hole and each path is on the drawing
@@ -396,7 +408,7 @@ export function machineQueue(jobs: JobSummary[], machine: string, lastN = 8): { 
 /** The names of `copies` copies of a job: `board`, `board #2`, `board #3` ... (60 characters at most). */
 export function copyNames(name: string, copies: number): string[] {
   const n = Math.max(1, Math.min(Math.floor(copies) || 1, 50));
-  return Array.from({ length: n }, (_, i) => (i === 0 ? name : `${name.slice(0, 54)} #${i + 1}`));
+  return Array.from({ length: n }, (_, i) => (i === 0 ? name : `${clip(name, 54)} #${i + 1}`));
 }
 
 /** The drawing as a file to keep: the SVG of the page with its own size and a white margin-less background. */

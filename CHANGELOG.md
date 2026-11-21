@@ -3,6 +3,7 @@
 All notable changes to this project are documented here.
 
 ## [Unreleased]
+- **A damaged address no longer stops the page, a link with a name in front of the host is not a link, and numbers typed in hexadecimal are refused:** `parseRoute` raised on an address with a damaged escape (`#/job/%zz`) and left the page blank; a link from the server such as `https://trusted.example@evil.example` was shown as a link of the page; the holes, the tools and the line to start from read `0x10`, `0b11` and `0o7` as numbers; a name cut at sixty units could split a picture in two halves; a time that was not a number showed `Invalid Date`. 45 new tests cover them, the CSV of the jobs, the list of jobs, the plan, the machines moved between servers and the lines of a program.
 
 ## [0.1.9] - Eight official languages, PNP nodes panel and job authorization
 
