@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A damaged file of machines no longer stops the import half way (fix):** an address that is not a text (a number, a list) made the import end with no message after the machines before it were already added; it is now read as no address and that machine is counted as skipped. One new test.
+
 ## [0.2.0] - Printers page with live status, read only
 
 - **3D printers, read only:** a **Printers** tab in the jobs page shows the printers the server watches (`/api/v1/printers`): health, state, temperatures with their targets, progress, time left, layers, job, camera, a box of warnings and a line of news for what is new, with the sound of the alerts when they are on. It has no control at all, and the client only reads (`GET`). What is missing or impossible is shown as unknown, never as zero; an answer that is not the contract is an error. The five new refusals and the five new settings of the server are in the eight languages. Seen against a simulator only.
