@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **A token can be limited to scopes:** the form of the tokens has a switch to limit the token and the scopes that its role can use, with two ready sets for a program that creates users (`admin:users` and every scope of the users it creates: a server now refuses it otherwise with `403 forbidden_scope`). The list of the tokens shows the scopes and the template of each one. A refusal for the scopes while users or tokens are managed says what the request needs, and the text of `forbidden_scope` says it too. The users card says that a new user with the name of a deleted one is another person.
+- **Nodes asked too slowly are told:** the Nodes tab shows the warnings of the server (`poll_too_slow`) with the interval, the time after which each node goes to its safe state (and whether it is the one the node says or the default of its contract) and what to change, a badge on the node and that time in its row.
+- **The copy of the settings contract and of the error codes follows the server:** `pnp_node_poll_s` is 1 by default and its help says why.
 - **A damaged file of machines no longer stops the import half way (fix):** an address that is not a text (a number, a list) made the import end with no message after the machines before it were already added; it is now read as no address and that machine is counted as skipped. One new test.
 
 ## [0.2.0] - Printers page with live status, read only

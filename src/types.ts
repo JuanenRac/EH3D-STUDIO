@@ -31,6 +31,10 @@ export interface TokenInfo {
   last_used?: number | null;
   /** When it stops working (seconds since 1970); null for one that does not expire. */
   expires?: number | null;
+  /** What the token is limited to; null or absent: all that its role allows. */
+  scopes?: string[] | null;
+  /** The kind of program it was made for, when it was made from a template. */
+  template?: string | null;
 }
 
 export interface NewToken {

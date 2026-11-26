@@ -114,8 +114,10 @@ export class Api {
     this.request<unknown>("PUT", `/users/${encodeURIComponent(name)}`, change);
   deleteUser = (name: string) => this.request<unknown>("DELETE", `/users/${encodeURIComponent(name)}`);
   tokens = () => this.request<TokenInfo[]>("GET", "/tokens");
-  /** With `days` the token stops working after them (1 to 3650); without, it takes the server's default (which is no expiry unless `token_default_days` says otherwise). */
-  addToken = (name: string, role: Role, days?: number) => this.request<NewToken>("POST", "/tokens", days === undefined ? { name, role } : { name, role, days });
+  /** With `days` the token stops working after them (1 to 3650); without, it takes the server's default (which is no expiry unless `token_default_days` says otherwise).
+   *  With `scopes` it may do only what both its role and its scopes allow; without, all that its role allows. */
+  addToken = (name: string, role: Role, days?: number, scopes?: readonly string[]) =>
+    this.request<NewToken>("POST", "/tokens", { name, role, ...(days === undefined ? {} : { days }), ...(scopes === undefined ? {} : { scopes }) });
   deleteToken = (id: string) => this.request<unknown>("DELETE", `/tokens/${encodeURIComponent(id)}`);
 
   // ---- machines and the fleet

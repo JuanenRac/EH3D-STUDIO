@@ -21,6 +21,7 @@ import {
   newBody,
   nodeActions,
   nodeFacts,
+  slowWarnings,
 } from "../services/pnp";
 import type { NodeForm, PnpNode, SocketLike } from "../services/pnp";
 import type { TextKey } from "../i18n";
@@ -76,6 +77,7 @@ export function PnpNodesCard({ machines }: { machines: { id: string; name?: stri
   const admin = sv.allowed("machines.manage");
   const nodes = shown ?? [];
   const counts = countReady(nodes);
+  const slow = slowWarnings(list.data);
   const problems = form ? formProblems(form, editing) : [];
 
   const fail = (e: unknown) => {
@@ -154,6 +156,20 @@ export function PnpNodesCard({ machines }: { machines: { id: string; name?: stri
               <strong>{t("pnp_summary", { registered: counts.registered, ready: counts.ready, notReady: counts.notReady })}</strong>
               {list.data?.limits && <small className="muted"> · {t("pnp_limits", { poll: list.data.limits.poll_s, silence: list.data.limits.silence_s, max: list.data.limits.max })}</small>}
             </p>
+            {slow.length > 0 && (
+              <div className="warn-box" role="alert">
+                <strong>{t("pnp_slow_title")}</strong>
+                <ul>
+                  {slow.map((w) => (
+                    <li key={w.node}>
+                      {t("pnp_slow_node", { name: nodes.find((n) => n.id === w.node)?.name ?? w.node, poll: w.poll_s, ms: w.link_lost_ms })}
+                      {!w.link_lost_declared && <> {t("pnp_slow_assumed")}</>}
+                    </li>
+                  ))}
+                </ul>
+                <small>{t("pnp_slow_fix")}</small>
+              </div>
+            )}
             {nodes.length === 0 ? (
               <Empty>{t("pnp_none")}</Empty>
             ) : (
@@ -188,7 +204,11 @@ export function PnpNodesCard({ machines }: { machines: { id: string; name?: stri
                         <td>
                           <Badge tone={healthTone(n.health)}>{key ? t(key) : n.health}</Badge>
                           <Badge tone={n.ready ? "ok" : "bad"}>{n.ready ? t("pnp_ready") : t("pnp_not_ready")}</Badge>
+                          {n.poll_too_slow === true && <Badge tone="bad">{t("pnp_poll_too_slow")}</Badge>}
                           {n.evidence === "simulator" && <Badge tone="wait">{t("sim_only")}</Badge>}
+                          {typeof n.link_lost_ms === "number" && (
+                            <small className="muted machine-facts">{t(n.link_lost_declared === true ? "pnp_link_lost" : "pnp_link_lost_assumed", { ms: n.link_lost_ms })}</small>
+                          )}
                           {facts && <small className="muted machine-facts">{facts}</small>}
                           {n.last_error && <small className="muted machine-facts">{n.last_error}</small>}
                         </td>

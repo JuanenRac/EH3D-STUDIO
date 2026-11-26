@@ -317,3 +317,27 @@ describe("the authorization of a job in the queue", () => {
     expect(calls).toEqual(["start {}"]);
   });
 });
+
+describe("the nodes that are asked too slowly", () => {
+  const slow = [node("head-1", "head", { link_lost_ms: 2000, link_lost_declared: false, poll_too_slow: true }), node("feeder-1", "feeder", { link_lost_ms: 15000, link_lost_declared: true, poll_too_slow: false })];
+
+  it("are told with their times, and what to change", async () => {
+    const sim = simulator(slow);
+    sim.routes["GET /pnp/nodes"] = () => ({ nodes: slow, summary: {}, limits: LIMITS, warnings: [{ code: "poll_too_slow", node: "head-1", poll_s: 5, link_lost_ms: 2000, link_lost_declared: false }] });
+    const p = await show("viewer", sim.routes);
+    await click(tab(p, "Nodes"));
+    expect(p.text()).toContain("Node head-1: asked every 5 s, but it goes to its safe state after 2000 ms without being asked.");
+    expect(p.text()).toContain("The node has not said its time");
+    expect(p.text()).toContain("pnp_node_poll_s");
+    expect(p.text()).toContain("Asked too slowly");
+    expect(p.text()).toContain("safe after 2000 ms without the server (assumed)");
+    expect(p.text()).toContain("safe after 15000 ms without the server");
+  });
+
+  it("say nothing when the server sends no warning", async () => {
+    const p = await show("viewer", simulator([node("feeder-1", "feeder")]).routes);
+    await click(tab(p, "Nodes"));
+    expect(p.text()).not.toContain("Nodes asked too slowly");
+    expect(p.text()).not.toContain("without the server");
+  });
+});

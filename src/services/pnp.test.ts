@@ -22,6 +22,7 @@ import {
   nodeActions,
   nodeEvent,
   nodeFacts,
+  slowWarnings,
 } from "./pnp";
 import type { PnpNode, SocketLike } from "./pnp";
 import { ROWS } from "../texts";
@@ -311,5 +312,17 @@ describe("the authorization of a job", () => {
     await w.start("w-1", hash);
     await w.start("w-1");
     expect(s.calls.map((c) => c.body)).toEqual([{ toolpath_sha256: hash }, { toolpath_sha256: hash }, {}]);
+  });
+});
+
+describe("the warnings of the nodes asked too slowly", () => {
+  const warning = { code: "poll_too_slow", node: "head-1", poll_s: 5, link_lost_ms: 2000, link_lost_declared: false };
+
+  it("are read from the list, and anything else is no warning", () => {
+    expect(slowWarnings({ warnings: [warning] })).toEqual([warning]);
+    expect(slowWarnings({})).toEqual([]);
+    expect(slowWarnings(null)).toEqual([]);
+    expect(slowWarnings({ warnings: "x" })).toEqual([]);
+    expect(slowWarnings({ warnings: [null, { ...warning, code: "another" }, { ...warning, node: 1 }, { ...warning, poll_s: "5" }, { code: "poll_too_slow" }] })).toEqual([]);
   });
 });

@@ -85,6 +85,8 @@ describe("the tokens of the programs", () => {
     });
     await api.addToken("laptop", "operator");
     await api.addToken("laptop", "operator", 30);
+    await api.addToken("laptop", "admin", undefined, ["admin:users"]);
+    expect(JSON.parse(calls[2])).toEqual({ name: "laptop", role: "admin", scopes: ["admin:users"] });
     expect(JSON.parse(calls[0])).toEqual({ name: "laptop", role: "operator" });
     expect(JSON.parse(calls[1])).toEqual({ name: "laptop", role: "operator", days: 30 });
   });
