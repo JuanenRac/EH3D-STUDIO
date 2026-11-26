@@ -9,7 +9,7 @@ import { copyId, isWebLink, machineExport, machineImport } from "../jobtools";
 import { copyText } from "../clipboard";
 import { provisioningScopes, roleScopes, scopesForRole } from "../services/scopes";
 import { ApiError } from "../api";
-import type { ConnectionKind, MachineInput, Role } from "../types";
+import type { ConnectionKind, MachineInput, Role, TokenInfo } from "../types";
 import { CONNECTION_KINDS, ROLES } from "../types";
 import { errorText } from "../i18n";
 import type { TextKey } from "../i18n";
@@ -248,6 +248,9 @@ export function AccessPage() {
   const [chosen, setChosen] = useState<string[]>([]);
   const [shown, setShown] = useState<{ name: string; token: string } | null>(null);
   const [copied, setCopied] = useState<boolean | null>(null);
+  // the token that waits for the confirmation of a new secret, and whether one is being asked for now
+  const [asked, setAsked] = useState<TokenInfo | null>(null);
+  const [rotating, setRotating] = useState(false);
 
   // a refusal for the scopes of a limited session says what the request needs, and then what the server said
   const guard = async (what: () => Promise<unknown>, done: () => void, denied: TextKey = "acc_scope_users_denied") => {
@@ -259,6 +262,30 @@ export function AccessPage() {
       else say(err(e), "error");
     }
   };
+  // the present secret stops working at once, so the new one is only asked for after a confirmation and while no other secret is on the screen
+  const rotate = async (k: TokenInfo) => {
+    setAsked(null);
+    setRotating(true);
+    await guard(
+      async () => {
+        try {
+          const r = await api.rotateToken(k.id);
+          setShown({ name: k.name, token: r.token });
+          setCopied(null);
+        } catch (e) {
+          // with no answer the server may have changed the secret already, and nobody saw the new one
+          if (e instanceof ApiError && e.status === 0) say(t("acc_rotate_unsure"), "error");
+          throw e;
+        }
+      },
+      () => undefined,
+      "acc_scope_rotate_denied",
+    );
+    setRotating(false);
+    tokens.reload();
+  };
+  // a token that expires opens no account: say it while a program that creates users is being given days
+  const expiringProvisioner = nt.role === "admin" && nt.days.trim() !== "" && (!limit || chosen.includes("admin:users"));
   const userOk = validName(nu.name) && validPassword(nu.password);
   const wanted = scopesForRole(chosen, nt.role);
   const preset = (role: "viewer" | "operator") => {
@@ -379,6 +406,9 @@ export function AccessPage() {
                     {state === "expired" && <Badge tone="bad">{t("acc_expired")}</Badge>}
                   </td>
                   <td className="row-actions">
+                    <button type="button" disabled={rotating || shown !== null || state === "expired"} onClick={() => setAsked(k)}>
+                      {t("acc_rotate")}
+                    </button>
                     <DangerButton label={t("act_delete")} onConfirm={() => void guard(() => api.deleteToken(k.id), tokens.reload, "acc_scope_tokens_denied")} />
                   </td>
                 </tr>
@@ -386,6 +416,17 @@ export function AccessPage() {
               })}
             </tbody>
           </table>
+        )}
+        {asked && (
+          <p role="alert" className="warn">
+            {t("acc_rotate_confirm", { name: asked.name })}{" "}
+            <button type="button" className="danger" onClick={() => void rotate(asked)}>
+              {t("act_confirm")}
+            </button>{" "}
+            <button type="button" onClick={() => setAsked(null)}>
+              {t("act_cancel")}
+            </button>
+          </p>
         )}
         <div className="form-grid">
           <Field label={t("acc_token_name")} hint={t("acc_token_name_hint")}>
@@ -418,6 +459,7 @@ export function AccessPage() {
           </button>
         </div>
         <p className="hint">{t("acc_preset_help")}</p>
+        {expiringProvisioner && <p className="warn">{t("acc_expiring_accounts")}</p>}
         {limit && (
           <fieldset>
             <legend>{t("acc_scopes")}</legend>
