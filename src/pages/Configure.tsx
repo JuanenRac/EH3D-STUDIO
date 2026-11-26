@@ -7,6 +7,7 @@ import { cfgKeys, tokenDays, tokenState, connectionBody, dollarSwitchShown, conn
 import type { MachineProblem, UpdatePhase } from "../model";
 import { copyId, isWebLink, machineExport, machineImport } from "../jobtools";
 import { copyText } from "../clipboard";
+import { provisioningScopes, roleScopes, scopesForRole } from "../services/scopes";
 import { ApiError } from "../api";
 import type { ConnectionKind, MachineInput, Role } from "../types";
 import { CONNECTION_KINDS, ROLES } from "../types";
@@ -243,18 +244,28 @@ export function AccessPage() {
   const tokens = usePolled(() => api.tokens(), 0);
   const [nu, setNu] = useState({ name: "", role: "operator" as Role, password: "" });
   const [nt, setNt] = useState({ name: "", role: "operator" as Role, days: "" });
+  const [limit, setLimit] = useState(false);
+  const [chosen, setChosen] = useState<string[]>([]);
   const [shown, setShown] = useState<{ name: string; token: string } | null>(null);
   const [copied, setCopied] = useState<boolean | null>(null);
 
-  const guard = async (what: () => Promise<unknown>, done: () => void) => {
+  // a refusal for the scopes of a limited session says what the request needs, and then what the server said
+  const guard = async (what: () => Promise<unknown>, done: () => void, denied: TextKey = "acc_scope_users_denied") => {
     try {
       await what();
       done();
     } catch (e) {
-      say(err(e), "error");
+      if (e instanceof ApiError && e.code === "forbidden_scope") say(e.detail ? `${t(denied)} (${e.detail})` : t(denied), "error");
+      else say(err(e), "error");
     }
   };
   const userOk = validName(nu.name) && validPassword(nu.password);
+  const wanted = scopesForRole(chosen, nt.role);
+  const preset = (role: "viewer" | "operator") => {
+    setNt({ ...nt, role: "admin" });
+    setLimit(true);
+    setChosen(provisioningScopes(role));
+  };
 
   return (
     <div className="stack">
@@ -296,6 +307,7 @@ export function AccessPage() {
             ))}
           </tbody>
         </table>
+        <p className="hint">{t("acc_deleted_name")}</p>
         <h4>{t("acc_user_new")}</h4>
         <div className="form-grid">
           <Field label={t("acc_name")} hint={t("mach_id_hint")}>
@@ -339,6 +351,7 @@ export function AccessPage() {
               <tr>
                 <th>{t("acc_name")}</th>
                 <th>{t("acc_role")}</th>
+                <th>{t("acc_scopes")}</th>
                 <th>{t("acc_created")}</th>
                 <th>{t("acc_last_used")}</th>
                 <th>{t("acc_expires")}</th>
@@ -352,6 +365,10 @@ export function AccessPage() {
                 <tr key={k.id}>
                   <td>{k.name}</td>
                   <td>{t(`role_${k.role}` as TextKey)}</td>
+                  <td>
+                    {k.scopes ? <code>{k.scopes.join(", ")}</code> : t("acc_scopes_all")}
+                    {k.template && <small className="muted"> {k.template}</small>}
+                  </td>
                   <td>{new Date(k.created * 1000).toLocaleString()}</td>
                   <td>
                     {k.last_used != null ? new Date(k.last_used * 1000).toLocaleString() : t("acc_unused")}
@@ -362,7 +379,7 @@ export function AccessPage() {
                     {state === "expired" && <Badge tone="bad">{t("acc_expired")}</Badge>}
                   </td>
                   <td className="row-actions">
-                    <DangerButton label={t("act_delete")} onConfirm={() => void guard(() => api.deleteToken(k.id), tokens.reload)} />
+                    <DangerButton label={t("act_delete")} onConfirm={() => void guard(() => api.deleteToken(k.id), tokens.reload, "acc_scope_tokens_denied")} />
                   </td>
                 </tr>
                 );
@@ -387,20 +404,49 @@ export function AccessPage() {
             <input inputMode="numeric" value={nt.days} onChange={(e) => setNt({ ...nt, days: e.target.value })} />
           </Field>
         </div>
+        <label className="check">
+          <input type="checkbox" checked={limit} onChange={(e) => setLimit(e.target.checked)} />
+          {t("acc_limit")}
+        </label>
+        <p className="hint">{t("acc_limit_help")}</p>
+        <div className="row-actions">
+          <button type="button" onClick={() => preset("viewer")}>
+            {t("acc_preset_viewers")}
+          </button>
+          <button type="button" onClick={() => preset("operator")}>
+            {t("acc_preset_operators")}
+          </button>
+        </div>
+        <p className="hint">{t("acc_preset_help")}</p>
+        {limit && (
+          <fieldset>
+            <legend>{t("acc_scopes")}</legend>
+            {roleScopes(nt.role).map((s) => (
+              <label className="check" key={s}>
+                <input type="checkbox" checked={chosen.includes(s)} onChange={(e) => setChosen((c) => (e.target.checked ? [...c, s] : c.filter((x) => x !== s)))} />
+                <code>{s}</code>
+              </label>
+            ))}
+            {wanted.length === 0 && <p className="error">{t("acc_scopes_none_chosen")}</p>}
+          </fieldset>
+        )}
         <div className="form-actions">
           <button
             className="primary"
-            disabled={nt.name.trim() === "" || tokenDays(nt.days) === null}
+            disabled={nt.name.trim() === "" || tokenDays(nt.days) === null || (limit && wanted.length === 0)}
             onClick={() =>
               void guard(
                 async () => {
-                  const r = await api.addToken(nt.name.trim(), nt.role, tokenDays(nt.days) ?? undefined);
+                  const r = await api.addToken(nt.name.trim(), nt.role, tokenDays(nt.days) ?? undefined, limit ? wanted : undefined);
                   setShown({ name: nt.name.trim(), token: r.token }); setCopied(null);
                 },
                 () => {
                   setNt({ name: "", role: "operator", days: "" });
+                  setLimit(false);
+                  setChosen([]);
                   tokens.reload();
                 },
+                "acc_scope_tokens_denied",
               )
             }
           >

@@ -12,7 +12,7 @@ The page **Security** (group Account) uses the single login of EH3D-SERVER (`/ap
 * **Audit** (administrator): the lines of `GET /api/v1/audit` with the filters by person and by event, the newest first, with the other fields of each line written as `key=value`. When the audit file is switched off on the server the page says so.
 * **Keys and TLS fingerprint** (administrator): the tokens of the programs by identifier, name, role, creation, last use and expiry (never their secret), and the SHA-256 fingerprint of the certificate that `tls_cert_file` names in `server.cfg` when the server has one.
 * **Where the login token is kept** (`src/tokenstore.ts`): in `sessionStorage` of the tab, so it is gone when the tab or the browser is closed and another tab does not see it. At the sign-in the box **Remember me on this computer** (off by default, with a warning about shared computers) keeps it in `localStorage` instead, so the next visit needs no password; the token is then in one store only, never in both. Signing out, or a refusal because the login ended, removes it from both. A token that an earlier version left in `localStorage` is still read, and is kept as remembered until the person signs out. A browser that keeps nothing is not an error: the login lasts until the page is closed.
-* Users and tokens stay in the page Users and tokens.
+* Users and tokens stay in the page Users and tokens. A token may be limited to scopes (`src/services/scopes.ts`): a program that creates users needs the role administrator, `admin:users` and every scope that the role of the users it creates can use, and it never creates, changes or deletes an administrator (`docs/API.md` of EH3D-SERVER). A refusal `forbidden_scope` on that page says so.
 
 ## Sign-in
 

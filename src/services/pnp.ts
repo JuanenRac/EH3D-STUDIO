@@ -52,6 +52,21 @@ export interface PnpNode {
   status: PnpStatus | null;
   evidence: string;
   simulator_only?: boolean;
+  /** Milliseconds without being asked after which the node goes to its safe state: what it says, else the default of its contract. Absent from an older server. */
+  link_lost_ms?: number;
+  /** Whether `link_lost_ms` is what the node said (false: the default of its contract). */
+  link_lost_declared?: boolean;
+  /** The server asks it every `pnp_node_poll_s`, which is that time or more. */
+  poll_too_slow?: boolean;
+}
+
+/** A warning of the list of the nodes; the only code today is `poll_too_slow`. */
+export interface PnpWarning {
+  code: string;
+  node: string;
+  poll_s: number;
+  link_lost_ms: number;
+  link_lost_declared: boolean;
 }
 
 export interface PnpLimits {
@@ -66,6 +81,17 @@ export interface PnpList {
   nodes: PnpNode[];
   summary: { registered?: number; ready?: number; not_ready?: number; by_health?: Record<string, number> };
   limits: PnpLimits;
+  /** Absent from an older server. */
+  warnings?: PnpWarning[];
+}
+
+/** The warnings of a node asked too slowly that can be read; an answer without them, or with something else in their place, has none. */
+export function slowWarnings(list: { warnings?: unknown } | null | undefined): PnpWarning[] {
+  const all = list?.warnings;
+  if (!Array.isArray(all)) return [];
+  return (all as Partial<PnpWarning>[]).filter(
+    (w): w is PnpWarning => !!w && w.code === "poll_too_slow" && typeof w.node === "string" && typeof w.poll_s === "number" && typeof w.link_lost_ms === "number",
+  );
 }
 
 export interface NewPnpNode {
