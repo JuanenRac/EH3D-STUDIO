@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.2.1] - New secrets for tokens, tokens limited to scopes and warnings of the pick-and-place nodes
+
 - **A token can get a new secret:** each row of the list of the tokens of the programs has a button that asks the server for a new secret (`POST /tokens/{id}/rotate`) after a confirmation that says the present one stops working at once; the name, role, scopes and expiry stay. The new secret is shown this once, and no other one can be asked for until it is put away. A token that has expired offers none. A refusal for the scopes or the expiry says what the request needs, and an answer that never comes says that the secret may have changed unseen. Six new tests, with the ones of the next line. Seen against a stand-in of the server only.
 - **A token that expires opens no account:** the page of the users and the tokens says it where a token for a program that creates users is made, warns while such a token is being given days, and the refusal of a user says it too, as the server now answers `403 forbidden_scope` to such a token.
 - **A token can be limited to scopes:** the form of the tokens has a switch to limit the token and the scopes that its role can use, with two ready sets for a program that creates users (`admin:users` and every scope of the users it creates: a server now refuses it otherwise with `403 forbidden_scope`). The list of the tokens shows the scopes and the template of each one. A refusal for the scopes while users or tokens are managed says what the request needs, and the text of `forbidden_scope` says it too. The users card says that a new user with the name of a deleted one is another person.
