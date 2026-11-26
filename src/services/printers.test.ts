@@ -91,7 +91,7 @@ describe("the client of the printers", () => {
         remaining_s: -1,
         layer: Number.NaN,
         layers: 1e12,
-        job_name: `a\u0007‮b${"x".repeat(100000)}`,
+        job_name: `a\u0007\u202eb${"x".repeat(100000)}`,
         alerts: [{ severity: "apocalypse", code: "C" }, null, ...Array.from({ length: 100 }, () => ({ severity: "info", code: "i" }))],
         camera: { present: "yes" },
       },

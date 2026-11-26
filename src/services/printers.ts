@@ -66,7 +66,7 @@ function record(v: unknown): Record_ | null {
 function text(v: unknown): string {
   if (typeof v !== "string") return "";
   // control characters and the ones that turn the reading order around are not shown
-  return [...v.replace(/[\p{Cc}​-‏‪-‮⁦-⁩]/gu, "")].slice(0, MAX_TEXT).join("");
+  return [...v.replace(/[\p{Cc}\u200b-\u200f\u202a-\u202e\u2066-\u2069]/gu, "")].slice(0, MAX_TEXT).join("");
 }
 
 function within(v: unknown, min: number, max: number): number | null {
