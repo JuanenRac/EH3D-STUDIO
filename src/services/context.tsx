@@ -9,6 +9,7 @@ import type { FeedEvent, FeedHello, FeedListener, FeedStatus, SourceLike } from 
 import { ServiceHttp } from "./http";
 import { can } from "./permissions";
 import { PnpClient } from "./pnp";
+import { PrinterClient } from "./printers";
 import type { Action, Who } from "./permissions";
 import { StoreClient } from "./store";
 import type { AuthClaims } from "./types";
@@ -22,6 +23,7 @@ export interface ServicesState {
   auth: AuthClient;
   work: WorkClient;
   pnp: PnpClient;
+  printers: PrinterClient;
   store: (app: string) => StoreClient;
   claims: AuthClaims | null;
   who: Who;
@@ -49,6 +51,7 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
   const auth = useMemo(() => new AuthClient(http), [http]);
   const work = useMemo(() => new WorkClient(http), [http]);
   const pnp = useMemo(() => new PnpClient(http), [http]);
+  const printers = useMemo(() => new PrinterClient(http), [http]);
   const stores = useRef(new Map<string, StoreClient>());
   const store = useCallback(
     (app: string) => {
@@ -101,7 +104,7 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
   }, [feed]);
   useEffect(() => () => feed.stop(), [feed]);
 
-  const value: ServicesState = useMemo(() => ({ http, auth, work, pnp, store, claims, who, allowed, acquireFeed, feed }), [http, auth, work, pnp, store, claims, who, allowed, acquireFeed, feed]);
+  const value: ServicesState = useMemo(() => ({ http, auth, work, pnp, printers, store, claims, who, allowed, acquireFeed, feed }), [http, auth, work, pnp, printers, store, claims, who, allowed, acquireFeed, feed]);
   return <ServicesContext.Provider value={value}>{children}</ServicesContext.Provider>;
 }
 

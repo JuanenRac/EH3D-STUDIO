@@ -12,6 +12,7 @@ import type { SourceLike } from "./events";
 import { ServiceHttp } from "./http";
 import { can } from "./permissions";
 import { PnpClient } from "./pnp";
+import { PrinterClient } from "./printers";
 import type { Who } from "./permissions";
 import { ServicesContext } from "./context";
 import type { ServicesState } from "./context";
@@ -115,6 +116,7 @@ export function makeServices(fetcher: (input: string, init?: RequestInit) => Pro
     auth: new AuthClient(http),
     work: new WorkClient(http),
     pnp: new PnpClient(http),
+    printers: new PrinterClient(http),
     store: (app) => {
       let c = stores.get(app);
       if (!c) {
