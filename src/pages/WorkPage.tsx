@@ -6,6 +6,7 @@ import { Badge, Card, DangerButton, Empty, Field, Progress, StartButton } from "
 import { AtcEditor, problemText } from "../components/AtcEditor";
 import { useFeed, useServices } from "../services/context";
 import { PnpNodesCard } from "../components/PnpNodes";
+import { PrintersCard } from "../components/Printers";
 import { EMPTY_FEED, affects, eventLine, feedReducer, matchesFeed } from "../services/events";
 import type { FeedEvent } from "../services/events";
 import { whenText } from "../services/format";
@@ -38,8 +39,8 @@ import { WORK_STATES } from "../services/types";
 import type { WorkJob, WorkJobSummary, WorkMachineInfo, WorkNotification, WorkState } from "../services/types";
 import type { TextKey } from "../i18n";
 
-const TABS = ["queue", "machines", "nodes", "live", "atc", "notices"] as const;
-const TAB_TEXT: Record<(typeof TABS)[number], TextKey> = { queue: "nav_jobs", machines: "ov_machines", nodes: "pnp_tab", live: "nav_live", atc: "atc_title", notices: "wk_tab_notices" };
+const TABS = ["queue", "machines", "nodes", "printers", "live", "atc", "notices"] as const;
+const TAB_TEXT: Record<(typeof TABS)[number], TextKey> = { queue: "nav_jobs", machines: "ov_machines", nodes: "pnp_tab", printers: "pr_tab", live: "nav_live", atc: "atc_title", notices: "wk_tab_notices" };
 const AUTH_TEXT: Record<"waiting" | "authorized" | "stale", TextKey> = { waiting: "wk_auth_waiting", authorized: "wk_auth_done", stale: "wk_auth_stale" };
 const STATE_TEXT: Record<WorkState, TextKey> = { queued: "wk_st_queued", running: "job_running", paused: "wk_st_paused", done: "job_done", failed: "job_failed", cancelled: "job_cancelled" };
 type Tab = (typeof TABS)[number];
@@ -141,6 +142,7 @@ export function WorkPage({ route }: { route: string }) {
         )}
         {tab === "machines" && <MachinesCard machines={machines.data ?? null} plugins={plugins.data ?? null} reload={reloadAll} />}
         {tab === "nodes" && <PnpNodesCard machines={(machines.data ?? []).filter((m) => m.plugin === "pnp")} />}
+        {tab === "printers" && <PrintersCard />}
         {tab === "live" && <LiveCard events={feed.events} total={feed.total} resyncs={feed.resyncs} status={feedState} machines={(machines.data ?? []).map((m) => m.id)} onClear={() => feedDispatch({ type: "clear" })} />}
         {tab === "atc" && <AtcEditor request={request} onRequest={(x) => { setRequest(x); setTab("queue"); }} canEdit={sv.allowed("jobs.prepare")} />}
         {tab === "notices" && <NoticesCard notes={notes} setNotes={setNotes} />}

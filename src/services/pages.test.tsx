@@ -567,7 +567,7 @@ describe("the fields of the pages", () => {
   it("mark the tabs and the panel they open for a screen reader", async () => {
     const p = await show(<WorkPage route="" />, "viewer", { "GET /work/machines": () => ({ machines: [] }), "GET /plugins": () => ({ plugins: [] }), "GET /work/jobs": () => ({ total: 0, offset: 0, limit: 100, items: [] }), "GET /notifications": () => ({ notifications: [] }) });
     const tabs = p.$$("[role=tab]");
-    expect(tabs).toHaveLength(6);
+    expect(tabs).toHaveLength(7);
     expect(tabs.filter((t) => t.getAttribute("aria-selected") === "true")).toHaveLength(1);
     const panel = p.$("[role=tabpanel]");
     expect(panel?.getAttribute("aria-labelledby")).toBe(tabs.find((t) => t.getAttribute("aria-selected") === "true")?.id);

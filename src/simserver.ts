@@ -70,6 +70,22 @@ function tagOf(text: string): string {
   return `"${h.toString(16).padStart(8, "0")}${text.length.toString(16)}"`;
 }
 
+/** The printers of the simulated server, as `GET /printers` of EH3D-SERVER answers (contract `eh3d.printers.status/1`): simulated ones, read only. */
+export const SIM_PRINTERS = {
+  schema: "eh3d.printers.status/1",
+  read_only: true,
+  printers: [
+    {
+      id: "printer-1", name: "Simulated A", family: "bambu_lan", health: "online", current: true, simulator_only: true, age_s: 1, certificate_seen: "",
+      status: {
+        state: "printing", temperatures: [{ name: "nozzle", current_c: 219.6, target_c: 220 }, { name: "bed", current_c: 60, target_c: 60 }],
+        progress_pct: 42, remaining_s: 4980, remaining_estimated: false, layer: 50, layers: 120, job_name: "simulated", alerts: [], camera: { present: true },
+      },
+    },
+    { id: "printer-2", name: "Simulated B", family: "moonraker", health: "offline", current: false, simulator_only: true, status: null, certificate_seen: "" },
+  ],
+};
+
 export class SimServer {
   mode: SimMode = "up";
   /** In `flaky` mode, the chance in a thousand that a request fails to connect. */
@@ -207,6 +223,7 @@ export class SimServer {
     if (method === "GET" && path === "/fleet") return json(200, fleetExample);
     if (method === "GET" && path === "/jobs") return json(200, jobsExample);
     if (method === "GET" && path === "/work/machines") return json(200, { machines: this.workMachines });
+    if (method === "GET" && path === "/printers") return json(200, SIM_PRINTERS);
     const act = /^\/work\/machines\/([^/]+)\/(emergency-stop|release|laser\/release)$/.exec(path);
     if (method === "POST" && act) return this.operate(decodeURIComponent(act[1]), act[2]);
     if (method === "GET" && path === "/settings/contract") {

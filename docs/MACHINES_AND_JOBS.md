@@ -7,6 +7,7 @@ The page **Machines and jobs** (group Services) uses the plugins, the generic qu
 * **Jobs:** the queue and history with filters (machine, state, mine, words), progress, position in the queue and the history of each job. Start, stop and delete ask twice; hold and resume are offered only when the plugin can hold. Below it, the form to prepare a job: the machine, a name and the request of the plugin as JSON (a template per kind). A refusal `bad_rack` is told with the place and the tool.
 * **Machines:** the machines of every plugin with their state and job, the safe actions of the next section (a stop button for a busy machine that cancels its job, asks twice), the plugins, and, for an administrator, adding and removing the machines of a plugin that keeps its own (`demo`).
 * **Nodes:** the feeder and head nodes of the pick-and-place machines (next section).
+* **Printers:** the 3D printers the server watches, read only (below).
 * **Live events:** the stream, with filters by machine, job and kind of event.
 * **Tool places:** the table tool to place of the `rack` of the second version of the request (`docs/ATC_CHAIN.md` of the server). It warns, as BUNGARD-GUI does, of a tool without a place, a place shared by two tools and a place the machine does not define, and finds before sending the other refusals of the server (the test pin, the tool in the chuck, `first`, the number of places). The result goes into the request of the job.
 * **Notifications:** from `/notifications` and from the stream; mark one or all as read.
@@ -32,6 +33,15 @@ The tab **Nodes** (`src/components/PnpNodes.tsx`, rules and client in `src/servi
 * A viewer reads. An operator (`jobs:prepare`) can ask a node now (`POST /pnp/nodes/{id}/poll`; not offered for a node that is switched off). An administrator (`machines:manage`) registers (`POST`), changes (`PUT`) and removes (`DELETE`) nodes; saving and removing ask twice.
 * The form checks the id (lower-case letters, digits and hyphens, up to 32), the name (up to 64 characters), `host:port` and a token with no spaces before it sends anything; the server judges again (`bad_pnp_node`, `pnp_node_exists`, `pnp_nodes_full`). A token left empty in the form of a node that has one is sent as `********`, which the server reads as "keep it".
 * Everything seen here was seen against a simulator: nothing has run on a real feeder or head.
+
+## The 3D printers, read only
+
+The tab **Printers** (`src/components/Printers.tsx`, rules and client in `src/services/printers.ts`) shows `GET /api/v1/printers` (contract `eh3d.printers.status/1`): for each printer its health, state, temperatures with their targets, progress, time left (marked when the server estimated it), layers, job and whether it has a camera; Studio never receives the access code or key of a printer, nor a camera picture or address. It has no control at all: no button, field or form that reaches a printer, and the client only knows how to `GET` the list. Printers are registered on the server (`docs/API.md` there), not here.
+
+* **Warnings:** a box lists what a person should see now (firmware stopped, error, failed print, alerts of the printer, paused, access refused, certificate not trusted, answer not understood, no answer, old information). What appears while the tab is open is also told in the line of news, a finished print too, with the sound of the alerts when they are on.
+* The list is asked again at the refresh rate of Studio while the tab is shown. A value the printer did not say, or an impossible one, is shown as unknown, never as zero; an answer that is not the contract is an error, not an empty list. When the server stops answering, the last list stays with a line that says it is old.
+* With `printers_enabled` off the server answers `501 printers_off` and the tab says so.
+* Everything seen here was seen against a simulator: nothing has run on a real printer.
 
 ## The hash and the authorization of a job
 
