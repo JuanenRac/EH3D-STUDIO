@@ -119,6 +119,8 @@ export class Api {
   addToken = (name: string, role: Role, days?: number, scopes?: readonly string[]) =>
     this.request<NewToken>("POST", "/tokens", { name, role, ...(days === undefined ? {} : { days }), ...(scopes === undefined ? {} : { scopes }) });
   deleteToken = (id: string) => this.request<unknown>("DELETE", `/tokens/${encodeURIComponent(id)}`);
+  /** A new secret for a token: the present one stops working at once; the name, role, scopes and expiry stay. The answer is the only time the new one is seen. */
+  rotateToken = (id: string) => this.request<NewToken>("POST", `/tokens/${encodeURIComponent(id)}/rotate`, {});
 
   // ---- machines and the fleet
   machines = () => this.request<Machine[]>("GET", "/machines");
