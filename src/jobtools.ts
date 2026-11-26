@@ -364,7 +364,7 @@ export function machineImport(text: string): { id: string; name: string; model: 
         station: typeof raw.station === "string" ? raw.station : "",
         connection:
           c.kind === "node"
-            ? { kind: "node" as const, address: c.address ?? "" }
+            ? { kind: "node" as const, address: typeof c.address === "string" ? c.address : "" }
             : c.kind === "grbl"
               ? { kind: "grbl" as const, port: typeof c.port === "string" ? c.port : "", baud: typeof c.baud === "number" ? c.baud : 115200 }
               : { kind: "demo" as const },

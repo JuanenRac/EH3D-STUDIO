@@ -503,6 +503,13 @@ describe("the machines moved between servers", () => {
     expect(list?.[2].connection).toEqual({ kind: "grbl", port: "", baud: 115200 });
   });
 
+  it("reads an address that is not a text as no address, so the form can name the problem", () => {
+    for (const address of ["5", '["10.0.0.5"]', '{"host":"x"}', "true", "null"]) {
+      const list = machineImport(`{"eh3d_machines":1,"machines":[{"id":"n","name":"N","connection":{"kind":"node","address":${address}}}]}`);
+      expect(list?.[0].connection, address).toEqual({ kind: "node", address: "" });
+    }
+  });
+
   it("writes a machine of a node and reads it back the same", () => {
     const machines = [{ id: "n1", name: "Node", model: "ccd-mtc", station: "s1", connection: { kind: "node", address: "http://10.0.0.5:8081" }, dcf: "d", rcf: "r", cfg: "c" }];
     const text = machineExport(machines);
