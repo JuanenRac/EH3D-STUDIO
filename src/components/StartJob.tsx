@@ -109,7 +109,8 @@ export function StartJobButton({ jobId, label, onStart, disabled }: { jobId: str
                 type="button"
                 className="primary"
                 disabled={loading}
-                onClick={() => {
+                onClick={(e) => {
+                  if (e.detail > 1) return;
                   setOpen(false);
                   onStart();
                 }}

@@ -42,7 +42,7 @@ export function Badge({ tone, children }: { tone: "ok" | "run" | "wait" | "bad" 
 }
 
 /** A delete button that needs a second click (the second click is the confirmation; leaving the button cancels it). */
-export function DangerButton({ label, onConfirm, disabled }: { label: string; onConfirm: () => void; disabled?: boolean }) {
+export function DangerButton({ label, onConfirm, disabled, deliberate }: { label: string; onConfirm: () => void; disabled?: boolean; deliberate?: boolean }) {
   const { t } = useApp();
   const [armed, setArmed] = useState(false);
   return (
@@ -51,7 +51,9 @@ export function DangerButton({ label, onConfirm, disabled }: { label: string; on
       className={`danger${armed ? " armed" : ""}`}
       disabled={disabled}
       onBlur={() => setArmed(false)}
-      onClick={() => {
+      onClick={(e) => {
+        // a button that frees a machine takes two separate clicks; a stop takes any
+        if (deliberate && e.detail > 1) return;
         if (armed) {
           setArmed(false);
           onConfirm();
@@ -78,7 +80,9 @@ export function StartButton({ label, onConfirm, disabled }: { label: string; onC
       className={`primary${armed ? " armed" : ""}`}
       disabled={disabled}
       onBlur={() => setArmed(false)}
-      onClick={() => {
+      onClick={(e) => {
+        // the second click of a double click is not the answer to "Sure?"
+        if (e.detail > 1) return;
         const next = twoSteps(armed);
         setArmed(next.armed);
         if (next.fire) onConfirm();

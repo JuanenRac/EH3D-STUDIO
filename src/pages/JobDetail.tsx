@@ -5,6 +5,7 @@ import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Progress } from "../components/ui";
 import { StartJobButton } from "../components/StartJob";
 import { PlanDownload, PlanView } from "../components/PlanView";
+import { mayHaveArrived, stopErrorText } from "../i18n";
 import { took } from "../jobtools";
 import { canGoOn, duration, isActive, jobActions, jobKindKey, jobPercent, pauseKey, resumeLine, resumeRefusal, spindleFindingKey } from "../model";
 import { ToolTable } from "./Prepare";
@@ -15,17 +16,20 @@ function when(seconds: number | null): string {
 }
 
 export function JobPage({ id }: { id: string }) {
-  const { api, session, t, err, say, refreshS } = useApp();
+  const { api, session, lang, t, err, say, refreshS } = useApp();
   const { data: job, error, reload } = usePolled(() => api.job(id), refreshS || 3, [id]);
   // why the server did not go on with this job by itself; it stays on the page, a notice that fades is not enough for it
   const [refused, setRefused] = useState<{ id: string; reason: string } | null>(null);
-  const act = async (what: () => Promise<unknown>, after?: () => void) => {
+  const act = async (what: () => Promise<unknown>, after?: () => void, kind?: "order" | "stop") => {
     try {
       await what();
       if (after) after();
       else reload();
     } catch (e) {
-      say(err(e), "error");
+      // err() also takes an ended login back to the sign-in, so it is asked in every case
+      const said = err(e);
+      say(kind === "order" ? (mayHaveArrived(e) ? t("cmd_unanswered") : said) : kind === "stop" ? stopErrorText(lang, e) : said, "error");
+      reload();
     }
   };
   if (error != null && !job) {
@@ -38,6 +42,8 @@ export function JobPage({ id }: { id: string }) {
   }
   if (!job) return <Empty>…</Empty>;
   const a = jobActions(job, session.role);
+  // the last request for the job failed: what is on the page is old, so nothing here may set the machine going
+  const old = error != null;
   const from = resumeLine(job);
   const pct = jobPercent(job);
   const tone = job.state === "failed" ? "bad" : job.state === "waiting_operator" ? "wait" : job.state === "done" ? "ok" : "run";
@@ -52,22 +58,23 @@ export function JobPage({ id }: { id: string }) {
               {t("nav_jobs")}
             </a>
             {a.start && (
-              <StartJobButton jobId={job.id} label={t("act_start")} onStart={() => void act(() => api.startJob(job.id))} />
+              <StartJobButton jobId={job.id} label={t("act_start")} disabled={old} onStart={() => void act(() => api.startJob(job.id), undefined, "order")} />
             )}
             {a.confirm && (
-              <button className="primary" onClick={() => void act(() => api.confirmJob(job.id))}>
+              <button className="primary" disabled={old} onClick={() => void act(() => api.confirmJob(job.id), undefined, "order")}>
                 {t("act_confirm")}
               </button>
             )}
             {a.pause && <button onClick={() => void act(() => api.pauseJob(job.id))}>{t("act_pause")}</button>}
             {a.resume && (
-              <button className="primary" onClick={() => void act(() => api.resumeJob(job.id))}>
+              <button className="primary" disabled={old} onClick={() => void act(() => api.resumeJob(job.id), undefined, "order")}>
                 {t("act_resume")}
               </button>
             )}
             {canGoOn(job, session.role) && (
               <button
                 className="primary"
+                disabled={old}
                 onClick={() =>
                   void act(async () => {
                     setRefused(null);
@@ -84,7 +91,7 @@ export function JobPage({ id }: { id: string }) {
                 {t("act_go_on")}
               </button>
             )}
-            {a.cancel && <button onClick={() => void act(() => (isActive(job) ? api.stopMachine(job.machine) : api.cancelJob(job.id)))}>{isActive(job) ? t("act_stop") : t("act_cancel")}</button>}
+            {a.cancel && <button onClick={() => void act(() => (isActive(job) ? api.stopMachine(job.machine) : api.cancelJob(job.id)), undefined, isActive(job) ? "stop" : undefined)}>{isActive(job) ? t("act_stop") : t("act_cancel")}</button>}
             {a.remove && <DangerButton label={t("act_delete")} onConfirm={() => void act(() => api.deleteJob(job.id), () => (window.location.hash = "#/jobs"))} />}
           </>
         }
@@ -94,6 +101,11 @@ export function JobPage({ id }: { id: string }) {
           <Progress percent={pct} tone={tone} />
           <strong>{pct} %</strong>
         </div>
+        {old && (
+          <p className="error" role="alert">
+            {t("data_old")}
+          </p>
+        )}
         {job.message && <p className="warn">{job.message}</p>}
         {job.pause && <p className="warn">{t("job_waits_for", { what: t(pauseKey(job.pause), { tool: job.pause.tool ?? "" }) })}</p>}
         {canGoOn(job, session.role) && <p className="hint">{from != null ? t("job_resume_help", { line: from }) : t("job_go_on_help")}</p>}

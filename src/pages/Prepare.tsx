@@ -1,6 +1,6 @@
 /* Prepare a job: pick the machine, give the work (the files the programs read, or the holes typed by hand), look at the plan and the time it will take, and keep it
  * ready. The job never starts by itself: it is started from the list of jobs or from its own page. */
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, Empty, Field } from "../components/ui";
 import { PlanDownload, PlanView } from "../components/PlanView";
@@ -93,6 +93,9 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
     );
   };
   const body = request();
+  // what the page would send now: a plan that was asked for something else is thrown away when it comes back
+  const asked = useRef("");
+  asked.current = `${chosen} ${JSON.stringify(body)}`;
   const setTool = (n: number, patch: Partial<DrillToolInput>) => {
     setTools((old) => ({ ...old, [n]: { ...(old[n] ?? defaultDrillTool(n)), ...patch } }));
     setView(null);
@@ -101,8 +104,10 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
   const preview = async () => {
     if (!body || !chosen) return;
     setBusy(true);
+    const mine = asked.current;
     try {
-      setView(await api.previewJob(chosen, body));
+      const planned = await api.previewJob(chosen, body);
+      if (asked.current === mine) setView(planned);
     } catch (e) {
       setView(null);
       say(err(e), "error");

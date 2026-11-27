@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Progress } from "../components/ui";
 import { StartJobButton } from "../components/StartJob";
+import { mayHaveArrived, stopErrorText } from "../i18n";
 import { atLeast, countJobs, duration, groupFleet, isActive, jobActions, jobKindKey, jobPercent, pauseKey } from "../model";
 import { JOB_ORDERS, finishedIds, jobsCsv, matchesQuery, sortJobs, totals, waitingJobs } from "../jobtools";
 import type { JobOrder } from "../jobtools";
@@ -41,7 +42,7 @@ export function Overview() {
   return (
     <div className="grid">
       {fleet.error != null && <p className="error">{err(fleet.error)}</p>}
-      <NeedsYou jobs={jobs.data ?? []} onDone={jobs.reload} />
+      <NeedsYou jobs={jobs.data ?? []} old={jobs.error != null} onDone={jobs.reload} />
       <Card title={t("ov_fleet")}>
         <div className="tiles">
           {tile(t("ov_machines"), f?.machines ?? "-")}
@@ -87,12 +88,22 @@ export function Overview() {
 }
 
 /** The jobs that wait for the operator, with the button that answers them, at the top of the overview where nobody can miss them. */
-function NeedsYou({ jobs, onDone }: { jobs: import("../types").JobSummary[]; onDone: () => void }) {
+function NeedsYou({ jobs, old, onDone }: { jobs: import("../types").JobSummary[]; old: boolean; onDone: () => void }) {
   const { api, session, t, err, say } = useApp();
+  const failed = (e: unknown) => {
+    const said = err(e);
+    say(mayHaveArrived(e) ? t("cmd_unanswered") : said, "error");
+    onDone();
+  };
   const waiting = waitingJobs(jobs);
   if (waiting.length === 0) return null;
   return (
     <Card title={t("ov_needs_you", { n: waiting.length })} wide>
+      {old && (
+        <p className="error" role="alert">
+          {t("data_old")}
+        </p>
+      )}
       {waiting.map((j) => (
         <div key={j.id} className="machine-row">
           <span className="dot wait" />
@@ -105,17 +116,12 @@ function NeedsYou({ jobs, onDone }: { jobs: import("../types").JobSummary[]; onD
             </small>
           </div>
           {jobActions(j, session.role).resume && (
-            <button className="primary" onClick={() => void api.resumeJob(j.id).then(onDone, (e) => say(err(e), "error"))}>
+            <button className="primary" disabled={old} onClick={() => void api.resumeJob(j.id).then(onDone, failed)}>
               {t("act_resume")}
             </button>
           )}
           {jobActions(j, session.role).confirm && (
-            <button
-              className="primary"
-              onClick={() =>
-                void api.confirmJob(j.id).then(onDone, (e) => say(err(e), "error"))
-              }
-            >
+            <button className="primary" disabled={old} onClick={() => void api.confirmJob(j.id).then(onDone, failed)}>
               {t("act_confirm")}
             </button>
           )}
@@ -176,21 +182,26 @@ export function FleetPage() {
 }
 
 export function JobsPage() {
-  const { api, session, t, err, say, refreshS } = useApp();
+  const { api, session, lang, t, err, say, refreshS } = useApp();
   const [machine, setMachine] = useState("");
   const [state, setState] = useState("");
   const [query, setQuery] = useState("");
   const [order, setOrder] = useState<JobOrder>("newest");
   const machines = usePolled(() => api.machines(), 0);
   const { data, error, reload } = usePolled(() => api.jobs({ machine, state }), refreshS, [machine, state]);
-  const act = async (what: () => Promise<unknown>) => {
+  const act = async (what: () => Promise<unknown>, kind?: "order" | "stop") => {
     try {
       await what();
       reload();
     } catch (e) {
-      say(err(e), "error");
+      // err() also takes an ended login back to the sign-in, so it is asked in every case
+      const said = err(e);
+      say(kind === "order" ? (mayHaveArrived(e) ? t("cmd_unanswered") : said) : kind === "stop" ? stopErrorText(lang, e) : said, "error");
+      reload();
     }
   };
+  // the last request for the list failed: what is on the page is old, so nothing here may set a machine going
+  const old = error != null;
   const shown = data ? sortJobs(data.filter((j) => matchesQuery(j, query)), order) : [];
   const clearFinished = async () => {
     const ids = finishedIds(shown);
@@ -306,11 +317,11 @@ export function JobsPage() {
                   <td>{j.by}</td>
                   <td>{duration(j.estimate_s)}</td>
                   <td className="row-actions">
-                    {a.start && <StartJobButton jobId={j.id} label={t("act_start")} onStart={() => void act(() => api.startJob(j.id))} />}
-                    {a.confirm && <button onClick={() => void act(() => api.confirmJob(j.id))}>{t("act_confirm")}</button>}
+                    {a.start && <StartJobButton jobId={j.id} label={t("act_start")} disabled={old} onStart={() => void act(() => api.startJob(j.id), "order")} />}
+                    {a.confirm && <button disabled={old} onClick={() => void act(() => api.confirmJob(j.id), "order")}>{t("act_confirm")}</button>}
                     {a.pause && <button onClick={() => void act(() => api.pauseJob(j.id))}>{t("act_pause")}</button>}
-                    {a.resume && <button onClick={() => void act(() => api.resumeJob(j.id))}>{t("act_resume")}</button>}
-                    {a.cancel && <button onClick={() => void act(() => (isActive(j) ? api.stopMachine(j.machine) : api.cancelJob(j.id)))}>{isActive(j) ? t("act_stop") : t("act_cancel")}</button>}
+                    {a.resume && <button disabled={old} onClick={() => void act(() => api.resumeJob(j.id), "order")}>{t("act_resume")}</button>}
+                    {a.cancel && <button onClick={() => void act(() => (isActive(j) ? api.stopMachine(j.machine) : api.cancelJob(j.id)), isActive(j) ? "stop" : undefined)}>{isActive(j) ? t("act_stop") : t("act_cancel")}</button>}
                     {a.remove && (
                       <button className="danger" onClick={() => void act(() => api.deleteJob(j.id))}>
                         {t("act_delete")}
