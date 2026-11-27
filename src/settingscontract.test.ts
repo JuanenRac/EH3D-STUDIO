@@ -118,10 +118,10 @@ describe("the copy of the contract kept in Studio", () => {
     for (const s of COPY.settings) expect(ids, s.key).toContain(s.group);
   });
 
-  it("marks 19 keys as written by the policy and the rest as set in server.cfg", () => {
+  it("marks 20 keys as written by the policy and the rest as set in server.cfg", () => {
     const policy = COPY.settings.filter((s) => s.write.via === "policy");
-    expect(policy.length).toBe(19);
-    expect(COPY.settings.filter((s) => s.write.via === "file").length).toBe(COPY.settings.length - 19);
+    expect(policy.length).toBe(20);
+    expect(COPY.settings.filter((s) => s.write.via === "file").length).toBe(COPY.settings.length - 20);
     // none of the keys written through the API is a secret
     for (const s of policy) expect(s.secret, s.key).toBe(false);
   });
@@ -231,9 +231,9 @@ describe("who may change a setting", () => {
     expect(canWrite({ role: "admin" }, make({ key: "a", write: { via: "policy", method: null, path: null } }))).toBe(false);
   });
 
-  it("is the administrator for the 19 keys of the policy of the real contract and nobody for the other keys", () => {
+  it("is the administrator for the 20 keys of the policy of the real contract and nobody for the other keys", () => {
     const writable = COPY.settings.filter((s) => canWrite({ role: "admin" }, s));
-    expect(writable.length).toBe(19);
+    expect(writable.length).toBe(20);
     expect(COPY.settings.filter((s) => canWrite({ role: "operator" }, s))).toEqual([]);
   });
 });
