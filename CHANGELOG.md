@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Safety text corrected: the spindle is started when a G-code job goes on.** The server now starts the spindle the program had on, after the operator confirms the resume. The switch in Prepare is for the coolant only and its name and warning say so; the wait before the first move of a resumed job says that the machine goes back on its own and starts the spindle, also in the list of the jobs.
+- **The reason of a resume the server does not do stays on the page:** when "go on" is refused (`422 bad_request` of `resume-from`), the page of the job keeps the reason of the server and says what to do.
+- **The settings page has the five settings of the stop and the resume:** the copy of the contract holds 105 keys (`grbl_stop_wait_s`, `resume_safe_z_mm`, `resume_spindle_wait_s`, `resume_plunge_feed_mm_min` and `resume_position_tolerance_um`, with their texts in the eight languages), and the units millimetres and micrometres are written as `mm` and `µm`.
+
 ## [0.2.1] - New secrets for tokens, tokens limited to scopes and warnings of the pick-and-place nodes
 
 - **A token can get a new secret:** each row of the list of the tokens of the programs has a button that asks the server for a new secret (`POST /tokens/{id}/rotate`) after a confirmation that says the present one stops working at once; the name, role, scopes and expiry stay. The new secret is shown this once, and no other one can be asked for until it is put away. A token that has expired offers none. A refusal for the scopes or the expiry says what the request needs, and an answer that never comes says that the secret may have changed unseen. Six new tests, with the ones of the next line. Seen against a stand-in of the server only.

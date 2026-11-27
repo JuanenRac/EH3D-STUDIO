@@ -25,6 +25,7 @@ import {
   readLight,
   sameValue,
   shownValue,
+  unitText,
   unlistedSettings,
   valueOf,
   writeSetting,
@@ -161,7 +162,7 @@ export function ServerSettings({ embedded = EMBEDDED_CONTRACT }: { embedded?: Se
               aria-invalid={problem !== null}
               onChange={(e) => setDrafts({ ...drafts, [s.key]: e.target.value })}
             />
-            {s.unit && <span className="hint">{s.unit}</span>}
+            {s.unit && <span className="hint">{unitText(s.unit)}</span>}
             <button disabled={busy === s.key || typed === null || !typed.ok || sameValue(typed.value, current)} onClick={() => typed && typed.ok && ask(s, typed.value)}>
               {t("act_save")}
             </button>
@@ -208,7 +209,7 @@ export function ServerSettings({ embedded = EMBEDDED_CONTRACT }: { embedded?: Se
           {kind === "number" && typeof s.min === "number" && typeof s.max === "number" && (
             <div className="hint">
               {s.min}–{s.max}
-              {s.unit ? ` ${s.unit}` : ""}
+              {s.unit ? ` ${unitText(s.unit)}` : ""}
             </div>
           )}
           {kind === "list" && <div className="hint">{t("ssc_list_hint")}</div>}

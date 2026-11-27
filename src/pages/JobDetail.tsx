@@ -1,10 +1,12 @@
 /* One job on its own page: the plan with the holes already drilled, how far it has got, who did what and when, the tools, and the buttons that fit its state. */
+import { useState } from "react";
+import { ApiError } from "../api";
 import { useApp, usePolled } from "../context";
 import { Badge, Card, DangerButton, Empty, Progress } from "../components/ui";
 import { StartJobButton } from "../components/StartJob";
 import { PlanDownload, PlanView } from "../components/PlanView";
 import { took } from "../jobtools";
-import { canGoOn, duration, isActive, jobActions, jobKindKey, jobPercent, pauseKey, resumeLine, spindleFindingKey } from "../model";
+import { canGoOn, duration, isActive, jobActions, jobKindKey, jobPercent, pauseKey, resumeLine, resumeRefusal, spindleFindingKey } from "../model";
 import { ToolTable } from "./Prepare";
 import { JOB_TONE, stateKey } from "./Monitor";
 
@@ -15,6 +17,8 @@ function when(seconds: number | null): string {
 export function JobPage({ id }: { id: string }) {
   const { api, session, t, err, say, refreshS } = useApp();
   const { data: job, error, reload } = usePolled(() => api.job(id), refreshS || 3, [id]);
+  // why the server did not go on with this job by itself; it stays on the page, a notice that fades is not enough for it
+  const [refused, setRefused] = useState<{ id: string; reason: string } | null>(null);
   const act = async (what: () => Promise<unknown>, after?: () => void) => {
     try {
       await what();
@@ -66,7 +70,12 @@ export function JobPage({ id }: { id: string }) {
                 className="primary"
                 onClick={() =>
                   void act(async () => {
-                    const next = await api.resumeFrom(job.id);
+                    setRefused(null);
+                    const next = await api.resumeFrom(job.id).catch((e: unknown) => {
+                      const reason = e instanceof ApiError ? resumeRefusal(e.status, e.code, e.detail) : null;
+                      if (reason != null) setRefused({ id: job.id, reason });
+                      throw e;
+                    });
                     say(t("job_resumed_new"), "ok");
                     window.location.hash = `#/job/${encodeURIComponent(next.id)}`;
                   })
@@ -88,6 +97,11 @@ export function JobPage({ id }: { id: string }) {
         {job.message && <p className="warn">{job.message}</p>}
         {job.pause && <p className="warn">{t("job_waits_for", { what: t(pauseKey(job.pause), { tool: job.pause.tool ?? "" }) })}</p>}
         {canGoOn(job, session.role) && <p className="hint">{from != null ? t("job_resume_help", { line: from }) : t("job_go_on_help")}</p>}
+        {refused?.id === job.id && (
+          <p className="error" role="alert">
+            {t("job_resume_refused", { reason: refused.reason })}
+          </p>
+        )}
         {job.resumed_from && (
           <p className="hint">
             {t("job_goes_on_from")} <a href={`#/job/${encodeURIComponent(job.resumed_from)}`}>{job.resumed_from}</a>
