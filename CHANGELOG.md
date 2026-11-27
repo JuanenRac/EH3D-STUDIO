@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.2.3] - Answer the new questions of the server when a job resumes, and the spindle and drill settings
+
 - **Before the tool goes down into the work:** when a job that goes on after a stop waits with `pause.plunge`, its page and the monitor says that the head is over the point and that confirming takes the tool down, in the eight languages. Needs the server that asks it; not tried on a machine.
 - **Preparing a drilling job asks for the number format of a file that does not declare it:** a list beside the order of the holes sends `drill_format` to the server, with nothing chosen at first and the choice kept in the browser. When the server refuses a file for its format, the page says why and what to choose in the eight languages. The warning of a file read this way says it was read with the chosen format. 2 new tests; checked against a stand-in, not on a machine.
 
