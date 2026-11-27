@@ -114,6 +114,8 @@ export const JOB_KINDS: JobKind[] = ["drill", "route", "gcode"];
 export interface JobPause {
   kind: "tool_change" | "spindle_start" | "hold" | "resume" | string;
   tool?: number;
+  /** Identifies this question: a new one every time the job stops to ask. Sent back with the answer; a server of an earlier version does not give it. */
+  question?: string;
 }
 
 /** What `GET /jobs/:id/request` answers: the request of the job as it came, and where a stopped job goes on from (`null` for a job that did not stop). */

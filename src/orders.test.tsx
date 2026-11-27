@@ -75,6 +75,19 @@ describe("an order of a job is sent once", () => {
     expect(sent).toHaveLength(2);
   });
 
+  it("sends back the question that is on the screen, and nothing when the server gives none", async () => {
+    vi.useFakeTimers({ now: 1_000_000 });
+    const bodies: string[] = [];
+    const api = new Api("t", async (_input: string, init?: RequestInit) => {
+      bodies.push(String(init?.body));
+      return new Response("{}", { status: 200 });
+    });
+    await api.confirmJob("a", "q0a1b2c3");
+    await api.resumeJob("b", "q4d5e6f7");
+    await api.confirmJob("c");
+    expect(bodies.map((b) => JSON.parse(b))).toEqual([{ question: "q0a1b2c3" }, { question: "q4d5e6f7" }, {}]);
+  });
+
   it("frees an order the server refused at once", async () => {
     const { api, sent, answer } = counting(409);
     await expect(api.startJob("a")).rejects.toThrow("not_in_state");

@@ -91,7 +91,7 @@
   },
   {
     "code": "bad_gcode",
-    "description": "A line of the G-code program cannot be sent (control characters, a $ line that is not allowed, a line too long).",
+    "description": "A line of the G-code program cannot be sent or cannot be judged (control characters, a command of the controller, a $ line that is not allowed, a line too long or one that cannot be read for certain).",
     "status": 422
   },
   {
@@ -588,6 +588,16 @@
     "code": "project_quota",
     "description": "The project, the application or the store would pass its limit (project_max_mb, project_max_files, project_max_projects).",
     "status": 507
+  },
+  {
+    "code": "question_changed",
+    "description": "The question named in the answer is not the one the job asks now: read the job again.",
+    "status": 409
+  },
+  {
+    "code": "question_required",
+    "description": "The answer to a job names no question and the setting answer_needs_question asks for it.",
+    "status": 409
   },
   {
     "code": "queue_full",

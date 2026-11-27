@@ -61,13 +61,13 @@ export function JobPage({ id }: { id: string }) {
               <StartJobButton jobId={job.id} label={t("act_start")} disabled={old} onStart={() => void act(() => api.startJob(job.id), undefined, "order")} />
             )}
             {a.confirm && (
-              <button className="primary" disabled={old} onClick={() => void act(() => api.confirmJob(job.id), undefined, "order")}>
+              <button className="primary" disabled={old} onClick={() => void act(() => api.confirmJob(job.id, job.pause?.question), undefined, "order")}>
                 {t("act_confirm")}
               </button>
             )}
             {a.pause && <button onClick={() => void act(() => api.pauseJob(job.id))}>{t("act_pause")}</button>}
             {a.resume && (
-              <button className="primary" disabled={old} onClick={() => void act(() => api.resumeJob(job.id), undefined, "order")}>
+              <button className="primary" disabled={old} onClick={() => void act(() => api.resumeJob(job.id, job.pause?.question), undefined, "order")}>
                 {t("act_resume")}
               </button>
             )}

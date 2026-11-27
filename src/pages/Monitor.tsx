@@ -116,12 +116,12 @@ function NeedsYou({ jobs, old, onDone }: { jobs: import("../types").JobSummary[]
             </small>
           </div>
           {jobActions(j, session.role).resume && (
-            <button className="primary" disabled={old} onClick={() => void api.resumeJob(j.id).then(onDone, failed)}>
+            <button className="primary" disabled={old} onClick={() => void api.resumeJob(j.id, j.pause?.question).then(onDone, failed)}>
               {t("act_resume")}
             </button>
           )}
           {jobActions(j, session.role).confirm && (
-            <button className="primary" disabled={old} onClick={() => void api.confirmJob(j.id).then(onDone, failed)}>
+            <button className="primary" disabled={old} onClick={() => void api.confirmJob(j.id, j.pause?.question).then(onDone, failed)}>
               {t("act_confirm")}
             </button>
           )}
@@ -318,9 +318,9 @@ export function JobsPage() {
                   <td>{duration(j.estimate_s)}</td>
                   <td className="row-actions">
                     {a.start && <StartJobButton jobId={j.id} label={t("act_start")} disabled={old} onStart={() => void act(() => api.startJob(j.id), "order")} />}
-                    {a.confirm && <button disabled={old} onClick={() => void act(() => api.confirmJob(j.id), "order")}>{t("act_confirm")}</button>}
+                    {a.confirm && <button disabled={old} onClick={() => void act(() => api.confirmJob(j.id, j.pause?.question), "order")}>{t("act_confirm")}</button>}
                     {a.pause && <button onClick={() => void act(() => api.pauseJob(j.id))}>{t("act_pause")}</button>}
-                    {a.resume && <button disabled={old} onClick={() => void act(() => api.resumeJob(j.id), "order")}>{t("act_resume")}</button>}
+                    {a.resume && <button disabled={old} onClick={() => void act(() => api.resumeJob(j.id, j.pause?.question), "order")}>{t("act_resume")}</button>}
                     {a.cancel && <button onClick={() => void act(() => (isActive(j) ? api.stopMachine(j.machine) : api.cancelJob(j.id)), isActive(j) ? "stop" : undefined)}>{isActive(j) ? t("act_stop") : t("act_cancel")}</button>}
                     {a.remove && (
                       <button className="danger" onClick={() => void act(() => api.deleteJob(j.id))}>
