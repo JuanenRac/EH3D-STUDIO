@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { Api } from "./api";
+import { Api, ApiError } from "./api";
+import { errorText, LANGS, needsDrillFormat } from "./i18n";
 import { shouldAlert, titleFor } from "./attention";
 import {
   copyId,
@@ -33,6 +34,8 @@ import {
   totals,
   twoSteps,
   waitingJobs,
+  DRILL_FORMATS,
+  drillFormatOf,
 } from "./jobtools";
 import { PAGES, pagesFor, parseRoute } from "./model";
 import type { JobSummary } from "./types";
@@ -320,5 +323,28 @@ describe("the start button asks once more", () => {
     expect(second).toEqual({ armed: false, fire: true });
     // after firing it is disarmed again: the next touch asks again
     expect(twoSteps(second.armed)).toEqual({ armed: true, fire: false });
+  });
+});
+
+describe("the number format of a drilling file that declares none", () => {
+  it("goes with a drilling job only when a person chose one", () => {
+    expect(fileRequest("drill", "j", { ncd: "n" }, "", "mils")).toEqual({ kind: "drill", name: "j", files: { ncd: "n" }, drill_format: "mils" });
+    expect(fileRequest("drill", "j", { ncd: "n" }, "", "")).toEqual({ kind: "drill", name: "j", files: { ncd: "n" } });
+    expect(fileRequest("route", "j", { plt: "p" }, "", "mils")).toEqual({ kind: "route", name: "j", files: { plt: "p" } });
+    expect(drillFormatOf("inch-2.4-tz")).toBe("inch-2.4-tz");
+    expect(drillFormatOf("anything")).toBe("");
+    expect(drillFormatOf(null)).toBe("");
+  });
+
+  it("is asked for in the language of the person when the server refuses the file", () => {
+    const refused = new ApiError(422, "bad_ncd", "EH3D-FORMATS-014: line 3: the format is not declared (drill_format)");
+    expect(needsDrillFormat(refused)).toBe(true);
+    expect(needsDrillFormat(new ApiError(422, "bad_ncd", "line 3 is not a hole"))).toBe(false);
+    for (const lang of LANGS) {
+      const said = errorText(lang, refused);
+      for (const name of DRILL_FORMATS) expect(said).toContain(name);
+      expect(said).toContain("EH3D-FORMATS-014");
+    }
+    expect(errorText("es", refused)).toContain("Elija el formato");
   });
 });

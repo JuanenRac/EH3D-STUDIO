@@ -193,10 +193,19 @@ export function drillRequest(name: string, boardMm: number, tools: DrillToolInpu
 
 export type SourceFiles = Record<string, string>;
 
+/** The number formats the server takes for a drilling file that does not declare one (`drill_format`). None is chosen unless a person chooses it. */
+export const DRILL_FORMATS = ["mils", "inch-2.4-tz", "inch-2.4-lz", "metric-3.3-tz", "metric-3.3-lz"] as const;
+
+/** The chosen format as it was kept, or none when what was kept is not one of the formats. */
+export function drillFormatOf(kept: string | null): string {
+  return (DRILL_FORMATS as readonly string[]).includes(kept ?? "") ? (kept as string) : "";
+}
+
 /** The request for a job from files: the drilling file `.ncd` and its tool table `.dtd`, or the HP-GL file `.plt` and its tool table `.rtd`. */
-export function fileRequest(kind: "drill" | "route", name: string, files: SourceFiles, sorting?: string): JobRequest {
+export function fileRequest(kind: "drill" | "route", name: string, files: SourceFiles, sorting?: string, drillFormat?: string): JobRequest {
   const r: JobRequest = { kind, name, files };
   if (kind === "drill" && sorting && sorting !== "") r.sorting = sorting;
+  if (kind === "drill" && drillFormat && drillFormat !== "") r.drill_format = drillFormat;
   return r;
 }
 
