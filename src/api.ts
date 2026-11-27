@@ -168,13 +168,14 @@ export class Api {
   previewJob = (machine: string, request: unknown) => this.request<JobView>("POST", `/machines/${encodeURIComponent(machine)}/preview`, request, true);
   createJob = (machine: string, request: unknown) => this.request<Job>("POST", `/machines/${encodeURIComponent(machine)}/jobs`, request, true);
   startJob = (id: string) => this.once(`start ${id}`, () => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/start`, {}, true));
-  /** Confirm and resume answer the question a job waits at, so they share their key. */
-  confirmJob = (id: string) => this.once(`answer ${id}`, () => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/confirm`, {}));
+  /** Confirm and resume answer the question a job waits at, so they share their key. `question` is the one on the screen (`pause.question`): the server refuses the answer
+   *  when the job asks something else by then. */
+  confirmJob = (id: string, question?: string) => this.once(`answer ${id}`, () => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/confirm`, question ? { question } : {}));
   cancelJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/cancel`, {});
   deleteJob = (id: string) => this.request<unknown>("DELETE", `/jobs/${encodeURIComponent(id)}`);
   /** Hold a running G-code job (the controller holds its movement) and let it go on: the resume also answers the wait of a job that goes on after a stop. */
   pauseJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/pause`, {});
-  resumeJob = (id: string) => this.once(`answer ${id}`, () => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/resume`, {}));
+  resumeJob = (id: string, question?: string) => this.once(`answer ${id}`, () => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/resume`, question ? { question } : {}));
   /** What was asked of a job as it came, and where a stopped one should go on from (`next_skip`). */
   jobRequest = (id: string) => this.request<SavedRequest>("GET", `/jobs/${encodeURIComponent(id)}/request`);
   /** A new job, ready and not started, from the saved request of a cancelled or failed one with the work done left out: the file is not asked for again. */
