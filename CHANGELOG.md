@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The contract of the settings of the server is the current one:** it has `push_enabled` (notices on a phone, off by default) and `push_service_account_file`. No other change.
+
 ## [0.2.4] - The current settings contract of the server
 
 - **The contract of the settings of the server is the current one:** `answer_needs_question` is now on by default there (an answer to a job names its question, as this program already sends it). No other change.
