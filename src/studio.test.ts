@@ -394,6 +394,7 @@ describe("free G-code jobs, the GRBL connection, hold and resume", () => {
     expect(pauseKey({ kind: "hold" })).toBe("pause_hold");
     expect(pauseKey({ kind: "resume" })).toBe("pause_resume");
     expect(pauseKey({ kind: "resume", power_on: true })).toBe("pause_power_on");
+    expect(pauseKey({ kind: "resume", plunge: true })).toBe("pause_plunge");
     expect(pauseKey(null)).toBe("pause_other");
     expect(jobKindKey("gcode")).toBe("jobs_gcode");
     expect(jobKindKey("route")).toBe("jobs_route");
