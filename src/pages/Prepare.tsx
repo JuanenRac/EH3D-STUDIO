@@ -5,12 +5,33 @@ import { useApp, usePolled } from "../context";
 import { Badge, Card, Empty, Field } from "../components/ui";
 import { PlanDownload, PlanView } from "../components/PlanView";
 import { SummaryFacts } from "../components/StartJob";
-import { copyNames, defaultDrillTool, drillRequest, fileRequest, fileSlot, gcodeLineCount, gcodeRequest, keepProgram, keptProgram, kindOfFiles, nameFromFile, parseHoles, parseToolList, prepareRoute, toolColour, toolsUsed, withSkips } from "../jobtools";
+import { needsDrillFormat } from "../i18n";
+import { copyNames, defaultDrillTool, DRILL_FORMATS, drillFormatOf, drillRequest, fileRequest, fileSlot, gcodeLineCount, gcodeRequest, keepProgram, keptProgram, kindOfFiles, nameFromFile, parseHoles, parseToolList, prepareRoute, toolColour, toolsUsed, withSkips } from "../jobtools";
 import type { DrillToolInput, SourceFiles } from "../jobtools";
 import { duration, spindleFindingKey, takesJob } from "../model";
 import type { JobView } from "../types";
 
 type Source = "files" | "typed" | "gcode";
+
+/** The number format a person chose for the drilling files that declare none is kept in this browser. */
+const FORMAT_KEY = "eh3d-studio.drillFormat";
+
+function keptDrillFormat(): string {
+  try {
+    return drillFormatOf(localStorage.getItem(FORMAT_KEY));
+  } catch {
+    return "";
+  }
+}
+
+function keepDrillFormat(chosen: string) {
+  try {
+    if (chosen === "") localStorage.removeItem(FORMAT_KEY);
+    else localStorage.setItem(FORMAT_KEY, chosen);
+  } catch {
+    /* a browser that keeps nothing: the choice lasts until the page is closed */
+  }
+}
 
 /** `machineId` is what follows `prepare/` in the address: the machine, and for a G-code job that goes on, the line to start from and the job whose program was kept. */
 export function PreparePage({ machineId = "" }: { machineId?: string }) {
@@ -30,6 +51,9 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
   const [files, setFiles] = useState<SourceFiles>({});
   const [fileNames, setFileNames] = useState<string[]>([]);
   const [sorting, setSorting] = useState("");
+  const [drillFormat, setDrillFormat] = useState(keptDrillFormat);
+  // the server refused the files for their number format: it stays said by the list of formats until another one is chosen or other files are picked
+  const [formatNeeded, setFormatNeeded] = useState(false);
   const [boardMm, setBoardMm] = useState(1.6);
   const [typed, setTyped] = useState("");
   const [tools, setTools] = useState<Record<number, DrillToolInput>>({});
@@ -66,6 +90,7 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
     }
     setFiles(next);
     setFileNames(names);
+    setFormatNeeded(false);
     setView(null);
   };
 
@@ -78,7 +103,7 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
     if (off.bad.length > 0) return null;
     if (source === "files") {
       const kind = kindOfFiles(files);
-      return kind ? withSkips(fileRequest(kind, name.trim() || "job", files, sorting), off.tools, skipItems) : null;
+      return kind ? withSkips(fileRequest(kind, name.trim() || "job", files, sorting, drillFormat), off.tools, skipItems) : null;
     }
     if (parsed.holes.length === 0 || parsed.bad.length > 0) return null;
     return withSkips(
@@ -110,6 +135,7 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
       if (asked.current === mine) setView(planned);
     } catch (e) {
       setView(null);
+      if (needsDrillFormat(e)) setFormatNeeded(true);
       say(err(e), "error");
     } finally {
       setBusy(false);
@@ -128,6 +154,7 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
       say(copies > 1 ? t("prep_created_n", { n: copies }) : t("prep_created"), "ok");
       window.location.hash = copies === 1 && first?.id ? `#/job/${first.id}` : "#/jobs";
     } catch (e) {
+      if (needsDrillFormat(e)) setFormatNeeded(true);
       say(err(e), "error");
     } finally {
       setBusy(false);
@@ -234,6 +261,31 @@ export function PreparePage({ machineId = "" }: { machineId?: string }) {
                   ))}
                 </select>
               </Field>
+            )}
+            {kindOfFiles(files) === "drill" && (
+              <Field label={t("prep_drill_format")} hint={t("prep_drill_format_hint")}>
+                <select
+                  value={drillFormat}
+                  onChange={(e) => {
+                    setDrillFormat(e.target.value);
+                    keepDrillFormat(e.target.value);
+                    setFormatNeeded(false);
+                    setView(null);
+                  }}
+                >
+                  <option value="">{t("prep_drill_format_none")}</option>
+                  {DRILL_FORMATS.map((f) => (
+                    <option key={f} value={f}>
+                      {f}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            )}
+            {formatNeeded && (
+              <p className="error" role="alert">
+                {t("drill_format_needed")}
+              </p>
             )}
             {fileNames.length > 0 && (
               <p className="hint">
