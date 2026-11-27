@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Third-party notices:** the release archive carries `THIRD_PARTY_NOTICES` beside the pages, with the copyright notices and licence texts of the packages they are built with (`docs/THIRD_PARTY_NOTICES`, made by `tools/third_party_notices.py`). The CI fails when a package of the dependency tree is not listed.
+
 ## [0.2.3] - Answer the new questions of the server when a job resumes, and the spindle and drill settings
 
 - **Before the tool goes down into the work:** when a job that goes on after a stop waits with `pause.plunge`, its page and the monitor says that the head is over the point and that confirming takes the tool down, in the eight languages. Needs the server that asks it; not tried on a machine.
