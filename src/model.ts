@@ -258,7 +258,7 @@ export function jobKindKey(kind: string): "jobs_drill" | "jobs_route" | "jobs_gc
 }
 
 /** The text that says what a job waits for. */
-export function pauseKey(pause: JobPause | null | undefined): "pause_tool_change" | "pause_spindle_start" | "pause_hold" | "pause_resume" | "pause_power_on" | "pause_other" {
+export function pauseKey(pause: JobPause | null | undefined): "pause_tool_change" | "pause_spindle_start" | "pause_hold" | "pause_resume" | "pause_power_on" | "pause_plunge" | "pause_other" {
   switch (pause?.kind) {
     case "tool_change":
       return "pause_tool_change";
@@ -267,7 +267,7 @@ export function pauseKey(pause: JobPause | null | undefined): "pause_tool_change
     case "hold":
       return "pause_hold";
     case "resume":
-      return pause.power_on === true ? "pause_power_on" : "pause_resume";
+      return pause.power_on === true ? "pause_power_on" : pause.plunge === true ? "pause_plunge" : "pause_resume";
     default:
       return "pause_other";
   }

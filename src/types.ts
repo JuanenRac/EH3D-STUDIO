@@ -122,6 +122,8 @@ export interface JobPause {
   question?: string;
   /** A job that goes on after a stop waits a second time, before the spindle or the laser is switched on again (`kind` is still `resume`). */
   power_on?: boolean;
+  /** A job that goes on after a stop waits with the head over the point, before the tool goes down into the work (`kind` is still `resume`). */
+  plunge?: boolean;
 }
 
 /** What `GET /jobs/:id/request` answers: the request of the job as it came, and where a stopped job goes on from (`null` for a job that did not stop). */
