@@ -204,6 +204,15 @@ export function MachinesPage() {
                 </Field>
               </>
             )}
+            {form.m.connection.kind !== "node" && (
+              <Field label={t("mach_tool_head")} hint={t("mach_tool_head_hint")}>
+                <select value={form.m.tool_head ?? ""} onChange={(e) => set({ tool_head: e.target.value })}>
+                  <option value="">{t("mach_tool_head_unsaid")}</option>
+                  <option value="spindle">{t("mach_tool_head_spindle")}</option>
+                  <option value="laser">{t("mach_tool_head_laser")}</option>
+                </select>
+              </Field>
+            )}
           </div>
           {dollarSwitchShown(form.m.connection.kind, session.role) && (
             <label className="check-row">

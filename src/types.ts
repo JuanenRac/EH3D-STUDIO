@@ -59,6 +59,8 @@ export interface Machine {
   spindle_guard?: string;
   /** Whether the G-code jobs of this machine may carry the `$` lines of GRBL (off unless an administrator turned it on). */
   allow_dollar?: boolean;
+  /** What the machine carries for a G-code job: `laser`, `spindle` or empty when it is not said. */
+  tool_head?: string;
 }
 
 /** What is sent to create or change a machine; an empty node token keeps the stored one. */
@@ -104,6 +106,8 @@ export interface MachineInput {
   cfg: string;
   /** The safety switch of the `$` lines of GRBL; only an administrator may send it, and an update that leaves it out keeps it. */
   allow_dollar?: boolean;
+  /** What the machine carries for a G-code job: `laser`, `spindle` or empty when it is not said. */
+  tool_head?: string;
 }
 
 /** What a job is: a drilling job, a routing job, or the free G-code program of a GRBL machine or of the simulator. */
@@ -116,6 +120,8 @@ export interface JobPause {
   tool?: number;
   /** Identifies this question: a new one every time the job stops to ask. Sent back with the answer; a server of an earlier version does not give it. */
   question?: string;
+  /** A job that goes on after a stop waits a second time, before the spindle or the laser is switched on again (`kind` is still `resume`). */
+  power_on?: boolean;
 }
 
 /** What `GET /jobs/:id/request` answers: the request of the job as it came, and where a stopped job goes on from (`null` for a job that did not stop). */

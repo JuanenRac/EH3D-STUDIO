@@ -393,6 +393,7 @@ describe("free G-code jobs, the GRBL connection, hold and resume", () => {
     expect(pauseKey({ kind: "spindle_start" })).toBe("pause_spindle_start");
     expect(pauseKey({ kind: "hold" })).toBe("pause_hold");
     expect(pauseKey({ kind: "resume" })).toBe("pause_resume");
+    expect(pauseKey({ kind: "resume", power_on: true })).toBe("pause_power_on");
     expect(pauseKey(null)).toBe("pause_other");
     expect(jobKindKey("gcode")).toBe("jobs_gcode");
     expect(jobKindKey("route")).toBe("jobs_route");
@@ -495,6 +496,7 @@ describe("going on from a stopped job and the $ lines of GRBL", () => {
     const m: Machine = { id: "g1", name: "Router", model: "ccd-mtc", station: "", connection: { kind: "grbl", address: "COM3", token_set: false, port: "COM3", baud: 115200 }, dcf: "", rcf: "", cfg: "" };
     expect(toInput(m).allow_dollar).toBe(false);
     expect(toInput({ ...m, allow_dollar: true }).allow_dollar).toBe(true);
+    expect(toInput({ ...m, tool_head: "laser" }).tool_head).toBe("laser");
     expect(emptyMachine().allow_dollar).toBeFalsy();
   });
 
