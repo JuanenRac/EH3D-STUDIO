@@ -4,6 +4,7 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **The settings of the server have the new `grbl_spindle_stop_on_pause`** (off: a pause of a GRBL machine also stops the spindle and the coolant), with its label and help from the contract of the server. Not tried on a machine.
 - **Confirm and Resume answer the question on the screen (safety):** they send back its identifier (`pause.question` of the job), and a server that asks something else by then refuses the answer (`409 question_changed`) instead of taking it as the answer to a question nobody has read. The settings page has the new setting `answer_needs_question` of the server (106 keys). A server of an earlier version is answered as before.
 
 ## [0.2.2] - Orders are sent once, buttons rest without a connection and the new stop and resume of the server
