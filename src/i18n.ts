@@ -73,9 +73,16 @@ export function stopErrorText(lang: Lang, e: unknown): string {
   return lost ? text(lang, "stop_not_sent") : errorText(lang, e);
 }
 
+/** True when the server refused a drilling file because it does not declare how its numbers are written (or the chosen format does not fit it). */
+export function needsDrillFormat(e: unknown): boolean {
+  return e instanceof ApiError && e.code === "bad_ncd" && e.detail.includes("EH3D-FORMATS-014");
+}
+
 /** The refusal of the server (or of the network) as a sentence in the language of the person. Codes that are not known say what the server said. */
 export function errorText(lang: Lang, e: unknown): string {
   if (!(e instanceof ApiError)) return e instanceof Error ? e.message : String(e);
+  // the server words how to choose in English only: the page says it in the language of the person
+  if (needsDrillFormat(e)) return `${text(lang, "drill_format_needed")} (EH3D-FORMATS-014)`;
   const key = `err_${e.code}` as TextKey;
   if (key in ROWS) return text(lang, key) + (e.detail && e.code !== "unreachable" && e.code !== "timeout" ? ` (${e.detail})` : "");
   return e.detail ? `${e.code}: ${e.detail}` : e.code;
