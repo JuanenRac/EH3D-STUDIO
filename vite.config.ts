@@ -11,6 +11,15 @@ const studioVersion = () => ({
   },
 });
 
+// The notices of the packages the pages are built with travel beside them (tools/third_party_notices.py makes the file).
+const thirdPartyNotices = () => ({
+  name: "eh3d-studio-notices",
+  generateBundle() {
+    const source = readFileSync(new URL("./docs/THIRD_PARTY_NOTICES", import.meta.url), "utf8");
+    this.emitFile({ type: "asset", fileName: "THIRD_PARTY_NOTICES", source });
+  },
+});
+
 // While developing, the pages are served by Vite and the API of the server is reached through it (`EH3D_SERVER` names the server).
 const server = process.env.EH3D_SERVER ?? "http://127.0.0.1:18200";
 
@@ -19,7 +28,7 @@ const packageVersion = (JSON.parse(readFileSync(new URL("./package.json", import
 
 export default defineConfig({
   define: { __STUDIO_VERSION__: JSON.stringify(packageVersion) },
-  plugins: [react(), studioVersion()],
+  plugins: [react(), studioVersion(), thirdPartyNotices()],
   server: {
     host: "127.0.0.1",
     port: 5188,

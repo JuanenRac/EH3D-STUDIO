@@ -98,6 +98,7 @@ jobs:
         run: |
           set -euo pipefail
           version=$(python3 -c "import json;print(json.load(open('eh3d.project.json'))['version'])")
+          cmp docs/THIRD_PARTY_NOTICES dist/THIRD_PARTY_NOTICES
           mkdir -p out
           tar -czf "out/eh3d-studio-${version}.tar.gz" -C dist .
           (cd out && sha256sum "eh3d-studio-${version}.tar.gz" > "eh3d-studio-${version}.tar.gz.sha256")
