@@ -7,6 +7,9 @@ All notable changes to this project are documented here.
 - **The second question before the spindle or the laser goes on:** a job that goes on after a stop and waits with `pause.power_on` says so on its page and on the monitor, and the form of a machine has the tool for G-code jobs (spindle, laser or not said), in the eight languages. It needs a server with that question.
 
 - **Confirm and Resume answer the question on the screen (safety):** they send back its identifier (`pause.question` of the job), and a server that asks something else by then refuses the answer (`409 question_changed`) instead of taking it as the answer to a question nobody has read. The settings page has the new setting `answer_needs_question` of the server (106 keys). A server of an earlier version is answered as before.
+
+## [0.2.2] - Orders are sent once, buttons rest without a connection and the new stop and resume of the server
+
 - **An order that sets a machine going is sent once (safety):** a double click on Confirm could answer the next question of the machine (the spindle start after a tool change) before anybody had read it. Start, confirm, resume and "go on" are not sent again while on their way and for a second after the server takes them, and the second click of a double click no longer answers "Sure?" nor releases the latch of a machine.
 - **Nothing is started or let go from old data:** when the server stops answering, Start, Confirm, Resume and "go on" are off on the page of a job, the list of jobs and the overview, and the page says why. The stop stays at hand.
 - **No answer is not told as a plain failure:** an order with no answer says that it may have arrived and the machine may be moving; a stop that did not get there says that it has NOT reached the server.
