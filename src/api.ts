@@ -26,7 +26,11 @@ export const DEFAULT_TIMEOUTS: Timeouts = { normal: 15000, health: 5000, long: 6
 /** How long a stop refused by an ended login stays valid to be sent again after the next login. */
 export const STOP_RESEND_WINDOW_MS = 120_000;
 
+/** How long after a taken order of a job the same order is not sent again: the second click of a double click must not answer the next question of the machine. */
+export const ORDER_HOLD_MS = 1000;
+
 export class Api {
+  private orders = new Map<string, { answer: Promise<unknown>; until: number | null }>();
   /** The login token of this person (kept by the application, never by this class). */
   token: string | null;
   private fetcher: Fetcher;
@@ -87,6 +91,24 @@ export class Api {
     return data as T;
   }
 
+  /** Sends an order that moves a machine once: while it is on its way, and for ORDER_HOLD_MS after the server took it, asking again gives the same answer and sends nothing. A refused or lost one is free again. */
+  private once<T>(key: string, send: () => Promise<T>): Promise<T> {
+    const held = this.orders.get(key);
+    if (held && (held.until === null || Date.now() < held.until)) return held.answer as Promise<T>;
+    const answer = send();
+    const entry: { answer: Promise<unknown>; until: number | null } = { answer, until: null };
+    this.orders.set(key, entry);
+    answer.then(
+      () => {
+        entry.until = Date.now() + ORDER_HOLD_MS;
+      },
+      () => {
+        if (this.orders.get(key) === entry) this.orders.delete(key);
+      },
+    );
+    return answer;
+  }
+
   // ---- who is who
   health = () => this.request<Health>("GET", "/health");
   setupNeeded = async () => (await this.request<{ needed: boolean }>("GET", "/setup")).needed;
@@ -145,18 +167,19 @@ export class Api {
   job = (id: string) => this.request<Job>("GET", `/jobs/${encodeURIComponent(id)}`);
   previewJob = (machine: string, request: unknown) => this.request<JobView>("POST", `/machines/${encodeURIComponent(machine)}/preview`, request, true);
   createJob = (machine: string, request: unknown) => this.request<Job>("POST", `/machines/${encodeURIComponent(machine)}/jobs`, request, true);
-  startJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/start`, {}, true);
-  confirmJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/confirm`, {});
+  startJob = (id: string) => this.once(`start ${id}`, () => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/start`, {}, true));
+  /** Confirm and resume answer the question a job waits at, so they share their key. */
+  confirmJob = (id: string) => this.once(`answer ${id}`, () => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/confirm`, {}));
   cancelJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/cancel`, {});
   deleteJob = (id: string) => this.request<unknown>("DELETE", `/jobs/${encodeURIComponent(id)}`);
   /** Hold a running G-code job (the controller holds its movement) and let it go on: the resume also answers the wait of a job that goes on after a stop. */
   pauseJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/pause`, {});
-  resumeJob = (id: string) => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/resume`, {});
+  resumeJob = (id: string) => this.once(`answer ${id}`, () => this.request<unknown>("POST", `/jobs/${encodeURIComponent(id)}/resume`, {}));
   /** What was asked of a job as it came, and where a stopped one should go on from (`next_skip`). */
   jobRequest = (id: string) => this.request<SavedRequest>("GET", `/jobs/${encodeURIComponent(id)}/request`);
   /** A new job, ready and not started, from the saved request of a cancelled or failed one with the work done left out: the file is not asked for again. */
   resumeFrom = (id: string, change: { skip?: number; skip_tools?: number[]; restore_outputs?: boolean; name?: string } = {}) =>
-    this.request<Job>("POST", `/jobs/${encodeURIComponent(id)}/resume-from`, change, true);
+    this.once(`go-on ${id} ${JSON.stringify(change)}`, () => this.request<Job>("POST", `/jobs/${encodeURIComponent(id)}/resume-from`, change, true));
 
   // ---- the node of the drill head, through the server
   headStatus = (machine: string) => this.request<HeadStatus>("GET", `/machines/${encodeURIComponent(machine)}/head/status`);

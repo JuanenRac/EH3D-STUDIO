@@ -48,6 +48,14 @@ The tab **Printers** (`src/components/Printers.tsx`, rules and client in `src/se
 
 Every job of the queue carries `toolpath_sha256`, the hash of what it will do, and `authorization` (who, when and for which hash). The queue shows the short hash and a badge (not authorized, authorized, or out of date when the hash changed after the authorization); the full hash and who authorized it are in the detail of the job. A person with the scope `jobs:authorize` (operator or above) authorizes a queued job with `POST /work/jobs/{id}/authorize` and a second touch, and the start sends the same hash (`POST /work/jobs/{id}/start` with `{"toolpath_sha256"}`), so the server refuses with `409 stale_authorization` a job that is no longer the one that was shown. After `stale_authorization` or `authorization_required` (while `work_require_authorization` is on) the job opens with its present hash; `pnp_node_not_ready` says that a node of the machine is not ready. A job without a hash starts with an empty body, as before.
 
+## Orders that set a machine going
+
+- Start, confirm, resume and "go on" are sent once: the same order is not sent again while it is on its way, nor for a second after the server takes it. A stop is never held back.
+- The second click of a double click does not answer "Sure?", does not start from the summary and does not release the latch of a machine.
+- While the last request for a job or for the list failed, Start, Confirm, Resume and "go on" are off. The stop stays.
+- An order with no answer (or a 502 or 504) says that it may have arrived; a stop that did not get there says that it has not reached the server.
+- A G-code program the server refuses (`422 bad_gcode`) is shown with the line and the reason of the server.
+
 ## Roles
 
 A viewer sees; an operator prepares, starts, holds and cancels; an administrator also manages the machines of the plugins.

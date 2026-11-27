@@ -12,6 +12,7 @@ import type { FeedEvent } from "../services/events";
 import { whenText } from "../services/format";
 import { problemOfDetail } from "../services/atc";
 import { ApiError } from "../api";
+import { stopErrorText } from "../i18n";
 import {
   NEEDS_CONFIRMATION,
   WORK_TONE,
@@ -436,7 +437,7 @@ function NewJob({
 // ---- plugins and machines
 
 function MachinesCard({ machines, plugins, reload }: { machines: WorkMachineInfo[] | null; plugins: { kind: string; title: string; manages_machines: boolean; capabilities: Record<string, unknown> }[] | null; reload: () => void }) {
-  const { t, err, say } = useApp();
+  const { lang, t, err, say } = useApp();
   const sv = useServices();
   const admin = sv.allowed("machines.manage");
   const [id, setId] = useState("");
@@ -468,7 +469,8 @@ function MachinesCard({ machines, plugins, reload }: { machines: WorkMachineInfo
       await sv.work.cancel(job);
       reload();
     } catch (e) {
-      say(err(e), "error");
+      say(stopErrorText(lang, e), "error");
+      err(e);
     }
   };
   /** The emergency stop: at once, with no question, and the machine is asked again either way, because it may have latched. */
@@ -477,7 +479,8 @@ function MachinesCard({ machines, plugins, reload }: { machines: WorkMachineInfo
       await sv.work.emergencyStop(m.id, m.plugin, m.job);
       say(t("wk_estop_done"), "ok");
     } catch (e) {
-      say(err(e), "error");
+      say(stopErrorText(lang, e), "error");
+      err(e);
     } finally {
       reload();
     }
@@ -554,7 +557,7 @@ function MachinesCard({ machines, plugins, reload }: { machines: WorkMachineInfo
                             {t("act_estop")}
                           </button>
                         )}
-                        {acts.includes("release") && <DangerButton label={t("act_release")} onConfirm={() => void release(m)} />}
+                        {acts.includes("release") && <DangerButton deliberate label={t("act_release")} onConfirm={() => void release(m)} />}
                         {m.job && !acts.includes("emergency_stop") && sv.allowed("jobs.cancel") && <DangerButton label={t("act_stop")} onConfirm={() => void stop(m.job!)} />}
                         {admin && plugins?.find((p) => p.kind === m.plugin)?.manages_machines && <DangerButton label={t("act_delete")} disabled={m.state === "busy"} onConfirm={() => void remove(m.id)} />}
                       </div>

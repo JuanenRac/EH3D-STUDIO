@@ -57,6 +57,22 @@ export function text(lang: Lang, key: TextKey, vars?: Record<string, string | nu
   return s;
 }
 
+/** True when nothing says whether the order got to the server: no answer, or a gateway that lost it. */
+export function mayHaveArrived(e: unknown): boolean {
+  return e instanceof ApiError && (e.status === 0 || e.status === 502 || e.status === 504);
+}
+
+/** What to say when an order to start or to go on fails: with no answer, the machine may be moving. */
+export function orderErrorText(lang: Lang, e: unknown): string {
+  return mayHaveArrived(e) ? text(lang, "cmd_unanswered") : errorText(lang, e);
+}
+
+/** What to say when a stop fails: with no answer (or a server that failed, or an ended login) the machine was NOT stopped as far as anybody knows. */
+export function stopErrorText(lang: Lang, e: unknown): string {
+  const lost = !(e instanceof ApiError) || e.status === 0 || e.status === 401 || e.status >= 500;
+  return lost ? text(lang, "stop_not_sent") : errorText(lang, e);
+}
+
 /** The refusal of the server (or of the network) as a sentence in the language of the person. Codes that are not known say what the server said. */
 export function errorText(lang: Lang, e: unknown): string {
   if (!(e instanceof ApiError)) return e instanceof Error ? e.message : String(e);

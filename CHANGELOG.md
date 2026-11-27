@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **An order that sets a machine going is sent once (safety):** a double click on Confirm could answer the next question of the machine (the spindle start after a tool change) before anybody had read it. Start, confirm, resume and "go on" are not sent again while on their way and for a second after the server takes them, and the second click of a double click no longer answers "Sure?" nor releases the latch of a machine.
+- **Nothing is started or let go from old data:** when the server stops answering, Start, Confirm, Resume and "go on" are off on the page of a job, the list of jobs and the overview, and the page says why. The stop stays at hand.
+- **No answer is not told as a plain failure:** an order with no answer says that it may have arrived and the machine may be moving; a stop that did not get there says that it has NOT reached the server.
+- **A refused G-code program is explained as the server now judges it** (`422 bad_gcode`: a line that cannot be sent or cannot be judged for certain), with the line and the reason of the server.
+- **A plan that comes back late is not shown** for the files or the machine chosen since.
+
 - **Safety text corrected: the spindle is started when a G-code job goes on.** The server now starts the spindle the program had on, after the operator confirms the resume. The switch in Prepare is for the coolant only and its name and warning say so; the wait before the first move of a resumed job says that the machine goes back on its own and starts the spindle, also in the list of the jobs.
 - **The reason of a resume the server does not do stays on the page:** when "go on" is refused (`422 bad_request` of `resume-from`), the page of the job keeps the reason of the server and says what to do.
 - **The settings page has the five settings of the stop and the resume:** the copy of the contract holds 105 keys (`grbl_stop_wait_s`, `resume_safe_z_mm`, `resume_spindle_wait_s`, `resume_plunge_feed_mm_min` and `resume_position_tolerance_um`, with their texts in the eight languages), and the units millimetres and micrometres are written as `mm` and `µm`.
