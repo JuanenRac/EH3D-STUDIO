@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+## [0.2.4] - The current settings contract of the server
+
 - **The contract of the settings of the server is the current one:** `answer_needs_question` is now on by default there (an answer to a job names its question, as this program already sends it). No other change.
 
 - **Third-party notices:** the release archive carries `THIRD_PARTY_NOTICES` beside the pages, with the copyright notices and licence texts of the packages they are built with (`docs/THIRD_PARTY_NOTICES`, made by `tools/third_party_notices.py`). The CI fails when a package of the dependency tree is not listed.
