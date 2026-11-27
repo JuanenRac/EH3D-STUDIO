@@ -278,6 +278,11 @@ export function resumeLine(j: { kind: string; state: JobState; line?: number }):
   return j.kind === "gcode" && (j.state === "failed" || j.state === "cancelled") && (j.line ?? 0) > 0 ? (j.line ?? 0) : null;
 }
 
+/** What the server says about why it does not go on with a stopped job by itself (`422 bad_request` of `resume-from`): the reason, or null for any other refusal. */
+export function resumeRefusal(status: number, code: string, detail: string): string | null {
+  return status === 422 && code === "bad_request" && detail.trim() !== "" ? detail.trim() : null;
+}
+
 // ---- the updates of the installed services
 
 /** The components that have a newer release than the one installed. */

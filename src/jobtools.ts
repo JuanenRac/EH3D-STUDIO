@@ -88,7 +88,7 @@ export function withSkips(r: JobRequest, skipTools: number[], skip: number): Job
   return out;
 }
 
-/** The request of a free G-code program. `skip` is how many lines of the text are already done (a job that goes on after a stop); `restoreOutputs` starts the spindle and the coolant again when it goes on, and is off unless asked. */
+/** The request of a free G-code program. `skip` is how many lines of the text are already done (a job that goes on after a stop); `restoreOutputs` turns the coolant on again when it goes on and is off unless asked. The spindle does not depend on it: the server starts the one the program had on, after the operator confirms. */
 export function gcodeRequest(name: string, gcode: string, skip = 0, restoreOutputs = false): JobRequest {
   const r: JobRequest = { kind: "gcode", name, gcode };
   if (Number.isFinite(skip) && skip > 0) r.skip = Math.floor(skip);

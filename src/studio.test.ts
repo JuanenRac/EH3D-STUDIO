@@ -36,8 +36,11 @@ import {
   validAddress,
   validName,
   validPassword,
+  resumeRefusal,
 } from "./model";
 import { ROWS } from "./texts";
+import { unitText } from "./services/settingscontract";
+import { readFileSync } from "node:fs";
 import type { Fleet, JobSummary, Machine } from "./types";
 import { describeEvent, stateKey } from "./pages/Monitor";
 import { SERVER_SETTINGS } from "./pages/Configure";
@@ -568,5 +571,37 @@ describe("the updates page", () => {
     expect(studioReplaced({ state: "updating", steps: done })).toBe(false);
     expect(studioReplaced({ state: "done", steps: [{ id: "server.install", state: "done" }] })).toBe(false);
     expect(studioReplaced({ state: "done" })).toBe(false);
+  });
+});
+
+describe("going on after a stop, as the server does it", () => {
+  const copy = JSON.parse(readFileSync(new URL("./data/settings-contract.json", import.meta.url), "utf-8")) as {
+    settings: { key: string; unit?: string; label: Record<string, string>; help: Record<string, string>; warning: Record<string, string> }[];
+  };
+
+  it("has the five settings of the stop and the resume with their texts in the eight languages", () => {
+    for (const key of ["grbl_stop_wait_s", "resume_safe_z_mm", "resume_spindle_wait_s", "resume_plunge_feed_mm_min", "resume_position_tolerance_um"]) {
+      const s = copy.settings.find((x) => x.key === key);
+      expect(s, key).toBeDefined();
+      for (const lang of ["en", "es", "de", "fr", "it", "ja", "zh", "pt"]) {
+        for (const field of [s?.label, s?.help, s?.warning]) expect(field?.[lang], `${key} ${lang}`).toBeTruthy();
+      }
+    }
+  });
+
+  it("knows how to write every unit of the contract", () => {
+    const written = ["", "days", "gigabytes", "hours", "kilobytes", "lines", "megabytes", "mm", "µm", "mm/min", "places", "seconds"];
+    for (const s of copy.settings) expect(written, `${s.key}: ${s.unit}`).toContain(unitText(s.unit));
+    expect(unitText("millimetres")).toBe("mm");
+    expect(unitText("micrometres")).toBe("µm");
+    expect(unitText(undefined)).toBe("");
+  });
+
+  it("keeps the reason of a resume that the server does not do by itself, and only that one", () => {
+    expect(resumeRefusal(422, "bad_request", " the stop of the machine was not confirmed ")).toBe("the stop of the machine was not confirmed");
+    expect(resumeRefusal(422, "bad_request", "  ")).toBeNull();
+    expect(resumeRefusal(422, "no_work", "every hole is done")).toBeNull();
+    expect(resumeRefusal(409, "not_stopped", "the job is running")).toBeNull();
+    for (const lang of LANGS) expect(text(lang, "job_resume_refused", { reason: "G91" })).toContain("G91");
   });
 });

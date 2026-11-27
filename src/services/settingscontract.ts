@@ -486,3 +486,10 @@ export async function loadContract(read: () => Promise<unknown>, embedded: Setti
     return { contract: embedded, source: "embedded", values: {}, serverVersion: null, why: code };
   }
 }
+
+/** The unit of a setting as it is written next to a number: a length is shown with its international symbol; any other unit as the contract writes it. */
+export function unitText(unit: string | undefined): string {
+  if (unit === "millimetres") return "mm";
+  if (unit === "micrometres") return "µm";
+  return unit ?? "";
+}
