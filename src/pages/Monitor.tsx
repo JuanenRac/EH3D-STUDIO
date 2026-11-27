@@ -304,7 +304,7 @@ export function JobsPage() {
                     </a>
                     <small>{t(jobKindKey(j.kind))}</small>
                     {j.message && <small className="warn">{j.message}</small>}
-                    {j.pause?.kind === "resume" && <small className="warn">{t("pause_resume")}</small>}
+                    {j.pause?.kind === "resume" && <small className="warn">{t(pauseKey(j.pause))}</small>}
                   </td>
                   <td>{j.machine}</td>
                   <td>
