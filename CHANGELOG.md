@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+- **Pages of the `pcb`, `laser` and `cad` plugins** in Machines and jobs: their machines, example requests that fill the form of the queue (nothing is sent from the page) and the verdict, figures and issues of each job's report. A test fire of a laser stays a job that is prepared and then started. 5 new tests; checked against the simulated server only.
+- **The attachments of an `.eh3d` project can be looked at** from Projects: the file is read in the browser and sent nowhere; text and pictures are shown (never HTML or SVG), a link is only written out, anything else is saved as a copy, and what can run asks first. The content is checked against its SHA-256 on a page served over HTTPS. 5 new tests; not tried with a project of a real design.
+- **Picking a machine no longer throws away a request already typed** for a kind that machine takes (the tool changer editor's request was replaced by the template).
 - **The contract of the settings of the server is the current one:** it has `push_enabled` (notices on a phone, off by default) and `push_service_account_file`. No other change.
 
 ## [0.2.4] - The current settings contract of the server

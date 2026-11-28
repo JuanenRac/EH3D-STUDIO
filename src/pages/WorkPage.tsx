@@ -6,6 +6,8 @@ import { Badge, Card, DangerButton, Empty, Field, Progress, StartButton } from "
 import { AtcEditor, problemText } from "../components/AtcEditor";
 import { useFeed, useServices } from "../services/context";
 import { PnpNodesCard } from "../components/PnpNodes";
+import { PluginStations } from "../components/PluginStations";
+import { STATION_PLUGINS, keepRequest } from "../services/stations";
 import { PrintersCard } from "../components/Printers";
 import { EMPTY_FEED, affects, eventLine, feedReducer, matchesFeed } from "../services/events";
 import type { FeedEvent } from "../services/events";
@@ -40,8 +42,8 @@ import { WORK_STATES } from "../services/types";
 import type { WorkJob, WorkJobSummary, WorkMachineInfo, WorkNotification, WorkState } from "../services/types";
 import type { TextKey } from "../i18n";
 
-const TABS = ["queue", "machines", "nodes", "printers", "live", "atc", "notices"] as const;
-const TAB_TEXT: Record<(typeof TABS)[number], TextKey> = { queue: "nav_jobs", machines: "ov_machines", nodes: "pnp_tab", printers: "pr_tab", live: "nav_live", atc: "atc_title", notices: "wk_tab_notices" };
+const TABS = ["queue", "machines", "pcb", "laser", "cad", "nodes", "printers", "live", "atc", "notices"] as const;
+const TAB_TEXT: Record<(typeof TABS)[number], TextKey> = { queue: "nav_jobs", machines: "ov_machines", pcb: "st_tab_pcb", laser: "st_tab_laser", cad: "st_tab_cad", nodes: "pnp_tab", printers: "pr_tab", live: "nav_live", atc: "atc_title", notices: "wk_tab_notices" };
 const AUTH_TEXT: Record<"waiting" | "authorized" | "stale", TextKey> = { waiting: "wk_auth_waiting", authorized: "wk_auth_done", stale: "wk_auth_stale" };
 const STATE_TEXT: Record<WorkState, TextKey> = { queued: "wk_st_queued", running: "job_running", paused: "wk_st_paused", done: "job_done", failed: "job_failed", cancelled: "job_cancelled" };
 type Tab = (typeof TABS)[number];
@@ -52,6 +54,8 @@ export function WorkPage({ route }: { route: string }) {
   const sv = useServices();
   const [tab, setTab] = useState<Tab>((TABS as readonly string[]).includes(route) ? (route as Tab) : "queue");
   const [request, setRequest] = useState(requestTemplate(["demo"]));
+  // the machine a page of a plugin chose for the form of the queue
+  const [picked, setPicked] = useState("");
   const [notes, setNotes] = useState<WorkNotification[] | null>(null);
   const machines = usePolled(() => sv.work.machines(), refreshS);
   const plugins = usePolled(() => sv.work.plugins(), 0);
@@ -138,10 +142,26 @@ export function WorkPage({ route }: { route: string }) {
         {tab === "queue" && (
           <>
             <QueueCard jobs={jobs.data?.items ?? null} machines={machines.data ?? []} reload={reloadAll} />
-            {sv.allowed("jobs.prepare") && <NewJob machines={machines.data ?? []} plugins={plugins.data ?? []} request={request} setRequest={setRequest} reload={reloadAll} />}
+            {sv.allowed("jobs.prepare") && <NewJob machines={machines.data ?? []} plugins={plugins.data ?? []} picked={picked} request={request} setRequest={setRequest} reload={reloadAll} />}
           </>
         )}
         {tab === "machines" && <MachinesCard machines={machines.data ?? null} plugins={plugins.data ?? null} reload={reloadAll} />}
+        {STATION_PLUGINS.map(
+          (p) =>
+            tab === p && (
+              <PluginStations
+                key={p}
+                plugin={p}
+                machines={machines.data ?? []}
+                jobs={jobs.data?.items ?? []}
+                onUse={(m, x) => {
+                  setPicked(m);
+                  setRequest(x);
+                  setTab("queue");
+                }}
+              />
+            ),
+        )}
         {tab === "nodes" && <PnpNodesCard machines={(machines.data ?? []).filter((m) => m.plugin === "pnp")} />}
         {tab === "printers" && <PrintersCard />}
         {tab === "live" && <LiveCard events={feed.events} total={feed.total} resyncs={feed.resyncs} status={feedState} machines={(machines.data ?? []).map((m) => m.id)} onClear={() => feedDispatch({ type: "clear" })} />}
@@ -344,19 +364,21 @@ function QueueCard({ jobs, machines, reload }: { jobs: WorkJobSummary[] | null; 
 function NewJob({
   machines,
   plugins,
+  picked,
   request,
   setRequest,
   reload,
 }: {
   machines: { id: string; name: string; plugin: string; capabilities?: Record<string, unknown> }[];
   plugins: { kind: string; title: string }[];
+  picked: string;
   request: string;
   setRequest: (s: string) => void;
   reload: () => void;
 }) {
   const { t, err, say } = useApp();
   const sv = useServices();
-  const [machine, setMachine] = useState("");
+  const [machine, setMachine] = useState(picked);
   const [name, setName] = useState("");
   const [problem, setProblem] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -365,7 +387,8 @@ function NewJob({
   const pick = (id: string) => {
     setMachine(id);
     const m = machines.find((x) => x.id === id);
-    if (m) setRequest(requestTemplate(requestKinds(m.capabilities)));
+    // a request already typed for a kind this machine takes (an example of a plugin page, the tool changer editor) stays
+    if (m && !keepRequest(request, requestKinds(m.capabilities))) setRequest(requestTemplate(requestKinds(m.capabilities)));
   };
 
   const prepare = async () => {
