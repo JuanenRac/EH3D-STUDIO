@@ -1,5 +1,6 @@
 /* The explorer of the project store: the projects of an application, the tree of the files with their versions, the lock, the import and export of the `.eh3dproj` container,
  * and a preview of what a file holds. The tag (`If-Match`) of every write is handled here from the list the person saw; a refusal of 412, 428 or 423 is a warning with a way out. */
+import { Eh3dAttachments } from "../components/Eh3dAttachments";
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import type { Dispatch as ReactDispatch } from "react";
 import { useApp } from "../context";
@@ -275,6 +276,7 @@ export function ProjectsPage({ route }: { route: string }) {
             storeApp={app}
           />
         )}
+        <Eh3dAttachments />
       </div>
     </div>
   );
