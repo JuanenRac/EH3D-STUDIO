@@ -126,7 +126,7 @@ export function safeName(name: string): string {
   const clean = name
     // eslint-disable-next-line no-control-regex
     .replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202e\u2060-\u2069\ufeff<>:"/\\|?*]/g, "_")
-    .replace(/^[\s.\-]+|[\s.]+$/g, "")
+    .replace(/^[\s.-]+|[\s.]+$/g, "")
     .slice(0, 150);
   if (clean === "" || /^(con|prn|aux|nul|com\d|lpt\d)(\..*)?$/i.test(clean)) return "attachment";
   return clean;
