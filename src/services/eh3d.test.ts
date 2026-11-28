@@ -109,7 +109,7 @@ describe("the attachments of an .eh3d project", () => {
     expect(safeName("../..\\etc/passwd")).toBe("_.._etc_passwd");
     expect(safeName("-rf")).toBe("rf");
     expect(safeName("CON.txt")).toBe("attachment");
-    expect(safeName("a‮gpj.exe")).toBe("a_gpj.exe");
+    expect(safeName("a\u202egpj.exe")).toBe("a_gpj.exe");
     expect(safeName("...")).toBe("attachment");
     expect(pictureType(new Uint8Array([0x89, 0x50, 0x4e, 0x47]))).toBe("image/png");
     expect(pictureType(bytes("<svg onload=alert(1)>"))).toBeNull();
